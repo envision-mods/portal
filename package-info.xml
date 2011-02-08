@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>EnvisionPortal:EnvisionPortal</id>
+	<name>Envision Portal</name>
+	<version>1.0</version>
+	<type>modification</type>
+
+	<install for="2.0 RC4, 2.0 RC5">
+		<readme type="file" parsebbc="true">ep_install/install.txt</readme>
+		<modification format="xml" type="file">ep_install/install.xml</modification>
+		<require-dir name="ep_extra" destination="$boarddir" />
+		<require-dir name="ep_source" destination="$sourcedir" />
+		<require-dir name="ep_css" destination="$themedir/css" />
+		<require-dir name="ep_languages" destination="$languagedir" />
+		<require-dir name="ep_scripts" destination="$themedir/scripts" />
+		<require-dir name="ep_template" destination="$themedir" />
+		<require-dir name="ep_images" destination="$imagesdir/images" />
+		<redirect url="?action=admin;area=corefeatures#js_feature_ep" />
+		<database>ep_install/install.php</database>
+	</install>
+	<uninstall for="2.0 RC4, 2.0 RC5">
+		<readme type="file" parsebbc="true">ep_uninstall/uninstall.txt</readme>
+		<modification format="xml" type="file" reverse="true">ep_install/install.xml</modification>
+		<database>ep_uninstall/uninstall.php</database>
+		<code>ep_uninstall/uninstall-required.php</code>
+		<remove-dir name="$sourcedir/ep_source" />
+		<remove-dir name="$themedir/ep_template" />
+		<remove-dir name="$imagesdir/ep_images" />
+		<remove-dir name="$languagedir/ep_language" />
+		<remove-dir name="$themedir/css/ep_css" />
+		<remove-dir name="$themedir/scripts/ep_scripts" />
+		<remove-dir name="$boarddir/ep_extra" />
+	</uninstall>
+
+</package-info>
