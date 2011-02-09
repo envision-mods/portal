@@ -41,13 +41,13 @@ function loadGeneralSettingParameters3($subActions = array(), $defaultAction = '
 	isAllowedTo('admin_forum');
 
 	// Language Files needed, load EnvisionModules 1st so that it can't overwrite any default Envision Strings.
-	loadLanguage('ep_languages/EnvisionModules+EnvisionHelp+ManageEnvisionModules+ManageSettings');
+	loadLanguage('ep_languages/EnvisionModules+ep_languages/EnvisionHelp+ep_languages/ManageEnvisionModules+ManageSettings');
 
 	// Will need the utility functions from here.
-	require_once($sourcedir . '/ep_source/ManageServer.php');
+	require_once($sourcedir . '/ManageServer.php');
 
 	// load the template and the style sheet needed
-	loadTemplate('ep_template/ManageEnvisionModules', 'envisionportal');
+	loadTemplate('ep_template/ManageEnvisionModules', 'ep_css/envisionportal');
 
 	$restrictedNames = $context['ep_restricted_names'];
 
@@ -265,8 +265,8 @@ function ManageEnvisionModules()
 
 	$context['html_headers'] .= '
 	<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/epManMods.js"></script>
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/epAdmin.js"></script>
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_man_mods.js"></script>
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
 	<script type="text/javascript">
 		var dlpIdPos = "' . $_SESSION['dlpIepos'] . '";
 		var sessVar = "' . $context['session_var'] . '";
