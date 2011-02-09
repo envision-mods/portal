@@ -1,0 +1,263 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+	<id>EnvisionPortal:EnvisionPortal</id>
+	<version>1.1 DEV</version>
+
+	<file name="$boarddir/index.php">
+		<operation>
+			<search position="before"><![CDATA[require_once($sourcedir . '/Security.php');]]></search>
+			<add><![CDATA[
+// START - EnvisionPortal
+require_once($sourcedir . '/ep_source/EnvisionPortal.php');
+// END - EnvisionPortal]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[// Is the forum in maintenance mode? (doesn't apply to administrators.)]]></search>
+			<add><![CDATA[// START - EnvisionPortal
+	ep_init();
+// END - EnvisionPortal
+	]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance, $sourcedir;]]></search>
+			<add><![CDATA[	global $context, $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance, $sourcedir;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		// Action and board are both empty... BoardIndex!
+		if (empty($board) && empty($topic))
+		{
+			require_once($sourcedir . '/BoardIndex.php');
+			return 'BoardIndex';
+		}]]></search>
+			<add><![CDATA[
+		// Envision Pages.
+		if (!empty($_REQUEST['page']))
+			if ($modSettings['ep_pages_mode'] == 1)
+				return 'envisionPages';
+
+		// Action and board are both empty... BoardIndex!
+		if (empty($board) && empty($topic))
+		{
+			// Display Portal?
+			if (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view'))
+				return 'ep_main';
+			// Otherwise, Board Index!
+			else
+			{
+				require_once($sourcedir . '/BoardIndex.php');
+				return 'BoardIndex';
+			}
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA['findmember' => array('Subs-Auth.php', 'JSMembers'),]]></search>
+			<add><![CDATA[
+		'forum' => array('BoardIndex.php', 'BoardIndex'),]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA['editpoll' => array('Poll.php', 'EditPoll'),]]></search>
+			<add><![CDATA['envision' => array('EnvisionPortal.php', 'envisionActions'),
+		'envisionFiles' => array('EnvisionPortal.php', 'envisionFiles'),
+		]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA['verificationcode']]></search>
+			<add><![CDATA[, 'envision', 'envisionFiles']]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[// Fall through to the board index then...]]></search>
+			<add><![CDATA[// Load up the forum layout.
+		ep_init('forum');
+
+		]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[// Otherwise, it was set - so let's go to that action.]]></search>
+			<add><![CDATA[if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin' && isset($_GET['area']) && $_GET['area'] == 'epmodules' && isset($_GET['sa'])) && ($_GET['sa'] == 'epaddlayout' || $_GET['sa'] == 'epaddlayout2' || $_GET['sa'] == 'epeditlayout' || $_GET['sa'] == 'epeditlayout2'))
+		$context['smf_actions'] = array_keys($actionArray);
+
+	]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Load.php">
+		<operation>
+			<search position="before"><![CDATA[Wireless+index+Modifications]]></search>
+			<add><![CDATA[+ep_languages/EnvisionPortal]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[array('Modifications]]></search>
+			<add><![CDATA[+EnvisionPortal]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$context['template_layers'] = array('html', 'body');]]></search>
+			<add><![CDATA[
+
+		if (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view'))
+		{
+			if (!loadLanguage('ep_languages/EnvisionPortal'))
+				loadLanguage('ep_languages/EnvisionPortal');
+
+			loadTemplate('ep_template/EnvisionPortal', 'envisionportal');
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[	// Is post moderation alive and well?]]></search>
+			<add><![CDATA[	// Shall we reveal... our envision?
+	$modSettings['ep_portal_mode'] = isset($modSettings['admin_features']) ? in_array('ep', explode(',', $modSettings['admin_features'])) : false;
+
+]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/ManageSettings.php">
+		<operation>
+			<search position="after"><![CDATA[		// k = karma.]]></search>
+			<add><![CDATA[		// ep = Envision Portal
+		'ep' => array(
+			'url' => 'action=admin;area=epmodules',
+		),
+]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Recent.php">
+		<operation>
+			<search position="replace"><![CDATA[
+				'url' => $scripturl . '#c' . (int) $_REQUEST['c'],]]></search>
+			<add><![CDATA[
+				'url' => $scripturl . '?action=forum#c' . (int) $_REQUEST['c'],]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+				'href' => $scripturl . '#c' . $row['id_cat'],
+				'link' => '<a href="' . $scripturl . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>']]></search>
+			<add><![CDATA[
+				'href' => $scripturl . '?action=forum#c' . $row['id_cat'],
+				'link' => '<a href="' . $scripturl . '?action=forum#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>']]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+			'url' => $scripturl . '#c' . (int) $_REQUEST['c'][0],]]></search>
+			<add><![CDATA[
+			'url' => $scripturl . '?action=forum#c' . (int) $_REQUEST['c'][0],]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Subs.php">
+		<operation>
+			<search position="replace"><![CDATA[	global $context, $modSettings, $user_info, $txt, $scripturl;]]></search>
+			<add><![CDATA[	global $context, $modSettings, $user_info, $txt, $scripturl, $sourcedir;]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$topic || $board]]></search>
+			<add><![CDATA[ || !empty($_GET['page'])]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[// Don't update for every page - this isn't wholly accurate but who cares.]]></search>
+			<add><![CDATA[
+		if (!empty($_GET['page']))
+			if (!empty($_SESSION['last_page_id']) && $_SESSION['last_page_id'] == $_GET['page'])
+				$force = false;
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	// Default to home.
+	$current_action = 'home';]]></search>
+			<add><![CDATA[
+	// Default to forum index.
+	$current_action = (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view')) ? 'forum' : 'home';]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[// Now we put the buttons in the context so the theme can use them.]]></search>
+			<add><![CDATA[if (!empty($modSettings['ep_portal_mode']))
+			$buttons = load_envision_menu($buttons);
+
+		]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	if (isset($context['menu_buttons'][$context['current_action']]))
+		$current_action = $context['current_action'];]]></search>
+			<add><![CDATA[
+	if (isset($context['menu_buttons'][$context['current_action']]))
+		$current_action = $context['current_action'];
+	elseif (empty($context['current_action']) && empty($_GET['board']) && empty($_GET['topic']))
+		$current_action = 'home';]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[$context['menu_buttons'] = $menu_buttons;]]></search>
+			<add><![CDATA[$context['menu_buttons'] = $menu_buttons;
+
+	if (!isset($context['user']['unread_messages']))
+		return;]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Subs-BoardIndex.php">
+		<operation>
+			<search position="replace"><![CDATA[
+					'href' => $scripturl . '#c' . $row_board['id_cat'],]]></search>
+			<add><![CDATA[
+					'href' => $scripturl . '?action=forum#c' . $row_board['id_cat'],]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Who.php">
+		<operation>
+			<search position="after"><![CDATA[// Sort out... the column sorting.]]></search>
+			<add><![CDATA[if (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view'))
+	{
+		loadLanguage('ep_languages/EnvisionPortal');
+		$txt['who_index'] = $txt['ep_who_portal'];
+		$txt['whoall_forum'] = $txt['ep_who_forum'];
+	}
+
+	]]></add>
+		</operation>
+	</file>
+
+	<file name="$boarddir/SSI.php">
+		<operation>
+			<search position="before"><![CDATA[require_once($sourcedir . '/Security.php');]]></search>
+			<add><![CDATA[
+require_once($sourcedir . '/ep_source/EnvisionPortal.php');
+require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/ManagePermissions.php">
+		<operation>
+			<search position="before"><![CDATA[loadLanguage('ManagePermissions+ManageMembers]]></search>
+			<add><![CDATA[+ep_languages/EnvisionPermissions]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[// All permission groups that will be shown in the left column on classic view.]]></search>
+			<add><![CDATA[$ep_ = array(
+		'membergroup' => array(
+			'ep_view' => array(false, 'ep_', 'ep_'),
+		),
+	);
+
+	$permissionList['membergroup'] = array_merge($ep_['membergroup'], $permissionList['membergroup']);
+	]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA['profile_identity_own',]]></search> <!-- Restricted group -->
+			<add><![CDATA[
+		'ep_view',]]></add>
+		</operation>
+
+	</file>
+
+	<file name="$themedir/scripts/script.js">
+		<operation>
+			<search position="replace"><![CDATA['#c']]></search>
+			<add><![CDATA['?action=forum#c']]></add>
+		</operation>
+	</file>
+
+</modification>
