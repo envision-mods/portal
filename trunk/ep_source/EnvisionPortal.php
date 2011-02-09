@@ -36,7 +36,7 @@ function ep_init($init_action = '')
 
 	// Software Version.
 	// !!!Revise this on each commit!
-	$portal_ver = '1.0 DEV r9';
+	$portal_ver = '1.0 DEV r10';
 
 	// Unallowed Envision names.
 	$envision_names = array('announce', 'usercp', 'stats', 'online', 'news', 'topics', 'posts', 'search', 'calendar', 'poll', 'top_posters', 'theme_select', 'new_members', 'staff', 'sitemenu', 'shoutbox', 'custom');
@@ -67,21 +67,21 @@ function ep_init($init_action = '')
 		loadLanguage('ep_languages/EnvisionPortal');
 
 	// Images. :D
-	$context['ep_icon_url'] = $boardurl . '/envisionportal/module_icons/';
-	$context['epmod_image_url'] = $boardurl . '/envisionportal/module_images/';
-	$context['epadmin_image_url'] = $boardurl . '/envisionportal/images/admin';
+	$context['ep_icon_url'] = $boardurl . '/ep_extra/module_icons/';
+	$context['epmod_image_url'] = $boardurl . '/ep_extra/module_images/';
+	$context['epadmin_image_url'] = $boardurl . '/ep_extra/images/admin';
 
 	// Files and Modules
-	$context['epmod_files_url'] = $boardurl . '/envisionportal/module_files/';
-	$context['epmod_files_dir'] = $boarddir . '/envisionportal/module_files/';
-	$context['epmod_modules_dir'] = $boarddir . '/envisionportal/modules';
+	$context['epmod_files_url'] = $boardurl . '/ep_extra/module_files/';
+	$context['epmod_files_dir'] = $boarddir . '/ep_extra/module_files/';
+	$context['epmod_modules_dir'] = $boarddir . '/ep_extra/modules';
 
 	// This is changeable from the Envision Admin -> Configuration -> Module Settings area, so we need to load up the correct filepath that is in there.
 	$context['epmod_icon_url'] = $boardurl . '/' . $modSettings['ep_icon_directory'] . '/';
 	$context['epmod_icon_dir'] = $boarddir . '/' . $modSettings['ep_icon_directory'] . '/';
 
 	// Templates
-	$context['epmod_template'] = $boarddir . '/envisionportal/module_templates/';
+	$context['epmod_template'] = $boarddir . '/ep_extra/module_templates/';
 
 	// Is Envision Portal disabled? Can you view it?
 	if (empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))
@@ -204,7 +204,7 @@ function ep_init($init_action = '')
 		// Include the JS file for everything.
 		if (!empty($context['has_ep_layout']))
 			$context['html_headers'] .= '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/envisionportal.js"></script>
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/envisionportal.js"></script>
 	<style type="text/css">
 		#envision_container
 		{
