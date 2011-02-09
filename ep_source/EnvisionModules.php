@@ -55,7 +55,7 @@ function module_usercp()
 	global $context, $txt, $scripturl, $settings, $user_info;
 
 	// Only display this info if we are logged in.
-	if ($user_info['is_logged'])
+	if (!$user_info['is_guest'])
 	{
 		// Set the logout variable.
 		$logout = sprintf($scripturl . '?action=logout;%1$s=%2$s', $context['session_var'], $context['session_id']);
@@ -546,7 +546,7 @@ function module_online($params)
 		if (!empty($show_online))
 		{
 			$online_info .= '<ul class="ep_list ep_paddingleft">';
-			foreach($show_online as $option => $type)
+			foreach ($show_online as $option => $type)
 			{
 				$type = (int) $type;
 
@@ -1831,7 +1831,7 @@ function module_shoutbox($params)
 			echo '
 			<div id="shoutbox_floating_message_', $message_position, '">', $message, '</div>';
 
-		if ($user_info['is_logged'])
+		if (!$user_info['is_guest'])
 		{
 			LoadSmilies();
 
@@ -1840,9 +1840,9 @@ function module_shoutbox($params)
 				<input name="ep_Reserved_Message" id="shout_input', $unique_id, '" maxlength="', $max_chars, '" type="text" value="" style="width: 90%;" tabindex="', $context['tabindex']++, '" />
 				<br class="clear" /><div style="padding-bottom: 3px;"></div>
 				<input name="shout_submit" value="', $txt['shoutbox_shout'], '" class="button_submit" type="submit" tabindex="', $context['tabindex']++, '" />
-					<img src="', $context['epmod_image_url'], 'shoutbox/emoticon_smile.png" alt="" title="', $txt['shoutbox_emoticons'], '" style="cursor: pointer;" id="toggle_smileys_div', $unique_id, '" />
-					<img src="', $context['epmod_image_url'], 'shoutbox/font.png" alt="" title="', $txt['shoutbox_fonts'], '" style="cursor: pointer;" id="toggle_font_styles_div', $unique_id, '" />
-					<img src="', $context['epmod_image_url'], 'shoutbox/clock.png" alt="" title="', $txt['shoutbox_history'], '" style="cursor: pointer;" id="toggle_history_div', $unique_id, '" />
+					<img src="', $context['epmod_image_url'], 'shoutbox/emoticon_smile.png" alt="" title="', $txt['shoutbox_emoticons'], '" class="hand" id="toggle_smileys_div', $unique_id, '" />
+					<img src="', $context['epmod_image_url'], 'shoutbox/font.png" alt="" title="', $txt['shoutbox_fonts'], '" class="hand" id="toggle_font_styles_div', $unique_id, '" />
+					<img src="', $context['epmod_image_url'], 'shoutbox/clock.png" alt="" title="', $txt['shoutbox_history'], '" class="hand" id="toggle_history_div', $unique_id, '" />
 					<div class="shout_smileys" id="shout_smileys', $unique_id, '">';
 
 			if (empty($context['smileys']))

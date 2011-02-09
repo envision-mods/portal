@@ -262,7 +262,7 @@ function can_moderate_shoutbox($name = '', $value = '')
 		// Check if they are able to moderate the shouts. Power-hungry, eh, guys? :P
 		$mod_any_shouts = count(array_intersect($user_info['groups'], $mod_groups)) >= 1 || $mod_groups_str == '-3' ? true : false;
 	}
-	elseif($name == 'mod_own')
+	elseif ($name == 'mod_own')
 	{
 		$mod_own_str = loadParameter(array(), 'list_groups', $value);
 		$mod_own = explode(',', $mod_own_str);
@@ -582,7 +582,7 @@ function ep_shoutbox_history($params)
 	);
 
 	// Now that we have all the options, create the list.
-	require_once($sourcedir . '/ep_source/Subs-List.php');
+	require_once($sourcedir . '/Subs-List.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -1251,7 +1251,7 @@ function ep_whosOnline()
 {
 	global $user_info, $txt, $sourcedir, $settings, $modSettings;
 
-	require_once($sourcedir . '/ep_source/Subs-MembersOnline.php');
+	require_once($sourcedir . '/Subs-MembersOnline.php');
 	$membersOnlineOptions = array(
 		'show_hidden' => allowedTo('moderate_forum'),
 		'sort' => 'log_time',
@@ -1303,7 +1303,7 @@ function ep_calendar_getinfo($calData, $today, $calOptions, $curCalInfo, $rtl)
 	$i = 0;
 	$calCount = count($calData);
 
-	foreach($calData as $key => $value)
+	foreach ($calData as $key => $value)
 	{
 		if ($i == 0)
 		{
@@ -1332,7 +1332,7 @@ function ep_calendar_getinfo($calData, $today, $calOptions, $curCalInfo, $rtl)
 	// Are we showing events/holidays/birthdays?
 	if (!empty($curCalInfo['show_options']))
 	{
-		foreach($curCalInfo['show_options'] as $opt => $type)
+		foreach ($curCalInfo['show_options'] as $opt => $type)
 		{
 			$type = (int) $type;
 
@@ -1358,7 +1358,7 @@ function ep_calendar_getinfo($calData, $today, $calOptions, $curCalInfo, $rtl)
 	}
 
 	// Still need this file for birthdays and events ONLY!
-	require_once($sourcedir . '/ep_source/Subs-Calendar.php');
+	require_once($sourcedir . '/Subs-Calendar.php');
 
 	// Hitting the database 3 times MAX here no matter how many months/years, that's all she wrote!
 	$calEvents = array(
@@ -1369,7 +1369,7 @@ function ep_calendar_getinfo($calData, $today, $calOptions, $curCalInfo, $rtl)
 
 	// Now pass it to the function to get all of the months we need!
 	$yearMonthInfo = array();
-	foreach($calData as $key => $month)
+	foreach ($calData as $key => $month)
 		$yearMonthInfo[$calData[$key]['year']][$calData[$key]['month']] = ep_calendar_GetMonthData($calData[$key]['month'], $calData[$key]['year'], $calOptions, $calEvents);
 
 	return $yearMonthInfo;

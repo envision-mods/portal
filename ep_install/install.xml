@@ -89,7 +89,7 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 		</operation>
 		<operation>
 			<search position="before"><![CDATA[array('Modifications]]></search>
-			<add><![CDATA[+EnvisionPortal]]></add>
+			<add><![CDATA[+ep_languages/EnvisionPortal]]></add>
 		</operation>
 		<operation>
 			<search position="before"><![CDATA[$context['template_layers'] = array('html', 'body');]]></search>
@@ -100,7 +100,7 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 			if (!loadLanguage('ep_languages/EnvisionPortal'))
 				loadLanguage('ep_languages/EnvisionPortal');
 
-			loadTemplate('ep_template/EnvisionPortal', 'envisionportal');
+			loadTemplate('ep_template/EnvisionPortal', 'ep_cssenvisionportal');
 		}]]></add>
 		</operation>
 		<operation>
