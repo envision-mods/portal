@@ -1487,7 +1487,7 @@ function module_theme_selector()
 	global $context, $smcFunc, $txt, $scripturl, $boardurl, $modSettings, $user_info, $settings;
 
 	// We need our themes language here.
-	loadLanguage('Themes');
+	loadLanguage('ep_languages/Themes');
 
 	// What theme are we currently using?
 	$cur_theme = isset($_GET['theme']) ? $_GET['theme'] : $user_info['theme'];

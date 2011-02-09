@@ -82,19 +82,10 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Admin.php">
-		<operation>
-			<search position="before"><![CDATA[
-	loadLanguage('Admin');]]></search>
-			<add><![CDATA[
-	loadLanguage('EnvisionPortal');]]></add>
-		</operation>
-	</file>
-
 	<file name="$sourcedir/Load.php">
 		<operation>
 			<search position="before"><![CDATA[Wireless+index+Modifications]]></search>
-			<add><![CDATA[+EnvisionPortal]]></add>
+			<add><![CDATA[+ep_languages/EnvisionPortal]]></add>
 		</operation>
 		<operation>
 			<search position="before"><![CDATA[array('Modifications]]></search>
@@ -106,10 +97,10 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 
 		if (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view'))
 		{
-			if (!loadLanguage('EnvisionPortal'))
-				loadLanguage('EnvisionPortal');
+			if (!loadLanguage('ep_languages/EnvisionPortal'))
+				loadLanguage('ep_languages/EnvisionPortal');
 
-			loadTemplate('EnvisionPortal', 'envisionportal');
+			loadTemplate('ep_template/EnvisionPortal', 'envisionportal');
 		}]]></add>
 		</operation>
 		<operation>
@@ -124,7 +115,7 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 	<file name="$sourcedir/ManageSettings.php">
 		<operation>
 			<search position="after"><![CDATA[		// k = karma.]]></search>
-			<add><![CDATA[		// ep = Envision Portal - What Envisions Are Made Of!
+			<add><![CDATA[		// ep = Envision Portal
 		'ep' => array(
 			'url' => 'action=admin;area=epmodules',
 		),
@@ -220,19 +211,10 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 			<search position="after"><![CDATA[// Sort out... the column sorting.]]></search>
 			<add><![CDATA[if (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view'))
 	{
-		loadLanguage('EnvisionPortal');
+		loadLanguage('ep_languages/EnvisionPortal');
 		$txt['who_index'] = $txt['ep_who_portal'];
 		$txt['whoall_forum'] = $txt['ep_who_forum'];
 	}
-
-	]]></add>
-		</operation>
-	</file>
-
-	<file name="$sourcedir/Help.php">
-		<operation>
-			<search position="after"><![CDATA[// Permission specific help?]]></search>
-			<add><![CDATA[loadLanguage('EnvisionModules+EnvisionHelp+EnvisionPermissions');
 
 	]]></add>
 		</operation>
@@ -242,15 +224,15 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 		<operation>
 			<search position="before"><![CDATA[require_once($sourcedir . '/Security.php');]]></search>
 			<add><![CDATA[
-require_once($sourcedir . '/EnvisionPortal.php');
-require_once($sourcedir . '/Subs-EnvisionPortal.php');]]></add>
+require_once($sourcedir . '/ep_source/EnvisionPortal.php');
+require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');]]></add>
 		</operation>
 	</file>
 
 	<file name="$sourcedir/ManagePermissions.php">
 		<operation>
 			<search position="before"><![CDATA[loadLanguage('ManagePermissions+ManageMembers]]></search>
-			<add><![CDATA[+EnvisionPermissions]]></add>
+			<add><![CDATA[+ep_languages/EnvisionPermissions]]></add>
 		</operation>
 		<operation>
 			<search position="after"><![CDATA[// All permission groups that will be shown in the left column on classic view.]]></search>

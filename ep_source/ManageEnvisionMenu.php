@@ -34,8 +34,8 @@ function Menu()
 {
 	global $context, $txt;
 
-	loadTemplate('ManageEnvisionMenu');
-	loadLanguage('ManageEnvisionMenu');
+	loadTemplate('ep_template/ManageEnvisionMenu');
+	loadLanguage('ep_languages/ManageEnvisionMenu');
 
 	$subActions = array(
 		'epmanmenu' => 'ManageEnvisionMenu',
@@ -109,7 +109,7 @@ function ManageEnvisionMenu()
 		redirectexit('action=admin;area=epmenu');
 	}
 
-	loadLanguage('ManageBoards');
+	loadLanguage('ep_languages/ManageBoards');
 
 	// Our options for our list.
 	$listOptions = array(
@@ -263,7 +263,7 @@ function ManageEnvisionMenu()
 		),
 	);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/ep_source/Subs-List.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -378,7 +378,7 @@ function SaveButton()
 			$context['error_title'] = empty($id) ? 'ep_envision_menu_errors_create' : 'ep_envision_menu_errors_modify';
 
 			// Needed for ListGroups()
-			require_once($sourcedir . '/ManageEnvisionModules.php');
+			require_once($sourcedir . '/ep_source/ManageEnvisionModules.php');
 
 			$context['button_data'] = array(
 				'name' => $name,
@@ -409,7 +409,7 @@ function PrepareContext()
 	setupMenuContext();
 
 	// Needed for ListGroups()
-	require_once($sourcedir . '/ManageEnvisionModules.php');
+	require_once($sourcedir . '/ep_source/ManageEnvisionModules.php');
 
 	if (isset($_GET['bid']))
 	{

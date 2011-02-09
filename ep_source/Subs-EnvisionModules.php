@@ -229,7 +229,7 @@ function ep_shoutbox($request, $get_value)
 		);
 	}
 
-	loadTemplate('Xml');
+	loadTemplate('ep_template/Xml');
 	$context['sub_template'] = 'generic_xml';
 	$xml_data = array(
 		'items' => array(
@@ -253,7 +253,7 @@ function can_moderate_shoutbox($name = '', $value = '')
 	$mod_own_shouts = false;
 	$mod_any_shouts = false;
 
-	require_once($sourcedir . '/Subs-EnvisionPortal.php');
+	require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
 
 	if ($name == 'mod_groups')
 	{
@@ -434,7 +434,7 @@ function LoadShoutBBC()
 	global $context, $txt;
 
 	// These strings are stright from the post files...
-	loadLanguage('Post');
+	loadLanguage('ep_languages/Post');
 
 	// The below array makes it dead easy to add images to this control. Add it to the array and everything else is done for you!
 	$context['ep_bbc_tags'] = array();
@@ -582,7 +582,7 @@ function ep_shoutbox_history($params)
 	);
 
 	// Now that we have all the options, create the list.
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/ep_source/Subs-List.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -695,8 +695,8 @@ function ep_boardNews($board, $limit)
 {
 	global $scripturl, $smcFunc, $modSettings;
 
-	if (!loadLanguage('Stats'))
-		loadLanguage('Stats');
+	if (!loadLanguage('ep_languages/Stats'))
+		loadLanguage('ep_languages/Stats');
 
 	$request = $smcFunc['db_query']('', '
 		SELECT b.id_board
@@ -1251,7 +1251,7 @@ function ep_whosOnline()
 {
 	global $user_info, $txt, $sourcedir, $settings, $modSettings;
 
-	require_once($sourcedir . '/Subs-MembersOnline.php');
+	require_once($sourcedir . '/ep_source/Subs-MembersOnline.php');
 	$membersOnlineOptions = array(
 		'show_hidden' => allowedTo('moderate_forum'),
 		'sort' => 'log_time',
@@ -1358,7 +1358,7 @@ function ep_calendar_getinfo($calData, $today, $calOptions, $curCalInfo, $rtl)
 	}
 
 	// Still need this file for birthdays and events ONLY!
-	require_once($sourcedir . '/Subs-Calendar.php');
+	require_once($sourcedir . '/ep_source/Subs-Calendar.php');
 
 	// Hitting the database 3 times MAX here no matter how many months/years, that's all she wrote!
 	$calEvents = array(

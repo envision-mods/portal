@@ -40,13 +40,13 @@ function loadGeneralSettingParameters($subActions = array(), $defaultAction = ''
 	// You need to be an admin to edit settings!
 	isAllowedTo('admin_forum');
 
-	loadLanguage('EnvisionHelp');
-	loadLanguage('ManageSettings');
-	loadLanguage('ManageEnvisionSettings');
-	loadTemplate('ManageEnvisionSettings');
+	loadLanguage('ep_languages/EnvisionHelp');
+	loadLanguage('ep_languages/ManageSettings');
+	loadLanguage('ep_languages/ManageEnvisionSettings');
+	loadTemplate('ep_template/ManageEnvisionSettings');
 
 	// Will need the utility functions from here.
-	require_once($sourcedir . '/ManageServer.php');
+	require_once($sourcedir . '/ep_source/ManageServer.php');
 
 	$context['sub_template'] = 'show_settings';
 
@@ -106,7 +106,7 @@ function EnvisionPortalInfo()
 	global $context, $txt, $scripturl, $sourcedir, $modSettings, $settings, $portal_ver;
 
 	// Needed to get forum admins. (temporary placeholder)
-	require_once($sourcedir . '/Subs-Membergroups.php');
+	require_once($sourcedir . '/ep_source/Subs-Membergroups.php');
 
 	if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 	{

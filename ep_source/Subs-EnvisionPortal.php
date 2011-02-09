@@ -857,7 +857,7 @@ function createFile(&$fileOptions)
 		if (!empty($fileOptions['strict']))
 			move_uploaded_file($fileOptions['tmp_name'], $fileOptions['destination']);
 
-		require_once($sourcedir . '/Subs-Graphics.php');
+		require_once($sourcedir . '/ep_source/Subs-Graphics.php');
 		if (createThumbnail($fileOptions['destination'], $fileOptions['resizeWidth'], $fileOptions['resizeHeight']))
 		{
 			// Strict?
@@ -2276,7 +2276,7 @@ function GetEnvisionAddedModules()
 	$AvailableModules = array();
 
 	// We need this for parse_bbc()
-	require_once($sourcedir . '/Subs.php');
+	require_once($sourcedir . '/ep_source/Subs.php');
 
 	$added_mods = array();
 
@@ -2401,7 +2401,7 @@ function ep_insert_column()
 
 	$iid = $smcFunc['db_insert_id']('{db_prefix}ep_layout_positions', 'id_layout_position');
 
-	loadTemplate('Xml');
+	loadTemplate('ep_template/Xml');
 	$context['sub_template'] = 'generic_xml';
 	$xml_data = array(
 		'items' => array(
@@ -2513,7 +2513,7 @@ function ep_edit_db_select()
 
 		$iid = $smcFunc['db_insert_id']('{db_prefix}ep_layout_positions', 'id_layout_position');
 
-		loadTemplate('Xml');
+		loadTemplate('ep_template/Xml');
 		$context['sub_template'] = 'generic_xml';
 		$xml_data = array(
 			'items' => array(
@@ -2994,13 +2994,11 @@ function add_ep_admin_areas($admin_areas)
 	// Building the Envision Portal admin areas
 	$envisionportal = array(
 		'title' => $txt['ep_'],
-
 		'areas' => array(
 			'epconfig' => array(
 				'label' => $txt['ep_admin_config'],
-				'file' => 'ManageEnvisionSettings.php',
+				'file' => 'ep_source/ManageEnvisionSettings.php',
 				'function' => 'Configuration',
-
 				'icon' => 'epconfiguration.png',
 				'subsections' => array(
 					'epinfo' => array($txt['ep_admin_information'], ''),
@@ -3010,9 +3008,8 @@ function add_ep_admin_areas($admin_areas)
 			),
 			'epmodules' => array(
 				'label' => $txt['ep_admin_modules'],
-				'file' => 'ManageEnvisionModules.php',
+				'file' => 'ep_source/ManageEnvisionModules.php',
 				'function' => 'Modules',
-
 				'icon' => 'epmodules.png',
 				'subsections' => array(
 					'epmanmodules' => array($txt['ep_admin_manage_modules'], ''),
@@ -3021,9 +3018,8 @@ function add_ep_admin_areas($admin_areas)
 			),
 			'eppages' => array(
 				'label' => $txt['ep_admin_pages'],
-				'file' => 'ManageEnvisionPages.php',
+				'file' => 'ep_source/ManageEnvisionPages.php',
 				'function' => 'Pages',
-
 				'icon' => 'eppages.png',
 				'subsections' => array(
 					'epmanpages' => array($txt['ep_admin_manage_pages'], ''),
@@ -3032,9 +3028,8 @@ function add_ep_admin_areas($admin_areas)
 			),
 			'epmenu' => array(
 				'label' => $txt['ep_admin_menu'],
-				'file' => 'ManageEnvisionMenu.php',
+				'file' => 'ep_source/ManageEnvisionMenu.php',
 				'function' => 'Menu',
-
 				'icon' => 'epmenu.png',
 				'subsections' => array(
 					'epmanmenu' => array($txt['ep_admin_manage_menu'], ''),

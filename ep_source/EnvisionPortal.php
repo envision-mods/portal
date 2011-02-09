@@ -36,7 +36,7 @@ function ep_init($init_action = '')
 
 	// Software Version.
 	// !!!Revise this on each commit!
-	$portal_ver = '1.0 DEV r1';
+	$portal_ver = '1.0 DEV r3';
 
 	// Unallowed Envision names.
 	$envision_names = array('announce', 'usercp', 'stats', 'online', 'news', 'topics', 'posts', 'search', 'calendar', 'poll', 'top_posters', 'theme_select', 'new_members', 'staff', 'sitemenu', 'shoutbox', 'custom');
@@ -48,12 +48,12 @@ function ep_init($init_action = '')
 	if (isset($_REQUEST['xml']))
 	{
 		// !!! TODO: Put all XML functions into Subs-EnvisionXml.php
-		require_once($sourcedir . '/Subs-EnvisionPortal.php');
-		require_once($sourcedir . '/Subs-EnvisionModules.php');
+		require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
+		require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
 
 		// Avert a SMF bug with the menu...
-		if (!loadLanguage('EnvisionPortal'))
-			loadLanguage('EnvisionPortal');
+		if (!loadLanguage('ep_languages/EnvisionPortal'))
+			loadLanguage('ep_languages/EnvisionPortal');
 
 		return;
 	}
@@ -63,8 +63,8 @@ function ep_init($init_action = '')
 		return;
 
 	// This is important to be loaded first.
-	if (!loadLanguage('EnvisionPortal'))
-		loadLanguage('EnvisionPortal');
+	if (!loadLanguage('ep_languages/EnvisionPortal'))
+		loadLanguage('ep_languages/EnvisionPortal');
 
 	// Images. :D
 	$context['ep_icon_url'] = $boardurl . '/envisionportal/module_icons/';
@@ -88,13 +88,13 @@ function ep_init($init_action = '')
 		return;
 
 	// Load the sub-functions needed for Envision Portal, and the Envision Modules.
-	require_once($sourcedir . '/Subs-EnvisionPortal.php');
-	require_once($sourcedir . '/Subs-EnvisionModules.php');
-	require_once($sourcedir . '/EnvisionModules.php');
+	require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
+	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
+	require_once($sourcedir . '/ep_source/EnvisionModules.php');
 
 	// Load the EnvisionModules Language File for all you Module Customizers out there :)
-	if (!loadLanguage('EnvisionModules'))
-		loadLanguage('EnvisionModules');
+	if (!loadLanguage('ep_languages/EnvisionModules'))
+		loadLanguage('ep_languages/EnvisionModules');
 
 	// These puppies are evil >:D
 	unset($_GET['PHPSESSID'], $_GET['theme']);
@@ -277,7 +277,7 @@ function envisionPages()
 
 	// If Envision is inactive, we can still use Envision Pages thanks to this.
 	if (!$modSettings['ep_portal_mode'])
-		loadTemplate('EnvisionPortal');
+		loadTemplate('ep_template/EnvisionPortal');
 
 	// Let's see what page name or id they put in, if blank, send em to the home page.
 	$call = isset($_GET['page']) ? $_GET['page'] : redirectexit();
@@ -467,7 +467,7 @@ function envisionFiles()
 	// No point in a nicer message, because this is supposed to be a file anyways...
 	if (!file_exists($filename))
 	{
-		loadLanguage('Errors');
+		loadLanguage('ep_languages/Errors');
 
 		header('HTTP/1.0 404 ' . $txt['file_not_found']);
 		header('Content-Type: text/plain; charset=' . (empty($context['character_set']) ? 'ISO-8859-1' : $context['character_set']));

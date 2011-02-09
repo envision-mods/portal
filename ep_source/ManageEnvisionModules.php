@@ -41,13 +41,13 @@ function loadGeneralSettingParameters3($subActions = array(), $defaultAction = '
 	isAllowedTo('admin_forum');
 
 	// Language Files needed, load EnvisionModules 1st so that it can't overwrite any default Envision Strings.
-	loadLanguage('EnvisionModules+EnvisionHelp+ManageEnvisionModules+ManageSettings');
+	loadLanguage('ep_languages/EnvisionModules+EnvisionHelp+ManageEnvisionModules+ManageSettings');
 
 	// Will need the utility functions from here.
-	require_once($sourcedir . '/ManageServer.php');
+	require_once($sourcedir . '/ep_source/ManageServer.php');
 
 	// load the template and the style sheet needed
-	loadTemplate('ManageEnvisionModules', 'envisionportal');
+	loadTemplate('ep_template/ManageEnvisionModules', 'envisionportal');
 
 	$restrictedNames = $context['ep_restricted_names'];
 
@@ -381,7 +381,7 @@ function ModifyModule()
 	$context['sub_template'] = 'modify_modules';
 
 	// Used for grabbing stored variables and the file_input parameter type.
-	require_once($sourcedir . '/Subs-EnvisionPortal.php');
+	require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
 
 	// We need to know if they are modifying an original module or a clone.  Clones will be a simple module=id_clone
 	$context['modid'] = isset($_REQUEST['modid']) && !isset($_REQUEST['module']) ? (int) $_REQUEST['modid'] : '';
@@ -762,7 +762,7 @@ function ModifyModule()
 					elseif ($row['parameter_type'] == 'rich_edit')
 					{
 						// Needed for the editor.
-						require_once($sourcedir . '/Subs-Editor.php');
+						require_once($sourcedir . '/ep_source/Subs-Editor.php');
 
 						// Now create the editor.
 						$editorOptions = array(
@@ -1550,8 +1550,8 @@ function ListGroups($checked = array(), $unallowed = array(), $order = array(), 
 	global $context, $smcFunc, $txt;
 
 	// We'll need this for loading up the names of each group.
-	if (!loadLanguage('ManageBoards'))
-		loadLanguage('ManageBoards');
+	if (!loadLanguage('ep_languages/ManageBoards'))
+		loadLanguage('ep_languages/ManageBoards');
 
 	$ep_groups = array();
 
@@ -1798,7 +1798,7 @@ function UploadModule($reservedNames = array(), $installed_functions = array())
 	if (!allowedTo('admin_forum'))
 		return;
 
-	require_once($sourcedir . '/Subs-Package.php');
+	require_once($sourcedir . '/ep_source/Subs-Package.php');
 
 	if ($_FILES['ep_modules']['error'] === UPLOAD_ERR_OK)
 	{
@@ -2178,7 +2178,7 @@ function AddEnvisionModules()
 	$context['sub_template'] = 'add_modules';
 
 	// We'll just require it, since if Envision is disabled, would be a problem with this.
-	require_once($sourcedir . '/Subs-EnvisionPortal.php');
+	require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
 
 	$context['module_info'] = GetEnvisionAddedModules();
 
@@ -4064,7 +4064,7 @@ function EnvisionClone($id_layout_position, $smf_id = 0, $id_clones = array())
 	{
 		global $sourcedir;
 
-		require_once($sourcedir . '/Subs-EnvisionPortal.php');
+		require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
 
 		$modules = loadDefaultModuleConfigs(array(), true);
 
@@ -4349,7 +4349,7 @@ function EnvisionDeclone($clones = array(), $modules = array(), $admin = 1)
 	 {
 	 	global $sourcedir;
 
-		require_once($sourcedir . '/Subs-EnvisionPortal.php');
+		require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
 
 		$request = $smcFunc['db_query']('', '
 			SELECT

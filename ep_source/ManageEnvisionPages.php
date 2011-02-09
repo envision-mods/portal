@@ -34,8 +34,8 @@ function Pages()
 {
 	global $context, $txt;
 
-	loadTemplate('ManageEnvisionPages');
-	loadLanguage('ManageEnvisionPages');
+	loadTemplate('ep_template/ManageEnvisionPages');
+	loadLanguage('ep_languages/ManageEnvisionPages');
 
 	$subActions = array(
 		'epmanpages' => array('ManageEnvisionPages', 'admin_forum'),
@@ -275,7 +275,7 @@ function ManageEnvisionPages()
 		),
 	);
 
-	require_once($sourcedir . '/Subs-List.php');
+	require_once($sourcedir . '/ep_source/Subs-List.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -396,10 +396,10 @@ function SavePage()
 
 
 			// Needed for ListGroups()
-			require_once($sourcedir . '/ManageEnvisionModules.php');
+			require_once($sourcedir . '/ep_source/ManageEnvisionModules.php');
 
 			// Needed for the editor.
-			require_once($sourcedir . '/Subs-Editor.php');
+			require_once($sourcedir . '/ep_source/Subs-Editor.php');
 
 			$context['page_data'] = array(
 				'page_name' => $name,
@@ -426,10 +426,10 @@ function prepareContext()
 	global $context, $smcFunc, $txt, $sourcedir;
 
 	// Needed for ListGroups()
-	require_once($sourcedir . '/ManageEnvisionModules.php');
+	require_once($sourcedir . '/ep_source/ManageEnvisionModules.php');
 
 	// Needed for the editor.
-	require_once($sourcedir . '/Subs-Editor.php');
+	require_once($sourcedir . '/ep_source/Subs-Editor.php');
 
 	// Now create the editor.
 	$editorOptions = array(
