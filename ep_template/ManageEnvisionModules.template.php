@@ -792,7 +792,6 @@ function template_manage_modules()
 							</div>';
 
 		echo '
-							<div class="draggable_module dummy">&nbsp;</div>
 						</div>
 						<span class="lowerframe"><span></span></span>
 					</div>
@@ -851,8 +850,6 @@ function template_manage_modules()
 											</div>';
 						}
 					}
-					echo '
-											<div class="draggable_module dummy">&nbsp;</div>';
 					echo '
 										</div>
 										<span class="lowerframe"><span></span></span>
