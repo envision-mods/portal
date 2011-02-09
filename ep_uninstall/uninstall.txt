@@ -1,1 +1,0 @@
-Uninstalling Envision Portal will also remove all modules. You must save any custom code you wrote.
