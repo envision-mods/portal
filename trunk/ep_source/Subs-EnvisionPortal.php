@@ -966,7 +966,7 @@ function envisionBuffer($buffer)
 		'class="copywrite"',
 	);
 	$replace_array = array(
-		', Simple Machines LLC</a><br /><a class="new_win" href="http://envisionportal.net/" target="_blank">Envision Portal v' . $portal_ver . ' &copy; 2009&ndash;2010 Envision Portal Team</a>',
+		', Simple Machines LLC</a><br /><a class="new_win" href="http://envisionportal.net/" target="_blank">Envision Portal v' . $portal_ver . ' &copy; 2011 Envision Portal Team</a>',
 		'class="copywrite" style="line-height: 1;"',
 	);
 
