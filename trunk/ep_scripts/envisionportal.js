@@ -1,13 +1,13 @@
 /**************************************************************************************
-* envisionportal.js                                                                      *
+* envisionportal.js                                                                   *
 ***************************************************************************************
-* Envision Portal                                                                        *
-* Forum Portal Modification Project founded by ccbtimewiz (ccbtimewiz@ccbtimewiz.com) *
+* Envision Portal                                                                     *
+* Community Portal Application for SMF                                                *
 * =================================================================================== *
-* Software by:                  Envision Portal Team (http://envisionportal.net/team/)     *
+* Software by:                  EnvisionPortal (http://envisionportal.net/)           *
 * Software for:                 Simple Machines Forum                                 *
-* Copyright 2009-2010 by:       Envision Portal Team (http://envisionportal.net/team/)     *
-* Support, News, Updates at:    http://envisionportal.net/                              *
+* Copyright 2011 by:            EnvisionPortal (http://envisionportal.net/)           *
+* Support, News, Updates at:    http://envisionportal.net/                            *
 **************************************************************************************/
 
 var start = 0;

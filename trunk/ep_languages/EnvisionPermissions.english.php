@@ -1,6 +1,5 @@
 <?php
-// Envision Portal (c) 2011 EnvisionPortal
-// EnvisionPermissions.english.php; @1.1
+// Version 1.0; EnvisionPermissions
 
 // Place all permission strings for Envision Portal, including help strings, for permissions in here.
 

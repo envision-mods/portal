@@ -1,6 +1,5 @@
 <?php
-// Envision Portal (c) 2011 EnvisionPortal
-// ManageEnvisionMenu.english.php; @1.1
+// Version 1.0; ManageEnvisionMenu
 
 // Main Title for the Administration Envision Menu.
 $txt['ep_admin_menu'] = 'Envision Menu';

@@ -1,6 +1,5 @@
 <?php
-// Envision Portal (c) 2011 EnvisionPortal
-// ManageEnvisionModules.template.php; ver 1.0 RC
+// Version 1.0; ManageEnvisionModules
 
 /**
  * This file handles showing Envision Portal's module management settings.

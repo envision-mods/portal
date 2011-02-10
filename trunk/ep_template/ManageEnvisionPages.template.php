@@ -1,4 +1,6 @@
 <?php
+// Version 1.0; ManageEnvisionPages
+
 /**
  * This file handles the visuals of Envision Page management.
  *

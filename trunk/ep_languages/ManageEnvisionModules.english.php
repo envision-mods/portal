@@ -1,6 +1,5 @@
 <?php
-// Envision Portal (c) 2011 EnvisionPortal
-// ManageEnvisionModules.english.php; @1.1
+// Version 1.0; ManageEnvisionModules
 
 /*
 

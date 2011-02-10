@@ -13,6 +13,7 @@
 
 if (!defined('SMF'))
 	die('Hacking attempt...');
+
 /*	The following are Functions used for various default Envision Portal Modules.
 
 	void ep_shoutbox()

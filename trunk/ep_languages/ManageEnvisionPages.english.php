@@ -1,6 +1,5 @@
 <?php
-// Envision Portal (c) 2011 EnvisionPortal
-// ManageEnvisionPages.english.php; @1.1
+// Version 1.0; ManageEnvisionPages
 
 /**
  * This file contains all the language strings for Envision Pages.

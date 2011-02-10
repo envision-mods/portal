@@ -1,6 +1,5 @@
 <?php
-// Envision Portal (c) 2011 EnvisionPortal
-// ManageEnvisionSettings.english.php; @1.1
+// Version 1.0; ManageEnvisionSettings
 
 // Main Title for this section.
 $txt['ep_admin_config'] = 'Envision Portal Configuration';
