@@ -1,0 +1,6 @@
+Directory: "./ep_plugins_extra"
+------------------------
+This directory is used for storing any extra media that is to be
+used by any plugins. All plugin authors are encouraged to make use
+of this directory as best they can when adding extra media for their
+plugins.

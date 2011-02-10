@@ -9,6 +9,7 @@
 	<install for="2.0 RC4, 2.0 RC5">
 		<readme type="file" parsebbc="true">ep_install/install.txt</readme>
 		<modification format="xml" type="file">ep_install/install.xml</modification>
+		<database>ep_install/install.php</database>
 		<require-dir name="ep_extra" destination="$boarddir" />
 		<require-dir name="ep_source" destination="$sourcedir" />
 		<require-dir name="ep_css" destination="$themedir/css" />
@@ -16,8 +17,14 @@
 		<require-dir name="ep_scripts" destination="$themedir/scripts" />
 		<require-dir name="ep_template" destination="$themedir" />
 		<require-dir name="ep_images" destination="$imagesdir/images" />
+
+		<!-- Envision Plugins -->
+		<require-dir name="ep_plugins_source" destination="$sourcedir" />
+		<require-dir name="ep_plugins_template" destination="$themedir" />
+		<require-dir name="ep_plugins_language" destination="$languagedir" />
+		<require-dir name="ep_plugins_extra" destination="$boarddir" />
+
 		<redirect url="?action=admin;area=corefeatures#js_feature_ep" />
-		<database>ep_install/install.php</database>
 	</install>
 	<uninstall for="2.0 RC4, 2.0 RC5">
 		<readme type="file" parsebbc="true">ep_uninstall/uninstall.txt</readme>
@@ -31,6 +38,13 @@
 		<remove-dir name="$themedir/css/ep_css" />
 		<remove-dir name="$themedir/scripts/ep_scripts" />
 		<remove-dir name="$boarddir/ep_extra" />
+
+		<!-- Envision Plugins -->
+		<remove-dir name="$sourcedir/ep_plugins_source" />
+		<remove-dir name="$themedir/ep_plugins_template" />
+		<remove-dir name="$boarddir/ep_plugins_extra" />
+		<remove-dir name="$languagedir/ep_plugins_language" />
+
 	</uninstall>
 
 </package-info>
