@@ -6,7 +6,7 @@
 	<version>1.0</version>
 	<type>modification</type>
 
-	<install for="2.0 RC4, 2.0 RC5">
+	<install for="2.0 RC4, 1.0">
 		<readme type="file" parsebbc="true">ep_install/install.txt</readme>
 		<modification format="xml" type="file">ep_install/install.xml</modification>
 		<database>ep_install/install.php</database>
@@ -26,7 +26,7 @@
 
 		<redirect url="?action=admin;area=corefeatures#js_feature_ep" />
 	</install>
-	<uninstall for="2.0 RC4, 2.0 RC5">
+	<uninstall for="2.0 RC4, 1.0">
 		<readme type="file" parsebbc="true">ep_uninstall/uninstall.txt</readme>
 		<modification format="xml" type="file" reverse="true">ep_install/install.xml</modification>
 		<database>ep_uninstall/uninstall.php</database>

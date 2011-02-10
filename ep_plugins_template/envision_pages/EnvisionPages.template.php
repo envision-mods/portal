@@ -1,5 +1,5 @@
 <?php
-// Version: 2.0 RC5; EnvisionPages
+// Version: 1.0; EnvisionPages
 
 function template_ep_pages()
 {
