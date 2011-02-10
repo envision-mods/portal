@@ -46,7 +46,7 @@ function loadGeneralSettingParameters($subActions = array(), $defaultAction = ''
 	loadTemplate('ep_template/ManageEnvisionSettings');
 
 	// Will need the utility functions from here.
-	require_once($sourcedir . '/ep_source/ManageServer.php');
+	require_once($sourcedir . '/ManageServer.php');
 
 	$context['sub_template'] = 'show_settings';
 

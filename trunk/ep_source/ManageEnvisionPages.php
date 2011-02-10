@@ -190,7 +190,7 @@ function ManageEnvisionPages()
 					'value' => $txt['ep_envision_pages_page_title'],
 				),
 				'data' => array(
-					'db' => 'title',
+					'db_htmlsafe' => 'title',
 					'class' => 'centertext',
 				),
 				'sort' => array(
@@ -257,7 +257,7 @@ function ManageEnvisionPages()
 							'id_page' => false,
 						),
 					),
-					'style' => 'text-align: center',
+					'class' => 'centertext',
 				),
 			),
 		),
@@ -275,7 +275,7 @@ function ManageEnvisionPages()
 		),
 	);
 
-	require_once($sourcedir . '/ep_source/Subs-List.php');
+	require_once($sourcedir . '/Subs-List.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';
@@ -399,7 +399,7 @@ function SavePage()
 			require_once($sourcedir . '/ep_source/ManageEnvisionModules.php');
 
 			// Needed for the editor.
-			require_once($sourcedir . '/ep_source/Subs-Editor.php');
+			require_once($sourcedir . '/Subs-Editor.php');
 
 			$context['page_data'] = array(
 				'page_name' => $name,
@@ -429,7 +429,7 @@ function prepareContext()
 	require_once($sourcedir . '/ep_source/ManageEnvisionModules.php');
 
 	// Needed for the editor.
-	require_once($sourcedir . '/ep_source/Subs-Editor.php');
+	require_once($sourcedir . '/Subs-Editor.php');
 
 	// Now create the editor.
 	$editorOptions = array(
@@ -497,7 +497,7 @@ function prepareContext()
  * Loads the list of Envision Pages for createList().
  *
  * @param int $start determines where to start getting pages. Used in SQL's LIMIT clause.
- * @param int $items_peer_page determines how many pages are returned. Used in SQL's LIMIT clause.
+ * @param int $items_per_page determines how many pages are returned. Used in SQL's LIMIT clause.
  * @param string $sort determines which column to sort by. Used in SQL's ORDER BY clause.
  * @return array the associative array returned by $smcFunc['db_fetch_assoc']().
  * @since 1.0
