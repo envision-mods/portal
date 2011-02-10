@@ -3100,4 +3100,46 @@ function envision_whos_online($actions)
 	return $data;
 }
 
+function envision_integrate_actions(&$action_array)
+{
+	$action_array['envision'] = array('ep_source/EnvisionPortal.php', 'envisionActions');
+	$action_array['envisionFiles'] = array('ep_source/EnvisionPortal.php', 'envisionFiles');
+	$action_array['forum'] = array('BoardIndex.php', 'BoardIndex');
+}
+
+function envision_integrate_pre_load()
+{
+	global $modSettings, $sourcedir;
+
+	// Is Envision Portal enabled in the Core Features?
+	$modSettings['ep_portal_mode'] = isset($modSettings['admin_features']) ? in_array('ep', explode(',', $modSettings['admin_features'])) : false;
+
+	// Include the main file.
+	require_once($sourcedir . '/ep_source/EnvisionPortal.php');
+}
+
+function envision_integrate_load_theme()
+{
+	global $context, $maintenance, $modSettings;
+
+	// Load the portal layer, making sure we didn't arleady add it.
+	if (!empty($context['template_layers']) && !in_array('portal', $context['template_layers']))
+		// Checks if the forum is in maintenance, and if the portal is disabled.
+		if (($maintenance && !allowedTo('admin_forum')) || empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))
+			$context['template_layers'] = array('html', 'body');
+		else
+			$context['template_layers'][] = 'portal';
+
+	if (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view'))
+	{
+		if (!loadLanguage('ep_languages/EnvisionPortal'))
+			loadLanguage('ep_languages/EnvisionPortal');
+
+		loadTemplate('ep_template/EnvisionPortal', 'ep_css/envisionportal');
+	}
+
+	// Kick off time!
+	ep_init();
+}
+
 ?>

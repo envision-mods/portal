@@ -722,10 +722,10 @@ function template_manage_modules()
 		unset($envision_buttons['del']);
 
 	echo '
-	<div class="floatleft" style="width: 100%;">
+	<div class="floatleft w100">
 		<div class="floatright">
 			<form name="urLayouts" id="epmod_change_layout" action="', $scripturl, '?action=admin;area=epmodules;sa=epmanmodules;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
-				<select onchange="document.forms[\'epmod_change_layout\'].submit();" name="layout_picker" style="width: 100%;">';
+				<select onchange="document.forms[\'epmod_change_layout\'].submit();" name="layout_picker" class="w100">';
 
 		foreach ($_SESSION['layouts'] as $id_layout => $layout_name)
 			echo '
@@ -740,31 +740,7 @@ function template_manage_modules()
 
 	// Input the back colors.
 	echo '
-				<div class="ep_colour_menu" style="margin-right: -12px;">
-					<ul class="ep_select">
-						<li class="ep_line"><a href="javascript:void(0);"><img src="', $context['epadmin_image_url'], '/ep_colors.png" alt="', $txt['ep_alt_module_colors'], '" title="', $txt['ep_module_colors'], '" width="25" height="25" border="0" /></a>
-							<ul class="ep_sub">
-								<li><a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'1\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/white.png" alt="', $txt['ep_alt_white'], '" width="25" height="25" border="0" /></a></li>
-								<li>
-									<a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'2\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/gray.png" alt="', $txt['ep_alt_gray'], '" width="25" height="25" border="0" /></a></li>
-								<li>
-									<a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'3\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/blue.png" alt="', $txt['ep_alt_blue'], '" width="25" height="25" border="0" /></a></li>
-								<li>
-									<a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'4\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/yellow.png" alt="', $txt['ep_alt_yellow'], '" width="25" height="25" border="0" /></a></li>
-								<li>
-									<a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'5\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/green.png" alt="', $txt['ep_alt_green'], '" width="25" height="25" border="0" /></a></li>
-								<li>
-									<a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'6\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/orange.png" alt="', $txt['ep_alt_orange'], '" width="25" height="25" border="0" /></a></li>
-								<li>
-									<a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'7\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/red.png" alt="', $txt['ep_alt_red'], '" width="25" height="25" border="0" /></a></li>
-								<li>
-									<a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'8\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/purple.png" alt="', $txt['ep_alt_purple'], '" width="25" height="25" border="0" /></a></li>
-								<li>
-									<a href="javascript:void(0);" onclick="javascript:loadModuleColors(\'9\', \'' . $context['session_id'] . '\');" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/black.png" alt="', $txt['ep_alt_black'], '" width="25" height="25" border="0" /></a></li>
-							</ul>
-						</li>
-					</ul>
-				</div></div>
+		</div>
 				<div id="messages"></div></div>
 				<div class="module_page floatright">';
 
@@ -782,7 +758,7 @@ function template_manage_modules()
 		if (!empty($context['ep_columns']['disabled']['modules']))
 			foreach($context['ep_columns']['disabled']['modules'] as $module => $id)
 				echo '
-							<div class="DragBox ', ($id['is_clone'] ? 'clonebox' : 'modbox'), '', (!empty($options['ep_mod_color']) ? $options['ep_mod_color'] : '1'), ' draggable_module centertext" id="envisionmod_' . $id['id'] . '">
+							<div class="DragBox plainbox draggable_module centertext" id="envisionmod_' . $id['id'] . '">
 								<p>
 									', $id['title'], '
 								</p>
@@ -803,7 +779,7 @@ function template_manage_modules()
 	}
 
 	echo '
-					<table width="100%" cellspacing="11" style="table-layout: fixed;">';
+					<table>';
 
 	foreach ($context['ep_columns'] as $row_id => $row_data)
 	{
@@ -817,7 +793,7 @@ function template_manage_modules()
 				echo '
 							<td class="tablecol_', $column_id, '"', $context['span']['rows'][$column_data['id_layout_position']], $context['span']['columns'][$column_data['id_layout_position']], '>
 
-								<div id="module_container_', $column_data['id_layout_position'], '" class="enabled" style="width: 100%;">
+								<div id="module_container_', $column_data['id_layout_position'], '" class="enabled w100">
 									<div class="cat_bar block_header">
 										<h3 class="catbg centertext">
 											', (!$column_data['is_smf'] ? '<input type="checkbox" ' . (!empty($column_data['enabled']) ? 'checked="checked" ' : '') . 'id="column_' . $column_data['id_layout_position'] . '" class="check_enabled input_check" /><label for="column_' . $column_data['id_layout_position'] . '">' . $txt['ep_admin_modules_manage_col_section'] . '</label>' : $txt['ep_is_smf_section']), '
@@ -840,7 +816,7 @@ function template_manage_modules()
 								continue;
 							}
 							echo '
-											<div class="DragBox ', ($id['is_clone'] ? 'clonebox' : 'modbox'), '', (!empty($options['ep_mod_color']) ? $options['ep_mod_color'] : '1'), ' draggable_module centertext" id="envisionmod_' . $id['id'] . '">
+											<div class="DragBox plainbox draggable_module centertext" id="envisionmod_' . $id['id'] . '">
 												<p>
 													', $id['title'], '
 												</p>

@@ -9,15 +9,8 @@
 			<search position="before"><![CDATA[require_once($sourcedir . '/Security.php');]]></search>
 			<add><![CDATA[
 // START - EnvisionPortal
-require_once($sourcedir . '/ep_source/EnvisionPortal.php');
+require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
 // END - EnvisionPortal]]></add>
-		</operation>
-		<operation>
-			<search position="after"><![CDATA[// Is the forum in maintenance mode? (doesn't apply to administrators.)]]></search>
-			<add><![CDATA[// START - EnvisionPortal
-	ep_init();
-// END - EnvisionPortal
-	]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance, $sourcedir;]]></search>
@@ -52,17 +45,6 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 		}]]></add>
 		</operation>
 		<operation>
-			<search position="before"><![CDATA['findmember' => array('Subs-Auth.php', 'JSMembers'),]]></search>
-			<add><![CDATA[
-		'forum' => array('BoardIndex.php', 'BoardIndex'),]]></add>
-		</operation>
-		<operation>
-			<search position="after"><![CDATA['editpoll' => array('Poll.php', 'EditPoll'),]]></search>
-			<add><![CDATA['envision' => array('EnvisionPortal.php', 'envisionActions'),
-		'envisionFiles' => array('EnvisionPortal.php', 'envisionFiles'),
-		]]></add>
-		</operation>
-		<operation>
 			<search position="before"><![CDATA['verificationcode']]></search>
 			<add><![CDATA[, 'envision', 'envisionFiles']]></add>
 		</operation>
@@ -79,36 +61,6 @@ require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 		$context['smf_actions'] = array_keys($actionArray);
 
 	]]></add>
-		</operation>
-	</file>
-
-	<file name="$sourcedir/Load.php">
-		<operation>
-			<search position="before"><![CDATA[Wireless+index+Modifications]]></search>
-			<add><![CDATA[+ep_languages/EnvisionPortal]]></add>
-		</operation>
-		<operation>
-			<search position="before"><![CDATA[array('Modifications]]></search>
-			<add><![CDATA[+ep_languages/EnvisionPortal]]></add>
-		</operation>
-		<operation>
-			<search position="before"><![CDATA[$context['template_layers'] = array('html', 'body');]]></search>
-			<add><![CDATA[
-
-		if (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view'))
-		{
-			if (!loadLanguage('ep_languages/EnvisionPortal'))
-				loadLanguage('ep_languages/EnvisionPortal');
-
-			loadTemplate('ep_template/EnvisionPortal', 'ep_cssenvisionportal');
-		}]]></add>
-		</operation>
-		<operation>
-			<search position="after"><![CDATA[	// Is post moderation alive and well?]]></search>
-			<add><![CDATA[	// Shall we reveal... our envision?
-	$modSettings['ep_portal_mode'] = isset($modSettings['admin_features']) ? in_array('ep', explode(',', $modSettings['admin_features'])) : false;
-
-]]></add>
 		</operation>
 	</file>
 

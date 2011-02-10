@@ -188,28 +188,6 @@ function submitLayout(confirmText, url, sessVar, sessId)
 	layoutForm.submit();
 }
 
-function loadModuleColors(value, sessId)
-{
-	var alldivs = document.getElementsByTagName("div");
-	var i = alldivs.length;
-	while(i--)
-	{
-		var divClass = alldivs[i].className;
-
-		if (!divClass)
-		  continue;
-
-		if (divClass.indexOf("DragBox") !== 0)
-		  continue;
-
-		if (divClass.indexOf("clonebox") >= 0)
-			alldivs[i].className = "DragBox clonebox" + value + " draggable_module centertext";
-		else
-			alldivs[i].className = "DragBox modbox" + value + " draggable_module centertext";
-	}
-	smf_setThemeOption("ep_mod_color", parseInt(value), null, sessId);
-}
-
 function sortOptions(optionList)
 {
 	var arrToSort = [];

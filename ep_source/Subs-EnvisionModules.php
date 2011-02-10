@@ -223,13 +223,10 @@ function ep_shoutbox($request, $get_value)
 			);
 	}
 	elseif (!empty($security))
-	{
 	   $xml_children[] = array(
 			'value' => $security,
 		);
-	}
 
-	loadTemplate('ep_template/Xml');
 	$context['sub_template'] = 'generic_xml';
 	$xml_data = array(
 		'items' => array(
@@ -284,7 +281,7 @@ function can_moderate_shoutbox($name = '', $value = '')
 	}
 }
 
-function LoadSmilies($force_reload = false, $cache_time = 3600)
+function load_smilies($force_reload = false, $cache_time = 3600)
 {
 	global $context, $modSettings, $settings, $smcFunc, $txt, $user_info;
 
@@ -429,12 +426,12 @@ function LoadSmilies($force_reload = false, $cache_time = 3600)
 
 }
 
-function LoadShoutBBC()
+function load_shout_bbc()
 {
 	global $context, $txt;
 
 	// These strings are stright from the post files...
-	loadLanguage('ep_languages/Post');
+	loadLanguage('Post');
 
 	// The below array makes it dead easy to add images to this control. Add it to the array and everything else is done for you!
 	$context['ep_bbc_tags'] = array();

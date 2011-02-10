@@ -1812,6 +1812,7 @@ function module_shoutbox($params)
 			echo '
 			<div id="shoutbox_floating_message_', $message_position, '">', $message, '</div>';
 
+		// !!! TODO: Get rid of the below div: ep_Reserved_Vars_Shoutbox
 		echo '
 			<div class="ep_Reserved_Vars_Shoutbox" id="reserved_vars', $unique_id, '" style="display: none;"></div>
 			<!--// This div below holds the actual shouts //-->
@@ -1822,10 +1823,7 @@ function module_shoutbox($params)
 			style="word-wrap: break-word; width: 160px;"';
 
 		echo '
-			></div>
-
-			<!--// This div below is just a spacer for the bottom //-->
-			<div style="padding-bottom: 9px;"></div>';
+			></div>';
 
 		if ($is_message_visible && $message_position == 'after')
 			echo '
@@ -1833,12 +1831,12 @@ function module_shoutbox($params)
 
 		if (!$user_info['is_guest'])
 		{
-			LoadSmilies();
+			load_smilies();
 
 			echo  '
 			<form name="post_shoutbox', $unique_id, '" id="post_shoutbox', $unique_id, '" method="post" action="" accept-charset="', $context['character_set'], '">
-				<input name="ep_Reserved_Message" id="shout_input', $unique_id, '" maxlength="', $max_chars, '" type="text" value="" style="width: 90%;" tabindex="', $context['tabindex']++, '" />
-				<br class="clear" /><div style="padding-bottom: 3px;"></div>
+				<input name="ep_Reserved_Message" id="shout_input', $unique_id, '" maxlength="', $max_chars, '" type="text" value="" class="w100" tabindex="', $context['tabindex']++, '" />
+				<br class="clear" />
 				<input name="shout_submit" value="', $txt['shoutbox_shout'], '" class="button_submit" type="submit" tabindex="', $context['tabindex']++, '" />
 					<img src="', $context['epmod_image_url'], 'shoutbox/emoticon_smile.png" alt="" title="', $txt['shoutbox_emoticons'], '" class="hand" id="toggle_smileys_div', $unique_id, '" />
 					<img src="', $context['epmod_image_url'], 'shoutbox/font.png" alt="" title="', $txt['shoutbox_fonts'], '" class="hand" id="toggle_font_styles_div', $unique_id, '" />
@@ -1850,12 +1848,12 @@ function module_shoutbox($params)
 				echo '';
 			else
 			{
-				foreach ($context['smileys']['postform'] as $row => $rowData)
+				foreach ($context['smileys']['postform'] as $row => $row_data)
 				{
 					echo '
 							<ul>';
 
-					foreach ($rowData['smileys'] as $smileyID => $smiley)
+					foreach ($row_data['smileys'] as $smiley_id => $smiley)
 					{
 						echo '
 								<li class="shout_smiley_img shout_smiley_img', $unique_id, '"><img src="', $settings['smileys_url'] . '/' . $smiley['filename'], '" alt="', $smiley['description'], '" title="', $smiley['description'], '" onclick="insertCode(\'', addslashes($smiley['code']), '\', \'replace\', \'', $unique_id, '\', \'smileys\')" class="smiley_item smiley_item', $unique_id, '" /></li>';
@@ -1871,19 +1869,19 @@ function module_shoutbox($params)
 					<div class="shout_font_styles" id="shout_font_styles', $unique_id, '">';
 
 			// Now process the bbc array...
-			LoadShoutBBC();
+			load_shout_bbc();
 
 			if (empty($context['ep_bbc_tags']))
 				// What, did someone delete our array?
 				echo '';
 			else
 			{
-				foreach ($context['ep_bbc_tags'] as $row => $rowData)
+				foreach ($context['ep_bbc_tags'] as $row => $row_data)
 				{
 					echo '
 							<ul>';
 
-					foreach ($rowData as $bbcID => $tag)
+					foreach ($row_data as $bbc_id => $tag)
 					{
 						echo '
 								<li class="shout_font_style_img"><img src="', $settings['images_url'] . '/bbc/' . $tag['image'] . '.gif', '" alt="', $tag['description'], '" title="', $tag['description'], '" onclick="insertCode(\'', addslashes($tag['code']), '\', \'surround\', \'', $unique_id, '\', \'font_styles\')" class="font_style_item font_style_item', $unique_id, '" /></li>';
@@ -1902,10 +1900,9 @@ function module_shoutbox($params)
 
 		if (!empty($context['shoutbox_loaded']))
 			echo '
-		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/epShoutbox.js"></script>
+		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_shoutbox.js"></script>
 		<script type="text/javascript">
-			createEventListener(window);
-			window.addEventListener("load", loadShouts, false);
+			addLoadEvent(loadShouts);
 			var sessVar = "' . $context['session_var'] . '";
 			var sessId = "' . $context['session_id'] . '";
 			var theDiv = document.getElementById("reserved_vars' . $unique_id . '");
@@ -1920,7 +1917,7 @@ function module_shoutbox($params)
 			theDiv.setAttribute("moduleid", "', $unique_id, '");
 			theDiv.setAttribute("refreshrate", ', $refresh_rate, ');';
 
-		if ($user_info['is_logged'] && !empty($context['shoutbox_loaded']))
+		if (!$user_info['is_guest'] && !empty($context['shoutbox_loaded']))
 			echo '
 			document.getElementById("post_shoutbox', $unique_id, '").setAttribute("moduleid", "', $unique_id, '");';
 
