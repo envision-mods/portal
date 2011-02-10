@@ -1,5 +1,5 @@
 <?php
-// Version: 2.0 RC5; EnvisionDownloads
+// Version: 1.0; EnvisionDownloads
 
 function template_ep_downloads()
 {

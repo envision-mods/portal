@@ -1,4 +1,4 @@
 <?php
-// Version: 2.0 RC5; EnvisionMenu
+// Version: 1.0; EnvisionMenu
 
 ?>
