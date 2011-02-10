@@ -35,8 +35,8 @@ function ep_init($init_action = '')
 	global $modSettings, $modules, $layout, $portal_ver, $maintenance, $forum_version, $user_info;
 
 	// Software Version.
-	// !!!Revise this on each commit!
-	$portal_ver = '1.0 DEV r10';
+	// !!! Revise this on each commit!
+	$portal_ver = '1.0 DEV r11';
 
 	// Unallowed Envision names.
 	$envision_names = array('announce', 'usercp', 'stats', 'online', 'news', 'topics', 'posts', 'search', 'calendar', 'poll', 'top_posters', 'theme_select', 'new_members', 'staff', 'sitemenu', 'shoutbox', 'custom');
@@ -48,12 +48,7 @@ function ep_init($init_action = '')
 	if (isset($_REQUEST['xml']))
 	{
 		// !!! TODO: Put all XML functions into Subs-EnvisionXml.php
-		require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
 		require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
-
-		// Avert a SMF bug with the menu...
-		if (!loadLanguage('ep_languages/EnvisionPortal'))
-			loadLanguage('ep_languages/EnvisionPortal');
 
 		return;
 	}
@@ -61,10 +56,6 @@ function ep_init($init_action = '')
 	// No need to load this function in this case.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
 		return;
-
-	// This is important to be loaded first.
-	if (!loadLanguage('ep_languages/EnvisionPortal'))
-		loadLanguage('ep_languages/EnvisionPortal');
 
 	// Images. :D
 	$context['ep_icon_url'] = $boardurl . '/ep_extra/module_icons/';
@@ -88,7 +79,6 @@ function ep_init($init_action = '')
 		return;
 
 	// Load the sub-functions needed for Envision Portal, and the Envision Modules.
-	require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
 	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
 	require_once($sourcedir . '/ep_source/EnvisionModules.php');
 
@@ -193,17 +183,9 @@ function ep_init($init_action = '')
 
 	loadLayout($curr_action);
 
-	// Load the portal layer, making sure we didn't arleady add it.
-	if (!empty($context['template_layers']) && !in_array('portal', $context['template_layers']))
-		// Checks if the forum is in maintenance, and if the portal is disabled.
-		if (($maintenance && !allowedTo('admin_forum')) || empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))
-			$context['template_layers'] = array('html', 'body');
-		else
-			$context['template_layers'][] = 'portal';
-
-		// Include the JS file for everything.
-		if (!empty($context['has_ep_layout']))
-			$context['html_headers'] .= '
+	// Include the JS file for everything.
+	if (!empty($context['has_ep_layout']))
+		$context['html_headers'] .= '
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/envisionportal.js"></script>
 	<style type="text/css">
 		#envision_container

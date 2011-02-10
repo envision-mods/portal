@@ -1162,6 +1162,9 @@ function DatabasePopulation()
 	));
 
 	// Now presenting... *drumroll*
+	add_integration_function('integrate_pre_load', 'envision_integrate_pre_load');
+	add_integration_function('integrate_load_theme', 'envision_integrate_load_theme');
+	add_integration_function('integrate_actions', 'envision_integrate_actions');
 	add_integration_function('integrate_menu_buttons', 'add_ep_menu_buttons');
 	add_integration_function('integrate_admin_areas', 'add_ep_admin_areas');
 	add_integration_function('integrate_buffer', 'envisionBuffer');

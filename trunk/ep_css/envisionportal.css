@@ -7,6 +7,11 @@
 /* General styles                        */
 /* ************************************* */
 
+.w100
+{
+	width: 100%;
+}
+
 .ep_main
 {
 	width: 100%;
@@ -238,6 +243,13 @@ img.ep_curveblock
 /* Envision Portal Admin Styles				*/
 /* **************************************** */
 
+.module_page table
+{
+	border-spacing: 11px;
+	table-layout: fixed;
+	width: 100%;
+}
+
 optgroup option, .ep_edit_column
 {
 	padding-left: 10px;
@@ -461,87 +473,6 @@ div.epsitemenu div a.sm:hover
 
 /* Site Menu Module CSS Finished */
 
-/* Hover Module Color Changer Begin */
-.ep_colour_menu {
-	float: right;
-	height: 25px;
-	width:25px;
-	position:relative;
-	font-family:Verdana, Helvetica, sans-serif;
-	z-index:900;
-}
-.ep_colour_menu .ep_select {
-   margin:0px;
-   padding:0px;
-   list-style:none;
-   white-space:nowrap;
-}
-.ep_colour_menu li {
-   float:left;
-}
-.ep_colour_menu .ep_select a {
-   display:block;
-   height: 1px;
-   float:left;
-   padding:0px 10px 0px 0px;
-   text-decoration:none;
-   line-height:25px;
-   white-space:nowrap;
-}
-.ep_colour_menu .ep_select a b {
-   display:block;
-   padding:0px 0px 0px 0px;
-}
-.ep_colour_menu .ep_select a:hover, .ep_colour_menu .ep_select li:hover a {
-   padding:0px 0px 0px 0px;
-   cursor:pointer;
-}
-.ep_colour_menu .ep_select a:hover b, .ep_colour_menu .ep_select li:hover a b {
-   display:block;
-   padding:0px 10px 0px 10px;
-   cursor:pointer;
-}
-.ep_colour_menu .ep_sub {
-   display:none;
-}
-.ep_colour_menu ul ul {
-   display:none;
-}
-.ep_colour_menu .ep_sub {
- margin:0px;
- padding:0px;
- list-style:none;
-}
-.ep_colour_menu .ep_sub li {
-   background:transparent;
-}
-.ep_colour_menu .ep_select :hover .ep_sub {
-   height:25px;
-   display:block;
-   position:absolute;
-   float:left;
-   width:230px;
-   top:25px;
-   left:0px;
-   text-align:center;
-}
-.ep_colour_menu .ep_select :hover .ep_sub li a {
-   display:block;
-   height:25px;
-   line-height:25px;
-   float:left;
-   padding:0px;
-   margin:0px;
-   white-space:nowrap;
-   font-size:10px;
-}
-.ep_colour_menu .ep_select :hover .ep_sub li a:hover, .ep_colour_menu .ep_select :hover .ep_sub li:hover {
-   line-height:25px;
-   position:relative;
-}
-
-/* Hover Module Color Changer END */
-
 /* **************************************** */
 /* Classes for Drag & Drop					*/
 /* **************************************** */
@@ -550,108 +481,7 @@ div.epsitemenu div a.sm:hover
 {
 	width: 106px;
 	font-size: 10px;
-	margin-bottom: 5px;
-	cursor: pointer;
-	font-family: verdana, tahoma, arial;
-}
-/* White */
-.modbox1
-{
-	border: #000 1px ridge;
-	background-color: #fcfcfc;
-}
-.clonebox1
-{
-	border: #000 1px ridge;
-	background-color: #e6e6e6;
-}
-/* Gray */
-.modbox2
-{
-	border: #000 1px ridge;
-	background-color: #c5c5c5;
-}
-.clonebox2
-{
-	border: #000 1px ridge;
-	background-color: #aaaaaa;
-}
-/* Blue */
-.modbox3
-{
-	border: #02528b 1px ridge;
-	background-color: #96c4e5;
-}
-.clonebox3
-{
-	border: #02528b 1px ridge;
-	background-color: #7fa5c2;
-}
-/* Yellow */
-.modbox4
-{
-	border: #88903b 1px ridge;
-	background-color: #e7f658;
-}
-.clonebox4
-{
-	border: #88903b 1px ridge;
-	background-color: #c7d922;
-}
-/* Green */
-.modbox5
-{
-	border: #367127 1px ridge;
-	background-color: #8fdf7a;
-}
-.clonebox5
-{
-	border: #367127 1px ridge;
-	background-color: #4baf2f;
-}
-/* Orange */
-.modbox6
-{
-	border: #8b6c17 1px ridge;
-	background-color: #f8d36f;
-}
-.clonebox6
-{
-	border: #8b6c17 1px ridge;
-	background-color: #E5AF30;
-}
-/* Red */
-.modbox7
-{
-	border: #7b1a1a 1px ridge;
-	background-color: #FF6666;
-}
-.clonebox7
-{
-	border: #7b1a1a 1px ridge;
-	background-color: #E84C4C;
-}
-/* Purple */
-.modbox8
-{
-	border: #533c5f 1px ridge;
-	background-color: #b186c9;
-}
-.clonebox8
-{
-	border: #533c5f 1px ridge;
-	background-color: #9274A5;
-}
-/* Black */
-.modbox9
-{
-	border: #fff 1px ridge;
-	background-color: #303030;
-}
-.clonebox9
-{
-	border: #fff 1px ridge;
-	background-color: #202020;
+	padding: 0;
 }
 .ui-sortable-placeholder {border: 1px dotted black; visibility: visible !important;}
 .ui-sortable-placeholder * {visibility: hidden;}
