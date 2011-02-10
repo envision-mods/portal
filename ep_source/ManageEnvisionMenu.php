@@ -109,7 +109,7 @@ function ManageEnvisionMenu()
 		redirectexit('action=admin;area=epmenu');
 	}
 
-	loadLanguage('ep_languages/ManageBoards');
+	loadLanguage('ManageBoards');
 
 	// Our options for our list.
 	$listOptions = array(
@@ -263,7 +263,7 @@ function ManageEnvisionMenu()
 		),
 	);
 
-	require_once($sourcedir . '/ep_source/Subs-List.php');
+	require_once($sourcedir . '/Subs-List.php');
 	createList($listOptions);
 
 	$context['sub_template'] = 'show_list';

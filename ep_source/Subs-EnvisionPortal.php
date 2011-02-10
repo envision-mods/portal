@@ -2275,12 +2275,10 @@ function GetEnvisionAddedModules()
 	// We want to define our variables now...
 	$AvailableModules = array();
 
-	// We need this for parse_bbc()
-	require_once($sourcedir . '/ep_source/Subs.php');
-
 	$added_mods = array();
 
 	// Let's loop throuugh each folder and get their module data. If anything goes wrong we shall skip it.
+	// !!! Use scandir()... don't tell me we're supporting PHP4!
 	if ($dir = @opendir($context['epmod_modules_dir']))
 	{
 		$dirs = array();

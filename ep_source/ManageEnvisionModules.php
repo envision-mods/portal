@@ -1551,8 +1551,8 @@ function ListGroups($checked = array(), $unallowed = array(), $order = array(), 
 	global $context, $smcFunc, $txt;
 
 	// We'll need this for loading up the names of each group.
-	if (!loadLanguage('ep_languages/ManageBoards'))
-		loadLanguage('ep_languages/ManageBoards');
+	if (!loadLanguage('ManageBoards'))
+		loadLanguage('ManageBoards');
 
 	$ep_groups = array();
 
