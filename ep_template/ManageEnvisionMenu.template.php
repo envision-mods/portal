@@ -1,6 +1,5 @@
 <?php
-// Envision Portal (c) 2011 EnvisionPortal
-// ManageEnvisionMenu.template.php; ver 1.0 RC
+// Version 1.0; ManageEnvisionMenu
 
 function template_main()
 {

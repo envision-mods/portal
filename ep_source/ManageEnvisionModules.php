@@ -10,6 +10,7 @@
 * Copyright 2011 by:            EnvisionPortal (http://envisionportal.net/)           *
 * Support, News, Updates at:    http://envisionportal.net/                            *
 **************************************************************************************/
+
 /**
  * This file handles Envision Portal's module management settings.
  *

@@ -1,6 +1,5 @@
 <?php
-// EnvisionPortal (c) 2011 EnvisionPortal
-// EnvisionPortal.template.php; ver 1.0 RC
+// Version 1.0; EnvisionPortal
 
 /**
  * Template for displaying everything above the portal. In this case, the basic rendering of the layout is done here. Modules that go after MF are held in a buffer and saved for later.

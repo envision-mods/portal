@@ -1,6 +1,5 @@
 <?php
-// Envision Portal (c) 2011 EnvisionPortal
-// EnvisionHelp.english-utf8.php; @1.1
+// Version 1.0; EnvisionHelp
 
 global $helptxt;
 
