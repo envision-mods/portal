@@ -16,7 +16,12 @@
 		<require-dir name="ep_languages" destination="$languagedir" />
 		<require-dir name="ep_scripts" destination="$themedir/scripts" />
 		<require-dir name="ep_template" destination="$themedir" />
-		<require-dir name="ep_images" destination="$imagesdir/images" />
+		<require-dir name="ep_images" destination="$imagesdir" />
+
+		<!-- Until SMF fixes their bug where the images directory for the
+		     Core Features is hard-coded into the template and the image
+		     parameter is not processed, we need to do this. Sigh. -->
+		<require-file name="ep_images/feature_ep.png" destination="$imagesdir/admin" />
 
 		<!-- Envision Plugins -->
 		<require-dir name="ep_plugins_source" destination="$sourcedir" />
@@ -38,6 +43,7 @@
 		<remove-dir name="$themedir/css/ep_css" />
 		<remove-dir name="$themedir/scripts/ep_scripts" />
 		<remove-dir name="$boarddir/ep_extra" />
+		<remove-file name="$imagesdir/admin/feature_ep.png" />
 
 		<!-- Envision Plugins -->
 		<remove-dir name="$sourcedir/ep_plugins_source" />

@@ -14,7 +14,7 @@ $txt['ep_admin_config_desc'] = 'This page allows you to change the settings of f
 $txt['ep_admin_config_help'] = 'Here you can view information about Envision Portal as well as change the basic features and options of Envision Portal.';
 
 // Descriptions here for each tab/page.
-$txt['ep_admin_config_info_desc'] = 'This page allows you to see announcements live from envision-prtal.net as well as the people involved in making Envision Portal.';
+$txt['ep_admin_config_info_desc'] = 'This page allows you to see announcements live from envisionportal.net as well as the people involved in making Envision Portal.';
 $txt['ep_admin_config_general_desc'] = 'This page allows you to change the features and options of Envision Portal.';
 
 /***********************************
@@ -42,7 +42,7 @@ $txt['ep_credits_groups_custom'] = 'Customization';
 $txt['ep_credits_groups_qa'] = 'Quality Assurance';
 $txt['ep_credits_groups_pr'] = 'Public Relations';
 $txt['ep_credits_groups_docs'] = 'Documentation Writers';
-$txt['ep_credits_groups_lang'] = 'Language Coordinators';
+$txt['ep_credits_groups_lang'] = 'Globalizers';
 $txt['ep_credits_translators_thanks'] = 'A big <u>THANK YOU</u> to our <strong>Translators</strong> who make Envision Portal possible in many different languages!';
 $txt['ep_credits_special'] = 'Special Thanks';
 $txt['ep_credits_fam_fam'] = 'Icons';
@@ -57,7 +57,7 @@ $txt['ep_credits_contribute'] = 'Do you like Envision Portal? <a href="http://en
 $txt['ep_admin_config_general'] = 'General Settings';
 
 // Settings titles
-$txt['ep_collapse_modules'] = 'Enable Collapsible Modules';
+$txt['ep_collapse_modules'] = 'Enable collapsible modules';
 $txt['ep_color_members'] = 'Color members with member group color';
 
 /***********************************
@@ -67,21 +67,21 @@ $txt['ep_color_members'] = 'Color members with member group color';
 $txt['ep_admin_config_modulesettings'] = 'Module Settings';
 
 // Description
-$txt['ep_admin_config_modulesettings_desc'] = 'Settings that apply to all of your Envision Modules.';
+$txt['ep_admin_config_modulesettings_desc'] = 'Settings that apply to all your modules.';
 
-// Module Settings titles
-$txt['ep_module_display_style'] = 'Module Display Style';
-$txt['ep_module_display_style_modular'] = 'Modular Style';
-$txt['ep_module_display_style_blocks'] = 'Block Style';
-$txt['ep_module_enable_animations'] = 'Enable Module Animations';
-$txt['ep_module_animation_speed'] = 'Module Animation Speed';
-$txt['ep_animation_speed_veryslow'] = 'Very Slow';
+// Module settings
+$txt['ep_module_display_style'] = 'Module display style';
+$txt['ep_module_display_style_modular'] = 'Modular style';
+$txt['ep_module_display_style_blocks'] = 'Block style';
+$txt['ep_module_enable_animations'] = 'Enable module animations';
+$txt['ep_module_animation_speed'] = 'Module animation speed';
+$txt['ep_animation_speed_veryslow'] = 'Very slow';
 $txt['ep_animation_speed_slow'] = 'Slow';
 $txt['ep_animation_speed_normal'] = 'Normal';
 $txt['ep_animation_speed_fast'] = 'Fast';
-$txt['ep_animation_speed_veryfast'] = 'Very Fast';
-$txt['ep_disable_custommod_icons'] = 'Do Not Install Custom Module Icons';
-$txt['ep_enable_custommod_icons'] = 'Do Not Uninstall Custom Module Icons';
-$txt['ep_icon_directory'] = 'Modules Icon directory';
+$txt['ep_animation_speed_veryfast'] = 'Very fast';
+$txt['ep_disable_custommod_icons'] = 'Do not install custom module icons';
+$txt['ep_enable_custommod_icons'] = 'Do not uninstall custom module icons';
+$txt['ep_icon_directory'] = 'Modules icon directory';
 
 ?>
