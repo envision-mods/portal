@@ -106,7 +106,7 @@ function EnvisionPortalInfo()
 	global $context, $txt, $scripturl, $sourcedir, $modSettings, $settings, $portal_ver;
 
 	// Needed to get forum admins. (temporary placeholder)
-	require_once($sourcedir . '/ep_source/Subs-Membergroups.php');
+	require_once($sourcedir . '/Subs-Membergroups.php');
 
 	if (listMembergroupMembers_Href($context['administrators'], 1, 32) && allowedTo('manage_membergroups'))
 	{
