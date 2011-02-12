@@ -1162,6 +1162,7 @@ function DatabasePopulation()
 	));
 
 	// Now presenting... *drumroll*
+	add_integration_function('integrate_pre_include', '$sourcedir/ep_source/Subs-EnvisionPortal.php');
 	add_integration_function('integrate_pre_load', 'envision_integrate_pre_load');
 	add_integration_function('integrate_load_theme', 'envision_integrate_load_theme');
 	add_integration_function('integrate_actions', 'envision_integrate_actions');

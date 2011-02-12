@@ -19,8 +19,8 @@ if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('SMF'))
 elseif (!defined('SMF'))
 	die('<b>Error:</b> Cannot uninstall - please verify you put this in the same place as SMF\'s index.php.');
 
-// Only Admin can uninstall...
-if((SMF == 'SSI') && !$user_info['is_admin'])
+// Only admins can uninstall...
+if ((SMF == 'SSI') && !$user_info['is_admin'])
 	die('Admin privileges required.');
 
 // An array of all table names, minus the prefixes, to uninstall.
