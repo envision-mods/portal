@@ -6,13 +6,6 @@
 
 	<file name="$boarddir/index.php">
 		<operation>
-			<search position="before"><![CDATA[require_once($sourcedir . '/Security.php');]]></search>
-			<add><![CDATA[
-// START - EnvisionPortal
-require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
-// END - EnvisionPortal]]></add>
-		</operation>
-		<operation>
 			<search position="replace"><![CDATA[	global $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance, $sourcedir;]]></search>
 			<add><![CDATA[	global $context, $modSettings, $settings, $user_info, $board, $topic, $board_info, $maintenance, $sourcedir;]]></add>
 		</operation>

@@ -960,19 +960,19 @@ function envisionBuffer($buffer)
 {
 	global $portal_ver, $context;
 
-	// Comeon now, does it really make that much of a difference?  Show some Respect please...
+	// Add our copyright. Please have a thought for the developers and keep it in place.
 	$search_array = array(
 		', Simple Machines LLC</a>',
-		'class="copywrite"',
+		'class="copyright"',
 	);
 	$replace_array = array(
 		', Simple Machines LLC</a><br /><a class="new_win" href="http://envisionportal.net/" target="_blank">Envision Portal v' . $portal_ver . ' &copy; 2011 Envision Portal Team</a>',
-		'class="copywrite" style="line-height: 1;"',
+		'class="copyright" style="line-height: 1;"',
 	);
 
 	if (!empty($context['has_ep_layout']))
 	{
-		// Prevent the Envision table from overrflowing the SMF theme
+		// Prevent the Envision table from overflowing the SMF theme
 		$search_array[] = '<body>';
 		$search_array[] = '</body>';
 
