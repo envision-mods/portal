@@ -36,7 +36,7 @@ function ep_init($init_action = '')
 
 	// Software Version.
 	// !!! Revise this on each commit!
-	$portal_ver = '1.0 DEV r11';
+	$portal_ver = '1.0 DEV r19';
 
 	// Unallowed Envision names.
 	$envision_names = array('announce', 'usercp', 'stats', 'online', 'news', 'topics', 'posts', 'search', 'calendar', 'poll', 'top_posters', 'theme_select', 'new_members', 'staff', 'sitemenu', 'shoutbox', 'custom');
@@ -77,10 +77,6 @@ function ep_init($init_action = '')
 	// Is Envision Portal disabled? Can you view it?
 	if (empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))
 		return;
-
-	// Load the sub-functions needed for Envision Portal, and the Envision Modules.
-	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
-	require_once($sourcedir . '/ep_source/EnvisionModules.php');
 
 	// Load the EnvisionModules Language File for all you Module Customizers out there :)
 	if (!loadLanguage('ep_languages/EnvisionModules'))

@@ -97,20 +97,16 @@ if (!defined('SMF'))
 		- adds something to an array
 */
 
-function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false)
+function ep_load_module_context($installed_mods = array(), $new_layout = false)
 {
 	global $txt;
 
-	// Default Module Configurations.
+	// Default module configurations.
 	$envisionModules = array(
 		'announce' => array(
-			'title' => 'Announcement',
-			'files' => '',
-			'target' => 1,
-			'icon' => 'world.png',
-			'title_link' => '',
-			'functions' => 'module_announce',
-			'params' => array(
+			'module_title' => $txt['ep_module_announce'],
+			'module_icon' => 'world.png',
+			'fields' => array(
 				'msg' => array(
 					'type' => 'large_text',
 					'value' => 'Welcome to Envision Portal!',
@@ -118,22 +114,15 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'usercp' => array(
-			'title' => $txt['ep_module_usercp'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'heart.png',
-			'title_link' => 'action=profile',
-			'functions' => 'module_usercp',
-			'params' => array(),
+			'module_title' => $txt['ep_module_usercp'],
+			'module_icon' => 'heart.png',
+			'module_link' => 'action=profile',
 		),
 		'stats' => array(
-			'title' => $txt['ep_module_stats'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'stats.png',
-			'title_link' => 'action=stats',
-			'functions' => 'module_stats',
-			'params' => array(
+			'module_title' => $txt['ep_module_stats'],
+			'module_icon' => 'stats.png',
+			'module_link' => 'action=stats',
+			'fields' => array(
 				'stat_choices' => array(
 					'type' => 'checklist',
 					'value' => '0,1,2,5,6:members;posts;topics;categories;boards;ontoday;onever:order',
@@ -141,13 +130,10 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'online' => array(
-			'title' => $txt['ep_module_online'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'user.png',
-			'title_link' => 'action=who',
-			'functions' => 'module_online',
-			'params' => array(
+			'module_title' => $txt['ep_module_online'],
+			'module_icon' => 'user.png',
+			'module_link' => 'action=who',
+			'fields' => array(
 				'online_pos' => array(
 					'type' => 'select',
 					'value' => '0:top;bottom',
@@ -163,13 +149,9 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'news' => array(
-			'title' => $txt['ep_module_news'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'cog.png',
-			'title_link' => '',
-			'functions' => 'module_news',
-			'params' => array(
+			'module_title' => $txt['ep_module_news'],
+			'module_icon' => 'cog.png',
+			'fields' => array(
 				'board' => array(
 					'type' => 'list_boards',
 					'value' => '1',
@@ -181,13 +163,10 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'recent' => array(
-			'title' => $txt['ep_module_topics'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'pencil.png',
-			'title_link' => 'action=recent',
-			'functions' => 'module_recent',
-			'params' => array(
+			'module_title' => $txt['ep_module_topics'],
+			'module_icon' => 'pencil.png',
+			'module_link' => 'action=recent',
+			'fields' => array(
 				'post_topic' => array(
 					'type' => 'select',
 					'value' => '1:posts;topics',
@@ -203,22 +182,14 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'search' => array(
-			'title' => $txt['ep_module_search'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'magnifier.png',
-			'title_link' => 'action=search',
-			'functions' => 'module_search',
-			'params' => array(),
+			'module_title' => $txt['ep_module_search'],
+			'module_icon' => 'magnifier.png',
+			'module_link' => 'action=search',
 		),
 		'calendar' => array(
-			'title' => $txt['ep_module_calendar'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'cal.png',
-			'title_link' => '',
-			'functions' => 'module_calendar',
-			'params' => array(
+			'module_title' => $txt['ep_module_calendar'],
+			'module_icon' => 'cal.png',
+			'fields' => array(
 				'display' => array(
 					'type' => 'select',
 					'value' => '0:month;info',
@@ -242,13 +213,9 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'poll' => array(
-			'title' => $txt['ep_module_poll'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'comments.png',
-			'title_link' => '',
-			'functions' => 'module_poll',
-			'params' => array(
+			'module_title' => $txt['ep_module_poll'],
+			'module_icon' => 'comments.png',
+			'fields' => array(
 				'options' => array(
 					'type' => 'select',
 					'value' => '0:showPoll;topPoll;recentPoll',
@@ -260,13 +227,9 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'top_posters' => array(
-			'title' => $txt['ep_module_topPosters'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'rosette.png',
-			'title_link' => '',
-			'functions' => 'module_topPosters',
-			'params' => array(
+			'module_title' => $txt['ep_module_topPosters'],
+			'module_icon' => 'rosette.png',
+			'fields' => array(
 				'show_avatar' => array(
 					'type' => 'check',
 					'value' => '1',
@@ -282,22 +245,15 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'theme_select' => array(
-			'title' => $txt['ep_module_theme_select'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'palette.png',
-			'title_link' => 'action=theme;sa=pick',
-			'functions' => 'module_theme_selector',
-			'params' => array(),
+			'module_title' => $txt['ep_module_theme_select'],
+			'module_icon' => 'palette.png',
+			'module_link' => 'action=theme;sa=pick',
 		),
 		'new_members' => array(
-			'title' => $txt['ep_module_new_members'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'overlays.png',
-			'title_link' => 'action=stats',
-			'functions' => 'module_new_members',
-			'params' => array(
+			'module_title' => $txt['ep_module_new_members'],
+			'module_icon' => 'overlays.png',
+			'module_link' => 'action=stats',
+			'fields' => array(
 				'limit' => array(
 					'type' => 'int',
 					'value' => '3',
@@ -309,13 +265,8 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'staff' => array(
-			'title' => $txt['ep_module_staff'],
-			'files' => '',
-			'target' => 1,
-			'icon' => '',
-			'title_link' => '',
-			'functions' => 'module_staff',
-			'params' => array(
+			'module_title' => $txt['ep_module_staff'],
+			'fields' => array(
 				'list_type' => array(
 					'type' => 'select',
 					'value' => '1:0;1;2',
@@ -331,13 +282,9 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'sitemenu' => array(
-			'title' => $txt['ep_module_sitemenu'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'star.png',
-			'title_link' => '',
-			'functions' => 'module_sitemenu',
-			'params' => array(
+			'module_title' => $txt['ep_module_sitemenu'],
+			'module_icon' => 'star.png',
+			'fields' => array(
 				'onesm' => array(
 					'type' => 'check',
 					'value' => '0',
@@ -345,13 +292,9 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'shoutbox' => array(
-			'title' => $txt['ep_module_shoutbox'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'comments.png',
-			'title_link' => '',
-			'functions' => 'module_shoutbox',
-			'params' => array(
+			'module_title' => $txt['ep_module_shoutbox'],
+			'module_icon' => 'comments.png',
+			'fields' => array(
 				'id' => array(
 					'type' => 'db_select',
 					'value' => '1;id_shoutbox:{db_prefix}ep_shoutboxes;name:custom',
@@ -403,13 +346,9 @@ function loadDefaultModuleConfigs($installed_mods = array(), $new_layout = false
 			),
 		),
 		'custom' => array(
-			'title' => $txt['ep_module_custom'],
-			'files' => '',
-			'target' => 1,
-			'icon' => 'comments.png',
-			'title_link' => '',
-			'functions' => 'module_custom',
-			'params' => array(
+			'module_title' => $txt['ep_module_custom'],
+			'module_icon' => 'comments.png',
+			'fields' => array(
 				'code_type' => array(
 					'type' => 'select',
 					'value' => '1:0;1;2',
@@ -767,8 +706,8 @@ function GetEnvisionModuleInfo($scripts, $mod_functions, $dirname, $file, $name 
 	$param_array = array();
 	if ($module_info1->exists('param'))
 	{
-		$params = $module_info1->set('param');
-		foreach ($params as $name => $param)
+		$fields = $module_info1->set('param');
+		foreach ($fields as $name => $param)
 		{
 			if ($param->exists('@name') && $param->exists('@type'))
 				$param_array[$param->fetch('@name')] = array(
@@ -788,7 +727,7 @@ function GetEnvisionModuleInfo($scripts, $mod_functions, $dirname, $file, $name 
 			'icon' => ($module_info1->exists('icon') ? $name . '/' . $module_info1->fetch('icon') : ''),
 			'title_link' => ($module_info1->exists('url') ? $module_info1->fetch('url') : ''),
 			'functions' => $mod_functions,
-			'params' => $param_array,
+			'fields' => $param_array,
 		);
 	}
 	else
@@ -809,7 +748,7 @@ function GetEnvisionModuleInfo($scripts, $mod_functions, $dirname, $file, $name 
 			'version' => ($module_info1->exists('version') ? $module_info1->fetch('version') : ''),
 			'author' => ($module_info1->exists('author') ? $module_info1->fetch('author') : ''),
 			'author_link' => ($module_info1->exists('author/@url') ? $module_info1->fetch('author/@url') : ''),
-			'params' => $param_array,
+			'fields' => $param_array,
 		);
 	}
 }
@@ -972,9 +911,9 @@ function ep_edit_db_select()
 	// Make sure we have a valid parameter ID of the right type.
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			dmp.value
-		FROM {db_prefix}ep_module_parameters AS dmp
-		WHERE dmp.id_param = {int:config_id} AND dmp.type = {string:type}',
+			emp.value
+		FROM {db_prefix}ep_module_parameters AS emp
+		WHERE emp.id_param = {int:config_id} AND emp.type = {string:type}',
 		array(
 			'config_id' => $_POST['config_id'],
 			'type' => 'db_select',
@@ -1078,18 +1017,17 @@ function loadLayout($url)
 {
 	global $smcFunc, $context, $scripturl, $txt, $user_info;
 
-	$match = (!empty($_REQUEST['board']) ? '[board]=' . $_REQUEST['board'] : (!empty($_REQUEST['topic']) ? '[topic]=' . (int)$_REQUEST['topic'] : (!empty($_REQUEST['page']) ? '[page]=' . $_REQUEST['page'] : $url)));
+	$match = (!empty($_REQUEST['board']) ? '[board]=' . $_REQUEST['board'] : (!empty($_REQUEST['topic']) ? '[topic]=' . (int) $_REQUEST['topic'] : (!empty($_REQUEST['page']) ? '[page]=' . $_REQUEST['page'] : $url)));
 	$general_match = (!empty($_REQUEST['board']) ? '[board]' : (!empty($_REQUEST['topic']) ? '[topic]' : (!empty($_REQUEST['page']) ? '[page]' : (!empty($_REQUEST['action']) ? '[all_actions]' : ''))));
 
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			dl.id_layout
-		FROM {db_prefix}ep_layouts AS dl
-			LEFT JOIN {db_prefix}ep_groups AS dg ON (dg.active = {int:one} AND dg.id_member = {int:zero})
-		WHERE dl.id_group = dg.id_group AND FIND_IN_SET({string:current_action}, dl.actions)',
+			el.id_layout
+		FROM {db_prefix}ep_layouts AS el
+			LEFT JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action})
+		WHERE el.id_member = {int:zero}',
 		array(
 			'current_action' => $match,
-			'one' => 1,
 			'zero' => 0,
 		)
 	);
@@ -1110,23 +1048,15 @@ function loadLayout($url)
 	// Let's grab the data necessary to show the correct layout!
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			dm.id_module AS id_mod, dm.name AS mod_name, dm.title AS mod_title, dlp.column, dlp.row,
-			dm.title_link AS mod_title_link, dm.target AS mod_target, dm.icon AS mod_icon, dm.files AS mod_files, dm.functions AS mod_functions, dm.header_display AS mod_header_display, dm.template AS mod_template, dm.groups AS mod_groups,
-			dmp.position, dlp.enabled, dl.actions, dmp.id_position, dlp.id_layout_position, dmc.id_clone,
-			dmc.title_link AS clone_title_link, dmc.target AS clone_target, dmc.icon AS clone_icon, dmc.files AS clone_files, dmc.functions AS clone_functions, dmc.header_display AS clone_header_display, dmc.template AS clone_template, dmc.groups AS clone_groups,
-			dmc.name AS clone_name, dmc.title AS clone_title, dmc.is_clone, dmp2.id_param, dmp2.name AS pName, dmp2.type, dmp2.value
-			FROM {db_prefix}ep_groups AS dg, {db_prefix}ep_layouts AS dl
-				JOIN {db_prefix}ep_layout_positions AS dlp ON (dlp.id_layout = dl.id_layout AND dlp.enabled NOT IN({array_int:invisible_layouts}))
-				JOIN {db_prefix}ep_module_positions AS dmp ON (dmp.id_layout_position = dlp.id_layout_position)
-				LEFT JOIN {db_prefix}ep_module_clones AS dmc ON (dmc.id_member = {int:zero} AND dmc.id_clone = dmp.id_clone)
-				LEFT JOIN {db_prefix}ep_modules AS dm ON (dm.id_module = dmp.id_module)
-				LEFT JOIN {db_prefix}ep_module_parameters AS dmp2 ON ((dmp2.id_module = dm.id_module AND dmp2.id_clone = {int:zero}) OR dmp2.id_clone = dmc.id_clone)
-			WHERE
-				dg.id_member = {int:zero} AND dg.active = {int:one} AND dl.id_group = dg.id_group AND FIND_IN_SET({string:current_action}, dl.actions)',
+			*
+		FROM {db_prefix}ep_layouts AS el
+			JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action})
+			LEFT JOIN {db_prefix}ep_layout_positions AS elp ON (elp.id_layout = el.id_layout)
+			LEFT JOIN {db_prefix}ep_module_positions AS emp ON (emp.id_layout_position = elp.id_layout_position)
+			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
+		WHERE el.id_member = {int:zero}',
 		array(
-			'one' => 1,
 			'zero' => 0,
-			'invisible_layouts' => array(-1, -2),
 			'current_action' => $match,
 		)
 	);
@@ -1143,79 +1073,33 @@ function loadLayout($url)
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$type = !empty($row['id_clone']) ? 'clone' : 'mod';
-		$is_clone = !empty($row['is_clone']) && !empty($row['id_clone']);
+		$smf_col = empty($row['id_module']) && !is_null($row['id_position']);
 
-		$smf = (int) $row['id_clone'] + (int) $row['id_mod'];
-		$smf_col = empty($smf) && !is_null($row['id_position']);
-
-		if (!$smf_col && $row['enabled'] == 0)
+		if (!$smf_col && $row['status'] == 'inactive')
 			continue;
 
-		// Who can view it?
-		$view_groups = isset($row[$type.'_groups']) && $row[$type.'_groups'] != '' ? explode(',', $row[$type.'_groups']) : array();
-
-		// -3 is for everybody...
-		if (in_array('-3', $view_groups))
-			$view_groups = $user_info['groups'];
-
-		// Match the current group(s) with the parameter to determine if the user may access this, Admins can select not to view Modules also here.
-		$view_groups = array_intersect($user_info['groups'], $view_groups);
-
-		// Shucks, you can't view it
-		if (!$view_groups && !$smf_col)
-			continue;
-
-		$current_row = explode(':', $row['row']);
-		$current_column = explode(':', $row['column']);
-		if (!isset($ep_modules[$current_row[0]][$current_column[0]]) && !empty($row['id_layout_position']))
-			$ep_modules[$current_row[0]][$current_column[0]] = array(
+		if (!isset($ep_modules[$row['x_pos']][$row['y_pos']]) && !empty($row['id_layout_position']))
+			$ep_modules[$row['x_pos']][$row['y_pos']] = array(
 				'is_smf' => $smf_col,
 				'id_layout_position' => $row['id_layout_position'],
-				'html' => ($current_column[1] >= 2 ? ' colspan="' . $current_column[1] . '"' : '') . ($current_row[1] >= 2 ? ' rowspan="' . $current_row[1] . '"' : '') . ($current_column[1] <= 1 && $context['ep_home'] && $current_column[0] != 1 || !$context['ep_home'] && $current_column[1] <= 1 && !$smf_col ? ' style="width: 200px;"' : ''),
-				'enabled' => $row['enabled'],
-				'disabled_module_container' => $row['enabled'] == -1,
+				'html' => ($row['colspan'] >= 2 ? ' colspan="' . $row['colspan'] . '"' : '') . ($context['ep_home'] && in_array($row['y_pos'], array(0, 2)) || !$context['ep_home'] && $row['y_pos'] <= 1 && !$smf_col ? ' style="width: 200px;"' : ''),
 			);
 
 		if (!is_null($row['id_position']) && !empty($row['id_layout_position']))
 		{
 			// Store $context variables for each module.  Mod Authors can use these for unique ID values, function names, etc.
-			if (!isset($ep_modules[$current_row[0]][$current_column[0]]['modules'][$row['position']]))
-			{
-				if (empty($context['ep_mod_' . $row[$type . '_name']]))
-					$context['ep_mod_' . $row[$type . '_name']] = array();
+			// !!! Is this really needed?
+			if (!isset($ep_modules[$row['x_pos']][$row['y_pos']]['modules'][$row['position']]))
+				if (empty($context['ep_mod_' . $row['type']]))
+					$context['ep_mod_' . $row['type']] = $row['type'] .  '_' . $row['id_position'];
 
-				$context['ep_mod_' . $row[$type . '_name']][] = $row[$type . '_name'] . '_' . $type . '_' . $row['id_' . $type];
-			}
-
-			$ep_modules[$current_row[0]][$current_column[0]]['modules'][$row['position']] = array(
-				'is_smf' => empty($smf),							// Returns true or false; Is this the mighty SMF that we should bow down to? :P
-				'is_clone' => $is_clone,							// Returns true or false; determines if it really is a clone or not.
-				'modify_link' => $user_info['is_admin'] ? ' [<a href="' . $scripturl . '?action=admin;area=epmodules;sa=modifymod;' . (isset($row['id_clone']) ? 'module=' . $row['id_clone'] : 'modid=' . $row['id_mod']) . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['modify'] . '</a>]' : '',
-				'type' => $type,									// Returns either 'mod' or 'clone'.
-				'id' => $row['id_position'],						// The unique position ID of the clone/module.
-				'id_position' => $row['id_position'],				// The unique position ID of the clone/module.
-				'name' => $row[$type.'_name'],						// Name of clone or module.
-				'title' => $row[$type.'_title'],					// Title of clone/module on titlebar.
-				'title_link' => $row[$type.'_title_link'],			// Link associated with the title.
-				'target' => $row[$type.'_target'],					// Target of clone/module (int value).
-				'icon' => $row[$type.'_icon'],						// Icon associated with the module/clone.
-				'files' => $row[$type.'_files'],					// File, if any, for the function of that module/clone.
-				'functions' => $row[$type.'_functions'],			// Any functions for that module/clone.
-				'header_display' => $row[$type.'_header_display'],	// Shall we show the title?
-				'template' => $row[$type.'_template'],				// Which template to use?
-				'groups' => !empty($row[$type.'_groups']) ? explode(',', $row[$type.'_groups']) : array(),		// The membergroups that can view this.
-			);
-
-			$params[$row['id_position']][] = array(
-				'id' => $row['id_' . $type],
-				'name' => $row['pName'],
+			$ep_modules[$row['x_pos']][$row['y_pos']]['modules'][$row['position']] = array(
+				'is_smf' => $smf_col,
+				'modify_link' => $user_info['is_admin'] ? ' [<a href="' . $scripturl . '?action=admin;area=epmodules;sa=modify;in=' . $row['id_module'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['modify'] . '</a>]' : '',
 				'type' => $row['type'],
-				'value' => $row['value'],
+				'id' => $row['id_position'],
 			);
 		}
-
-		$ep_modules[$current_row[0]][$current_column[0]]['modules'][$row['position']]['params'] = $params[$row['id_position']];
 	}
 
 	// Shouldn't be empty, but we check anyways!
@@ -1240,12 +1124,15 @@ function loadLayout($url)
 						ksort($ep_modules[$k][$key][$pos]);
 					}
 		}
+
+		$module_context = ep_load_module_context();
+
 		foreach ($ep_modules as $row_id => $row_data)
 			foreach ($row_data as $column_id => $column_data)
 				if (isset($column_data['modules']))
-						foreach($column_data['modules'] as $module => $id)
-							if (!empty($id['name']))
-								$ep_modules[$row_id][$column_id]['modules'][$module] = processModule($id);
+						foreach ($column_data['modules'] as $module => $id)
+							if (!empty($id['type']))
+								$ep_modules[$row_id][$column_id]['modules'][$module] = ep_process_module($module_context, $id);
 
 		$context['envision_columns'] = $ep_modules;
 
@@ -1255,112 +1142,102 @@ function loadLayout($url)
 	}
 }
 
-function processModule($data = array())
+function ep_process_module($module_context, $data)
 {
-	global $context, $modSettings, $settings, $options, $txt, $user_info;
+	global $context, $modSettings, $settings, $options, $txt, $user_info, $scripturl, $smcFunc;
 
-	$ep_modules = loadDefaultModuleConfigs(array(), !empty($data['functions']));
+	$info = $module_context[$data['type']];
+	$data = array_merge_recursive($data, $info);
 
-	$error_name = array();
-	foreach ($ep_modules as $key => $info)
-	{
-		if (isset($data['name']) && $key != $data['name'])
-			continue;
+	/*if ($data['id']==3) die(var_dump(array_merge_recursive($data, $info), $data, $info));
+	if ($data['id']==3){
+	// Now grab the custom fields assosiated with this module.
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			name, type, options, value
+		FROM {db_prefix}ep_module_field_data AS emd
+			LEFT JOIN {db_prefix}ep_module_fields AS emf ON (emf.id_module_position = {in:id_position})
+		WHERE emd.id_field = emf.id_field',
+		array(
+			'id_position' => $data['id'],
+		)
+	);
 
-		if (!empty($data['files']))
-		{
-			// We don't want any warnings to show, so we'll check if the file exists first.
-			// We already know the function doesn't exist.
-			$mod_files = explode('+', $data['files']);
-			foreach ($mod_files as $mFile)
-				if (file_exists($context['epmod_modules_dir'] . '/' . $data['name'] . '/' . $mFile))
-					require_once($context['epmod_modules_dir'] . '/' . $data['name'] . '/' . $mFile);
-				else
-				{
-					// Log it into the error log...
-					module_error(sprintf($txt['ep_modfile_not_exist'], $data['name'], $context['epmod_modules_dir'] . '/' . $data['name'] . '/' . $mFile), 'critical', true, false);
-					$error_name[$data['name']] = $data['name'];
-				}
-		}
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$data['fields'][] = array(
+			$row['name'] => array(
+				'type' => $row['type'],
+				'options' => $row['options'],
+				'value' => $row['value'],
+			),
+		);
+}*/
+
+		if (file_exists($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php'))
+			require_once($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php');
 
 		// Load the module template.
-		if (empty($data['template']) || !empty($data['template']) && !file_exists($context['epmod_template'].$data['template'].'.php'))
+		if (empty($data['template']) || !empty($data['template']) && !file_exists($context['epmod_template'] . $data['template'].'.php'))
 			$data['template'] = 'default';
 
 		require_once($context['epmod_template'] . $data['template'] . '.php');
 
 		// Correct the title target...
-		switch ((int) $data['target'])
+		if (!isset($data['module_target']))
+			$data['module_target'] = 1;
+
+		switch ((int) $data['module_target'])
 		{
 			case 1:
-				$data['target'] = '_self';
+				$data['module_target'] = '_self';
 				break;
 			case 2:
-				$data['target'] = '_parent';
+				$data['module_target'] = '_parent';
 				break;
 			case 3:
-				$data['target'] = '_top';
+				$data['module_target'] = '_top';
 				break;
 			default:
-				$data['target'] = '_blank';
+				$data['module_target'] = '_blank';
 				break;
 		}
 
-		// Load up the icon if there is one to load.
-		$data['icon'] = !empty($data['icon']) ? $context['epmod_icon_url'] . $data['icon'] : '';
+		if (!empty($data['module_icon']));
+			$data['module_icon'] = '<img src="' . $context['epmod_icon_url'] . $data['module_icon'] . '" alt="" title="' . $data['module_title'] . '" class="icon" style="margin-left: 0px;" />&nbsp;';
 
-		// Load up the link for the title.
-		// Checking for either an 'action' or a 'url'.
-		if (isset($data['title_link']))
+		if (isset($data['module_link']))
 		{
-			$http = (strpos(strtolower($data['title_link']), 'http://') === 0 ? true : (strpos(strtolower($data['title_link']), 'www.') === 0 ? true : false));
+			$http = stristr($data['module_link'], 'http://') !== false || stristr($data['module_link'], 'www.') !== false;
 
 			if ($http)
-			{
-				$data = array_merge($data, array(
-					'url' => !empty($data['url']) ? $data['url'] : '<a href="' . $data['title_link'] . '" target="' . $data['target'] . '" onfocus="if(this.blur)this.blur();">',
-					'action' => '',
-				));
-			}
+				$data['module_title'] = '<a href="' . $data['module_link'] . '" target="' . $data['module_target'] . '">' . $data['module_title'] . '</a>';
 			else
-			{
-				$data = array_merge($data, array(
-					'url' => '',
-					'action' => $data['title_link'],
-				));
-			}
+				$data['module_title'] = '<a href="' . $scripturl . '?' . $data['module_link'] . '" target="' . $data['module_target'] . '">' . $data['module_title'] . '</a>';
 		}
 
-		// Check for any parameters...
-		if (!empty($data['params']))
+		if (!empty($data['fields']))
 		{
-			$params = $data['params'];
-			$data['params'] = array();
+			$fields = $data['fields'];
+			$data['fields'] = array();
 
-			// Just a tad faster than foreach.
-			$countParams = count($params);
-			for ($i = 0; $i < $countParams; $i++)
-				$data['params'][$params[$i]['name']] = loadParameter($params[$i]['file_input'], $params[$i]['type'], $params[$i]['value']);
+			foreach ($fields as $key => $field)
+				$data['fields'][$key] = loadParameter(array(), $field['type'], $field['value']);
 		}
 
-		// Main module function will always be the first function in the list of functions.
-		if (empty($data['functions']))
-			$main_function = explode('+', $info['functions']);
-		else
-			$main_function = explode('+', $data['functions']);
-
-		$data['function'] = $main_function[0];
-	}
+		$data['function'] = 'module_' . $data['type'];
 
 	$data['is_collapsed'] = $user_info['is_guest'] ? !empty($_COOKIE[$data['type'] . 'module_' . $data['id']]) : !empty($options[$data['type'] . 'module_' . $data['id']]);
 
-	if ($data['header_display'] == 2)
+	if (isset($data['header_display']) && $data['header_display'] == 2)
 	{
 		$data['is_collapsed'] = false;
 		$data['hide_upshrink'] = true;
 	}
 	else
 		$data['hide_upshrink'] = false;
+
+	if (!isset($data['header_display']))
+		$data['header_display'] = 1;
 
 	// Which function to call?
 	$toggleModule = !empty($modSettings['ep_module_enable_animations']) ? 'Anim('  : '(';
@@ -1657,8 +1534,9 @@ function envision_integrate_pre_load()
 	// Is Envision Portal enabled in the Core Features?
 	$modSettings['ep_portal_mode'] = isset($modSettings['admin_features']) ? in_array('ep', explode(',', $modSettings['admin_features'])) : false;
 
-	// Include the main file.
 	require_once($sourcedir . '/ep_source/EnvisionPortal.php');
+	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
+	require_once($sourcedir . '/ep_source/EnvisionModules.php');
 }
 
 function envision_integrate_load_theme()

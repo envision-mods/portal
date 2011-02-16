@@ -38,11 +38,10 @@ function ep_template_default($module, $style, $location = 0)
 	{
 		if (!empty($module['header_display']) || $module['header_display'] == 2)
 			echo '
-			<div id="ep_', $module['type'], 'module_', $module['id'], '" class="cat_bar', (!$module['is_collapsed'] || empty($modSettings['ep_collapse_modules']) ? ' block_header' : ''), '"', (!empty($location) ? ' style="margin-top: 7px;"' : ''), '>
+			<div id="ep_module_', $module['type'], '_', $module['id'], '" class="cat_bar', (!$module['is_collapsed'] || empty($modSettings['ep_collapse_modules']) ? ' block_header' : ''), '"', (!empty($location) ? ' style="margin-top: 7px;"' : ''), '>
 				<h3 class="catbg">
 					', !empty($modSettings['ep_collapse_modules']) && $module['header_display'] != 2 ? '<img class="ep_curveblock floatright hand" id="' . $module['type'] . 'collapse_' . $module['id'] . '" src="' . $settings['images_url'] . '/collapse.gif" alt="" title="' . $txt['ep_core_modules'] . '" />' : '', '
-					' . (empty($module['icon']) ? '' : '
-								<img src="' . $module['icon'] . '" alt="" title="' . $module['title'] . '" class="icon" style="margin-left: 0px;" />&nbsp;') . (empty($module['action']) && empty($module['url']) ? '' : (!empty($module['url']) ? $module['url'] : '<a href="' . $scripturl . '?' . $module['action'] . '" target="' . $module['target'] . '">')) . $module['title'] . (empty($module['action']) && empty($module['url']) ? '' : '</a>') . '
+					' . $module['module_icon'] . $module['module_title'] . '
 				</h3>
 			</div>';
 		else
@@ -52,7 +51,7 @@ function ep_template_default($module, $style, $location = 0)
 		echo '
 				<div id="', $module['type'], 'module_', $module['id'], '"', $module['is_collapsed'] && !empty($modSettings['ep_collapse_modules']) && !empty($module['header_display']) ? ' style="display: none;"' : '', '>
 					<div class="roundframe blockframe">
-						', !empty($module['params']) ? $module['function']($module['params']) : $module['function'](), '
+						', !empty($module['fields']) ? $module['function']($module['fields']) : $module['function'](), '
 					</div>
 				<span class="lowerframe"><span></span></span></div>';
 	}
