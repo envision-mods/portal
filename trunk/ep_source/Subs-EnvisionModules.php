@@ -680,7 +680,7 @@ function list_getNumShouts($where, $where_params = array())
 	return $num_shouts;
 }
 
-function ep_getUrl()
+function ep_get_url()
 {
 	global $scripturl;
 
@@ -692,9 +692,6 @@ function ep_getUrl()
 function ep_boardNews($board, $limit)
 {
 	global $scripturl, $smcFunc, $modSettings;
-
-	if (!loadLanguage('ep_languages/Stats'))
-		loadLanguage('ep_languages/Stats');
 
 	$request = $smcFunc['db_query']('', '
 		SELECT b.id_board
@@ -861,7 +858,7 @@ function ep_recentTopics($num_recent = 8, $exclude_boards = null, $include_board
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		$topics[] = $row['id_topic'];
-		$boards['id_topic'] = $row;
+		$boards[$row['id_topic']] = $row;
 	}
 
 	// Find all the posts in distinct topics.  Newer ones will have higher IDs.
@@ -901,10 +898,10 @@ function ep_recentTopics($num_recent = 8, $exclude_boards = null, $include_board
 		// Build the array.
 		$posts[] = array(
 			'board' => array(
-				'id' => $boards['id_topic']['id_board'],
-				'name' => $boards['id_topic']['board_name'],
-				'href' => $scripturl . '?board=' . $boards['id_topic']['id_board'] . '.0',
-				'link' => '<a href="' . $scripturl . '?board=' . $boards['id_topic']['id_board'] . '.0">' . $boards['id_topic']['board_name'] . '</a>'
+				'id' => $boards[$row['id_topic']]['id_board'],
+				'name' => $boards[$row['id_topic']]['board_name'],
+				'href' => $scripturl . '?board=' . $boards[$row['id_topic']]['id_board'] . '.0',
+				'link' => '<a href="' . $scripturl . '?board=' . $boards[$row['id_topic']]['id_board'] . '.0">' . $boards[$row['id_topic']]['board_name'] . '</a>'
 			),
 			'topic' => $row['id_topic'],
 			'poster' => array(

@@ -60,7 +60,7 @@ function module_usercp()
 		// Set the logout variable.
 		$logout = sprintf($scripturl . '?action=logout;%1$s=%2$s', $context['session_var'], $context['session_id']);
 
-		$_SESSION['logout_url'] = ep_getUrl();
+		$_SESSION['logout_url'] = ep_get_url();
 
 		// What does the user want the time formatted as?
 		$s = strpos($user_info['time_format'], '%S') === false ? '' : ':%S';
@@ -716,9 +716,7 @@ function module_calendar($params)
 			<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>';
 
 		// Set $unique_id to the info for this calendar module instance and reset the $context variable.
-		$unique_id = $context['ep_mod_calendar'][0];
-		unset($context['ep_mod_calendar'][0]);
-		$context['ep_mod_calendar'] = array_values($context['ep_mod_calendar']);
+		$unique_id = $context['ep_mod_calendar'];
 
 		// Obtain todays info.
 		$today = array(
@@ -1771,14 +1769,7 @@ function module_shoutbox($params)
 
 	if (is_array($params))
 	{
-		// Grab this MODULE/CLONES id value, which will have the MOD NAME + '_' + TYPE (mod/clone) + '_' + the id_value
-		$unique_id = $context['ep_mod_shoutbox'][0];
-
-		// Remove this value so that it doesn't get used again!
-		unset($context['ep_mod_shoutbox'][0]);
-
-		// Reset the array keys from 0 to count($context['ep_mod_shoutbox']) - 1
-		$context['ep_mod_shoutbox'] = array_values($context['ep_mod_shoutbox']);
+		$unique_id = $context['ep_mod_shoutbox'];
 
 		$refresh_rate = !isset($params['refresh_rate']) ? 5000 : ($params['refresh_rate'] < 1 ? 500 : $params['refresh_rate'] * 1000);
 		$member_color = !isset($params['member_color']) ? 1 : (int) $params['member_color'];
