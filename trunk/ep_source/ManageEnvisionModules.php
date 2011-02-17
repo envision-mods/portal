@@ -80,8 +80,8 @@ function Modules()
 		'epinstallmodule' => 'InstallEnvisionModule',
 		'epuninstallmodule' => 'UninstallEnvisionModule',
 		'epdeletemodule' => 'DeleteEnvisionModule',
-		'modifymod' => 'ModifyModule',
-		'clonemod' => 'CloneEnvisionMod',
+		'modify' => 'ModifyModule',
+		'removemodule' => 'RemoveModule',
 		'epaddlayout' => 'AddEnvisionLayout',
 		'epaddlayout2' => 'AddEnvisionLayout2',
 		'epdellayout' => 'DeleteEnvisionLayout',
@@ -132,12 +132,10 @@ function ManageEnvisionModules()
 	{
 		$request = $smcFunc['db_query']('', '
 			SELECT
-				dl.id_layout, dl.name
-			FROM {db_prefix}ep_layouts AS dl
-				LEFT JOIN {db_prefix}ep_groups AS dg ON (dg.active = {int:one} AND dg.id_member = {int:zero})
-			WHERE dl.id_group = dg.id_group',
+				id_layout, name
+			FROM {db_prefix}ep_layouts
+			WHERE id_member = {int:zero}',
 			array(
-				'one' => 1,
 				'zero' => 0,
 			)
 		);
@@ -152,119 +150,27 @@ function ManageEnvisionModules()
 			'name' => $_SESSION['layouts'][$_POST['layout_picker']],
 		);
 
+	loadLayout($_SESSION['selected_layout']['id_layout']);
+
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			dm.id_module, dm.name AS mod_name, dm.title AS mod_title, dlp.column, dlp.row, dl.actions,
-			dmp.position, dlp.enabled, dmp.id_position, dlp.id_layout_position, dlp.id_layout_position AS original_id_layout_position,
-			dmc.id_clone, dmc.name AS clone_name, dmc.title AS clone_title, dmc.is_clone
-		FROM {db_prefix}ep_layout_positions AS dlp
-			LEFT JOIN {db_prefix}ep_groups AS dg ON (dg.active = {int:one} AND dg.id_member = {int:zero})
-			LEFT JOIN {db_prefix}ep_layouts AS dl ON (dl.id_group = dg.id_group AND dl.name = {string:layout_name} AND dl.id_layout = {int:id_layout})
-			LEFT JOIN {db_prefix}ep_module_positions AS dmp ON (dmp.id_layout_position = dlp.id_layout_position AND dmp.id_layout = dl.id_layout)
-			LEFT JOIN {db_prefix}ep_module_clones AS dmc ON (dmp.id_clone = dmc.id_clone AND dmc.id_member = {int:zero})
-			LEFT JOIN {db_prefix}ep_modules AS dm ON (dmp.id_module = dm.id_module)
-			WHERE dlp.id_layout = dl.id_layout AND dlp.enabled != {int:invisible_layout}
-		ORDER BY dlp.row',
-		array(
-			'layout_name' => $_SESSION['selected_layout']['name'],
-			'one' => 1,
-			'zero' => 0,
-			'invisible_layout' => -2,
-			'id_layout' => $_SESSION['selected_layout']['id_layout'],
-		)
-	);
+			type
+		FROM {db_prefix}ep_modules');
 
-	$old_row = 0;
+	$module_context = ep_load_module_context();
+
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$is_clone = !empty($row['is_clone']) && !empty($row['id_clone']);
+		$context['ep_all_modules'][] = array(
+			'type' => $row['type'],
+			'module_title' => !empty($row['module_title']) ? $row['module_title'] : $module_context[$row['type']]['module_title'],
+		);
 
-		if ($row['enabled'] == -1)
-		{
-			$row['id_layout_position'] = 0;
-			$row['row'] = '0:0';
-			$row['column'] = '0:0';
-		}
-
-		$_SESSION['layout_actions'] = explode(',', $row['actions']);
-		$smf = (int) $row['id_clone'] + (int) $row['id_module'];
-		$smf_col = empty($smf) && !is_null($row['id_position']);
-
-		$current_row = explode(':', $row['row']);
-		$current_column = explode(':', $row['column']);
-		$context['span']['rows'][$row['original_id_layout_position']] = ($current_row[1] >= 2 ? ' rowspan="' . $current_row[1] . '"' : '');
-		$context['span']['columns'][$row['original_id_layout_position']] = ($current_column[1] >= 2 ? ' colspan="' . $current_column[1] . '"' : '');
-		if (!isset($ep_modules[$current_row[0]][$current_column[0]]) && !empty($row['id_layout_position']))
-			$ep_modules[$current_row[0]][$current_column[0]] = array(
-				'is_smf' => $smf_col,
-				'id_layout_position' => $row['original_id_layout_position'],
-				'column' => explode(':', $row['column']),
-				'row' => explode(':', $row['row']),
-				'enabled' => $row['enabled'],
-				'disabled_module_container' => $row['enabled'] == -1,
-			);
-
-		if (!is_null($row['id_position']) && !empty($row['id_layout_position']))
-			$ep_modules[$current_row[0]][$current_column[0]]['modules'][$row['position']] = array(
-				'is_smf' => empty($smf),
-				'id' => $row['id_position'],
-				'title' => empty($row['id_clone']) ? $row['mod_title'] : $row['clone_title'],
-				'is_clone' => $is_clone,
-				'id_clone' => $row['id_clone'],
-				'modify' => '<a href="' . $scripturl . '?action=admin;area=epmodules;sa=modifymod;' . (isset($row['id_clone']) ? 'module=' . $row['id_clone'] : 'modid=' . $row['id_module']) . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['ep_admin_modules_manage_modify'] . '</a>',
-				'clone' => '<a href="javascript:void(0)" js_link="' . $scripturl . '?action=admin;area=epmodules;sa=clonemod' . (!$is_clone ? ';mod' : '') . ';xml;' . (!empty($row['id_clone']) ? 'module=' . $row['id_clone'] : 'modid=' . $row['id_module']) . ';' . $context['session_var'] . '=' . $context['session_id'] . '" class="clonelink">' . ($is_clone ? $txt['epmodule_declone'] : $txt['epmodule_clone']) . '</a>',
-			);
-
-		// Special case for disabled modules...
-		if (!isset($ep_modules['disabled']) && empty($row['id_layout_position']))
-			$ep_modules['disabled'] = array(
-				'id_layout_position' => $row['original_id_layout_position'],
-				'fake_id_layout_position' => $row['id_layout_position'],
-				'column' => explode(':', $row['column']),
-				'row' => explode(':', $row['row']),
-				'enabled' => $row['enabled'],
-			);
-
-		if (!is_null($row['id_position']) && empty($row['id_layout_position']))
-			$ep_modules['disabled']['modules'][] = array(
-				'id' => $row['id_position'],
-				'title' => empty($row['id_clone']) ? $row['mod_title'] : $row['clone_title'],
-				'is_clone' => $is_clone,
-				'id_clone' => $row['id_clone'],
-				'modify' => '<a href="' . $scripturl . '?action=admin;area=epmodules;sa=modifymod;' . (isset($row['id_clone']) ? 'module=' . $row['id_clone'] : 'modid=' . $row['id_module']) . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['ep_admin_modules_manage_modify'] . '</a>',
-				'clone' => '<a href="javascript:void(0)" js_link="' . $scripturl . '?action=admin;area=epmodules;sa=clonemod' . (!$is_clone ? ';mod' : '') . ';xml;' . (!empty($row['id_clone']) ? 'module=' . $row['id_clone'] : 'modid=' . $row['id_module']) . ';' . $context['session_var'] . '=' . $context['session_id'] . '" class="clonelink">' . ($is_clone ? $txt['epmodule_declone'] : $txt['epmodule_clone']) . '</a>',
-			);
-	}
-
-	if (!empty($ep_modules))
-	{
-		ksort($ep_modules);
-
-		foreach ($ep_modules as $k => $ep_module_rows)
-		{
-			ksort($ep_modules[$k]);
-			foreach ($ep_modules[$k] as $key => $ep)
-				if (is_array($ep_modules[$k][$key]))
-					foreach($ep_modules[$k][$key] as $pos => $mod)
-					{
-						if ($pos != 'modules' || !is_array($ep_modules[$k][$key][$pos]))
-							continue;
-
-						ksort($ep_modules[$k][$key][$pos]);
-					}
-		}
-
-		$context['ep_columns'] = $ep_modules;
-	}
-
-	if (!isset($context['ep_columns']))
+	/*if (!isset($context['ep_columns']))
 	{
 		unset($_SESSION['selected_layout']);
 		unset($_SESSION['layouts']);
 		redirectexit('action=admin;area=epmodules;sa=epmanmodules');
-	}
-
-	$_SESSION['dlpIepos'] = $context['ep_columns']['disabled']['id_layout_position'];
+	}*/
 
 	$context['html_headers'] .= '
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
@@ -272,12 +178,9 @@ function ManageEnvisionModules()
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_man_mods.js"></script>
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
 	<script type="text/javascript">
-		var dlpIdPos = "' . $_SESSION['dlpIepos'] . '";
 		var sessVar = "' . $context['session_var'] . '";
 		var sessId = "' . $context['session_id'] . '";
 		var errorString = "' . $txt['error_string'] . '";
-		var cloneMade = "' . $txt['clone_made'] . '";
-		var cloneDeleted = "' . $txt['clone_deleted'] . '";
 		var modulePositionsSaved = "' . $txt['module_positions_saved'] . '";
 		var clickToClose = "' . $txt['click_to_close'] . '";
 	</script>';
@@ -294,14 +197,55 @@ function SaveEnvisionModules()
 
 	foreach ($_POST as $epcol_idb => $epcol_data)
 	{
-		// if (is_bool(strpos($epcol_idb, 'epcol')))
-			// continue;
-
 		$epcol_id = str_replace('epcol_', '', $epcol_idb);
 
-		if (!is_bool(strpos($epcol_idb, 'epcol')))
+		if (is_array($epcol_data))
 			foreach ($epcol_data as $position => $id_position)
-				$newLayout[$epcol_id][$id_position] = $position;
+				if (is_numeric($id_position))
+					// Saving a module that was merely moved.
+					$smcFunc['db_query']('', '
+						UPDATE {db_prefix}ep_module_positions
+						SET
+							position = {int:position},
+							id_layout_position = {int:id_layout_position}
+						WHERE id_position = {int:id_position}',
+						array(
+							'id_position' => (int) $id_position,
+							'id_layout_position' => (int) $epcol_id,
+							'position' => $position,
+						)
+					);
+				else
+				{
+					if (is_numeric($epcol_id))
+					{
+						// First get the ID of the module type added.
+						$request = $smcFunc['db_query']('', '
+							SELECT id_module
+							FROM {db_prefix}ep_modules
+							WHERE type = {string:type}',
+							array(
+								'type' => str_replace('envisionmod_', '', $id_position),
+							)
+						);
+
+						list ($id_module) = $smcFunc['db_fetch_row']($request);
+
+						// Insert a new row for a module aadded from the list on the right.
+						$smcFunc['db_insert']('insert',
+							'{db_prefix}ep_module_positions',
+							array(
+								'id_layout_position' => 'int', 'id_module' => 'int', 'position' => 'int'
+							),
+							array(
+								$epcol_id, $id_module, $position
+							),
+							array('id_position', 'id_layout_position', 'id_module')
+						);
+					}
+				}
+
+		/*$epcol_id = str_replace('epcol_', '', $epcol_idb);
 
 		if (!is_array($_POST[$epcol_idb]))
 			// Doing the enabled checkboxes...
@@ -314,60 +258,10 @@ function SaveEnvisionModules()
 					'epcol_id' => (int)str_replace('column_', '', $epcol_idb),
 					'enabled_value' => (!empty($_POST[$epcol_idb]) ? 1 : 0),
 				)
-			);
+			);*/
 	}
 
-	if (!empty($newLayout))
-	foreach ($newLayout as $update_layout_key => $update_layout_value)
-	{
-		$update_query = '';
-		$update_params = array();
-		$current_positions = array();
-		foreach ($update_layout_value as $update_key => $update_value)
-		{
-			$update_query .= '
-					WHEN {int:current_position' . $update_key . '} THEN {int:new_position' . $update_key . '}';
-
-			$update_params = array_merge($update_params, array(
-				'current_position' . $update_key => $update_key,
-				'new_position' . $update_key => $update_value,
-			));
-			$current_positions[] = $update_key;
-		}
-
-		if ($update_layout_key == 0)
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}ep_module_positions
-				SET
-					position = CASE id_position ' . $update_query . '
-						END,
-					id_layout_position = 0
-				WHERE id_position IN({array_int:current_positions})',
-				array_merge($update_params, array(
-					'current_positions' => $current_positions,
-				))
-			);
-		else
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}ep_module_positions AS dmp, {db_prefix}ep_layout_positions AS dlp
-				SET
-					dmp.position = CASE dmp.id_position ' . $update_query . '
-						END,
-					dmp.id_layout_position = {int:new_column}
-				WHERE dmp.id_position IN({array_int:current_positions})',
-				array_merge($update_params, array(
-					'new_column' => $update_layout_key,
-					'current_positions' => $current_positions,
-				))
-			);
-	}
-
-	// We need to empty the cache now, but make sure it is in the correct format, first.
-	foreach ($_SESSION['layout_actions'] as $action)
-		if (is_array(cache_get_data('envision_columns_' . md5(md5($action)), 3600)))
-			cache_put_data('envision_columns_' . md5(md5($action)), 0, 3600);
-
-	// Yep, that's all, folks!
+	// !!! Do we die here or use obexit(false)?
 	die();
 }
 
@@ -1629,6 +1523,34 @@ function UninstallEnvisionModule()
 	$redirect = 'action=admin;area=epmodules;sa=epaddmodules';
 	redirectexit($redirect);
 }
+
+/**
+ * Removes a module from a layout.
+ *
+ * @since 1.0
+ */
+function RemoveModule()
+{
+	global $smcFunc;
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}ep_module_positions
+		WHERE id_position = {int:id_position}',
+		array(
+			'id_position' => str_replace('envisionmod_', '', $_POST['data']),
+		)
+	);
+
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}ep_module_field_data
+		WHERE id_layout_position = {int:id_position}',
+		array(
+			'id_position' => str_replace('envisionmod_', '', $_POST['data']),
+		)
+	);
+
+	die($_POST['data']);
+	}
 
 /**
  * Removes a module with all its files from the filesystem.

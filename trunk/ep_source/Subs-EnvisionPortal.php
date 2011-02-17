@@ -1017,59 +1017,78 @@ function loadLayout($url)
 {
 	global $smcFunc, $context, $scripturl, $txt, $user_info;
 
-	$match = (!empty($_REQUEST['board']) ? '[board]=' . $_REQUEST['board'] : (!empty($_REQUEST['topic']) ? '[topic]=' . (int) $_REQUEST['topic'] : (!empty($_REQUEST['page']) ? '[page]=' . $_REQUEST['page'] : $url)));
-	$general_match = (!empty($_REQUEST['board']) ? '[board]' : (!empty($_REQUEST['topic']) ? '[topic]' : (!empty($_REQUEST['page']) ? '[page]' : (!empty($_REQUEST['action']) ? '[all_actions]' : ''))));
-
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			el.id_layout
-		FROM {db_prefix}ep_layouts AS el
-			LEFT JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action})
-		WHERE el.id_member = {int:zero}',
-		array(
-			'current_action' => $match,
-			'zero' => 0,
-		)
-	);
-
-	$num2 = $smcFunc['db_num_rows']($request);
-	$smcFunc['db_free_result']($request);
-
-	if (empty($num2))
-		$match = $general_match;
-
-	// If this is empty, e.g. index.php?action or index.php?action=
-	if (empty($match))
+	if (is_int($url))
 	{
-		$match = '[home]';
-		$context['ep_home'] = true;
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				*
+			FROM {db_prefix}ep_layouts AS el
+				LEFT JOIN {db_prefix}ep_layout_positions AS elp ON (elp.id_layout = el.id_layout)
+				LEFT JOIN {db_prefix}ep_module_positions AS emp ON (emp.id_layout_position = elp.id_layout_position)
+				LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
+			WHERE el.id_layout = {int:id_layout}',
+			array(
+				'zero' => 0,
+				'id_layout' => $url,
+			)
+		);
 	}
+	else
+	{
+		$match = (!empty($_REQUEST['board']) ? '[board]=' . $_REQUEST['board'] : (!empty($_REQUEST['topic']) ? '[topic]=' . (int) $_REQUEST['topic'] : (!empty($_REQUEST['page']) ? '[page]=' . $_REQUEST['page'] : $url)));
+		$general_match = (!empty($_REQUEST['board']) ? '[board]' : (!empty($_REQUEST['topic']) ? '[topic]' : (!empty($_REQUEST['page']) ? '[page]' : (!empty($_REQUEST['action']) ? '[all_actions]' : ''))));
 
-	// Let's grab the data necessary to show the correct layout!
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			*
-		FROM {db_prefix}ep_layouts AS el
-			JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action})
-			LEFT JOIN {db_prefix}ep_layout_positions AS elp ON (elp.id_layout = el.id_layout)
-			LEFT JOIN {db_prefix}ep_module_positions AS emp ON (emp.id_layout_position = elp.id_layout_position)
-			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
-		WHERE el.id_member = {int:zero}',
-		array(
-			'zero' => 0,
-			'current_action' => $match,
-		)
-	);
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				el.id_layout
+			FROM {db_prefix}ep_layouts AS el
+				LEFT JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action})
+			WHERE el.id_member = {int:zero}',
+			array(
+				'current_action' => $match,
+				'zero' => 0,
+			)
+		);
 
-	$num = $smcFunc['db_num_rows']($request);
-	if (empty($num))
-		return;
+		$num2 = $smcFunc['db_num_rows']($request);
+		$smcFunc['db_free_result']($request);
 
-	$old_row = 0;
-	$view_groups = array();
+		if (empty($num2))
+			$match = $general_match;
 
-	// Let the theme know we have a layout.
-	$context['has_ep_layout'] = true;
+		// If this is empty, e.g. index.php?action or index.php?action=
+		if (empty($match))
+		{
+			$match = '[home]';
+			$context['ep_home'] = true;
+		}
+
+		// Let's grab the data necessary to show the correct layout!
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				*
+			FROM {db_prefix}ep_layouts AS el
+				JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action})
+				LEFT JOIN {db_prefix}ep_layout_positions AS elp ON (elp.id_layout = el.id_layout)
+				LEFT JOIN {db_prefix}ep_module_positions AS emp ON (emp.id_layout_position = elp.id_layout_position)
+				LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
+			WHERE el.id_member = {int:zero}',
+			array(
+				'zero' => 0,
+				'current_action' => $match,
+			)
+		);
+
+		$num = $smcFunc['db_num_rows']($request);
+		if (empty($num))
+			return;
+
+		$old_row = 0;
+		$view_groups = array();
+
+		// Let the theme know we have a layout.
+		$context['has_ep_layout'] = true;
+	}
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
@@ -1082,6 +1101,7 @@ function loadLayout($url)
 			$ep_modules[$row['x_pos']][$row['y_pos']] = array(
 				'is_smf' => $smf_col,
 				'id_layout_position' => $row['id_layout_position'],
+				'colspan' => $row['colspan'] >= 2 ? ' colspan="' . $row['colspan'] . '"' : '',
 				'html' => ($row['colspan'] >= 2 ? ' colspan="' . $row['colspan'] . '"' : '') . ($context['ep_home'] && in_array($row['y_pos'], array(0, 2)) || !$context['ep_home'] && $row['y_pos'] <= 1 && !$smf_col ? ' style="width: 200px;"' : ''),
 			);
 
@@ -1132,9 +1152,12 @@ function loadLayout($url)
 				if (isset($column_data['modules']))
 						foreach ($column_data['modules'] as $module => $id)
 							if (!empty($id['type']))
-								$ep_modules[$row_id][$column_id]['modules'][$module] = ep_process_module($module_context, $id);
+								$ep_modules[$row_id][$column_id]['modules'][$module] = ep_process_module($module_context, $id, !is_int($url));
 
-		$context['envision_columns'] = $ep_modules;
+		if (is_int($url))
+			$context['ep_columns'] = $ep_modules;
+		else
+			$context['envision_columns'] = $ep_modules;
 
 		// We are done with the modules' Javascript, sir!
 		$context['insert_after_template'] .= '
@@ -1142,7 +1165,7 @@ function loadLayout($url)
 	}
 }
 
-function ep_process_module($module_context, $data)
+function ep_process_module($module_context, $data, $full_layout)
 {
 	global $context, $modSettings, $settings, $options, $txt, $user_info, $scripturl, $smcFunc;
 
@@ -1172,6 +1195,9 @@ function ep_process_module($module_context, $data)
 			),
 		);
 }*/
+
+		if ($full_layout === false)
+			return $data;
 
 		if (file_exists($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php'))
 			require_once($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php');

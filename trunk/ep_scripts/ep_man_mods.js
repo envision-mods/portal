@@ -16,7 +16,7 @@ $j(document).ready(function() {
 	$j(".module_container").disableSelection();
 	$j("#messages").disableSelection();
 
-	// Make all module containers sortable and connect them, too, so they might recieve each other\'s items
+	// Make all module containers sortable and connect them, too, so they might recieve each other's items
 	$j(".module_container").each(function() {
 		$j(this).sortable({
 			cancel: "a",
@@ -28,6 +28,17 @@ $j(document).ready(function() {
 			tolerance: "pointer",
 		});
 	});
+
+	$j(".disabled_module_container").draggable({
+		connectToSortable: ".module_container",
+		helper: "clone",
+		forceHelperSize: true,
+		opacity: 0.6,
+		revert: true,
+		tolerance: "pointer",
+		revert: "invalid"
+	});
+
 
 	$j("#save").click(function() {
 		var submit_data = "";
@@ -44,7 +55,7 @@ $j(document).ready(function() {
 			success: function(data) {
 				$j("#messages").html("<div id=\"profile_success\"></div>");
 				$j("#profile_success").html("<strong>" + modulePositionsSaved + "</strong>")
-				.append("<br />" + clickToClose)
+				.append("<br />" + data+clickToClose)
 				.hide()
 				.click(function() {
 					$j(this).fadeOut();
@@ -63,55 +74,15 @@ $j(document).ready(function() {
 			}
 		});
 	});
-	$j(".clonelink").click(cloneLinkEvent);
 
-	function cloneLinkEvent() {
+
+	$j(".DragBox").dblclick(function() {
+		$j(this).fadeOut();
+
 		$j.ajax({
-			url: $j(this).attr("js_link"),
-			success: function(data) {
-				if (data.indexOf("deleted") != -1)
-				{
-					var removedID = data.replace("deleted", "");
-					$j("#envisionmod_" + removedID).fadeOut().remove();
-
-					$j("#messages").html("<div id=\"profile_success\"></div>");
-					$j("#profile_success").html("<strong>" + cloneDeleted + "</strong>")
-					.append("<br />" + clickToClose)
-					.hide()
-					.click(function() {
-						$j(this).fadeOut();
-					})
-					.fadeIn();
-				}
-				else
-				{
-					$j(".clonelink").unbind("click", cloneLinkEvent);
-					$j("#messages").html("<div id=\"profile_success\"></div>");
-					$j("#profile_success").html("<strong>" + cloneMade + "</strong>")
-					.append("<br />" + clickToClose)
-					.hide()
-					.click(function() {
-						$j(this).fadeOut();
-					})
-					.fadeIn();
-
-					// Insert the new cloned module
-					$j(".disabled .dummy").before(data);
-
-					// We need to rebind the event to the new clone link.
-					$j(".clonelink").bind("click", cloneLinkEvent);
-				}
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				$j("#messages").html("<div id=\"profile_error\"></div>");
-				$j("#profile_error").html("<strong>" + errorString + "</strong>" + textStatus)
-				.append("<br />" + clickToClose)
-				.hide()
-				.click(function() {
-					$j(this).fadeOut();
-				})
-				.fadeIn();
-			}
+			type: "POST",
+			url: smf_prepareScriptUrl(smf_scripturl) + "action=admin;area=epmodules;sa=removemodule;xml;" + sessVar + "=" + sessId,
+			data: "data=" + $j(this).attr("id")
 		});
-	}
+	});
 });

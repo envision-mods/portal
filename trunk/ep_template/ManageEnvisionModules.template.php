@@ -737,45 +737,34 @@ function template_manage_modules()
 
 	template_button_strip($envision_buttons, 'right');
 
-	// Input the back colors.
 	echo '
 		</div>
 				<div id="messages"></div></div>
-				<div class="module_page floatright">';
-
-	if (isset($context['ep_columns']['disabled']))
-	{
-		echo '
-					<div id="module_container_', $context['ep_columns']['disabled']['id_layout_position'], '" class="disabled module_holder">
+				<div class="module_page floatright">
+					<div class="disabled module_holder">
 						<div class="cat_bar block_header">
 							<h3 class="catbg centertext">
 								', $txt['ep_admin_modules_manage_col_disabled'], '
 							</h3>
 						</div>
-						<div class="roundframe blockframe module_container" id="epcol_', $context['ep_columns']['disabled']['id_layout_position'], '">';
+						<div class="roundframe blockframe" id="disabled_module_container">';
 
-		if (!empty($context['ep_columns']['disabled']['modules']))
-			foreach($context['ep_columns']['disabled']['modules'] as $module => $id)
-				echo '
-							<div class="DragBox plainbox draggable_module centertext" id="envisionmod_' . $id['id'] . '">
+	if (!empty($context['ep_all_modules']))
+		foreach($context['ep_all_modules'] as $module)
+			echo '
+							<div class="DragBox plainbox draggable_module disabled_module_container centertext" id="envisionmod_' . $module['type'] . '">
 								<p>
-									', $id['title'], '
-								</p>
-								<p class="inner">
-									', $id['modify'], ' | ', $id['clone'], '
+									', $module['module_title'], '
 								</p>
 							</div>';
 
-		echo '
+	echo '
 						</div>
 						<span class="lowerframe"><span></span></span>
 					</div>
 					<div class="clear"></div>
 				</div>
 				<div class="module_page floatleft">';
-
-		unset($context['ep_columns']['disabled']);
-	}
 
 	echo '
 					<table>';
@@ -787,10 +776,8 @@ function template_manage_modules()
 
 		foreach ($row_data as $column_id => $column_data)
 		{
-			if (isset($column_data['disabled_module_container']) && $column_data['disabled_module_container'] === false)
-			{
 				echo '
-							<td class="tablecol_', $column_id, '"', $context['span']['rows'][$column_data['id_layout_position']], $context['span']['columns'][$column_data['id_layout_position']], '>
+							<td class="tablecol_', $column_id, '"', $column_data['colspan'], '>
 
 								<div id="module_container_', $column_data['id_layout_position'], '" class="enabled w100">
 									<div class="cat_bar block_header">
@@ -817,10 +804,7 @@ function template_manage_modules()
 							echo '
 											<div class="DragBox plainbox draggable_module centertext" id="envisionmod_' . $id['id'] . '">
 												<p>
-													', $id['title'], '
-												</p>
-												<p class="inner">
-													', $id['modify'], ' | ', $id['clone'], '
+													', $id['module_title'], ' ', $id['modify_link'], '
 												</p>
 											</div>';
 						}
@@ -830,7 +814,6 @@ function template_manage_modules()
 										<span class="lowerframe"><span></span></span>
 									</div>
 								</td>';
-			}
 		}
 
 				echo '
