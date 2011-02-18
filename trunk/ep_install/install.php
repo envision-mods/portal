@@ -47,7 +47,7 @@ function DatabasePopulation()
 					'unsigned' => true,
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_layout')
@@ -83,7 +83,7 @@ function DatabasePopulation()
 					'size' => 40,
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_layout, action(40)')
@@ -137,7 +137,7 @@ function DatabasePopulation()
 					'default' => 'active',
 				)
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_layout_position')
@@ -181,7 +181,7 @@ function DatabasePopulation()
 						'size' => 80,
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_module')
@@ -245,7 +245,7 @@ function DatabasePopulation()
 					'size' => 2,
 				)
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_position')
@@ -312,7 +312,7 @@ function DatabasePopulation()
 					'default' => 'no',
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_field')
@@ -339,7 +339,7 @@ function DatabasePopulation()
 					'type' => 'text',
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_field', 'id_module_position')
@@ -373,6 +373,10 @@ function DatabasePopulation()
 					'size' => 255,
 				),
 				array(
+					'name' => 'header',
+					'type' => 'longtext',
+				),
+				array(
 					'name' => 'body',
 					'type' => 'longtext',
 				),
@@ -394,7 +398,7 @@ function DatabasePopulation()
 					'unsigned' => true,
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_page')
@@ -461,7 +465,7 @@ function DatabasePopulation()
 					'size' => 65,
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_button')
@@ -484,7 +488,7 @@ function DatabasePopulation()
 					'size' => 255,
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_shoutbox')
@@ -541,7 +545,7 @@ function DatabasePopulation()
 					'default' => 1,
 				),
 			),
-			'indexes' => array(
+			'indices' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_shout')
@@ -560,7 +564,7 @@ function DatabasePopulation()
 
 	foreach ($ep_tables as $table)
 	{
-		$smcFunc['db_create_table']('{db_prefix}ep_' . $table['name'], $table['columns'], $table['indexes'], array(), 'update');
+		$smcFunc['db_create_table']('{db_prefix}ep_' . $table['name'], $table['columns'], $table['indices'], array(), 'update');
 
 		if (isset($table['default']))
 			$smcFunc['db_insert']('ignore', '{db_prefix}ep_' . $table['name'], $table['default']['columns'], $table['default']['values'], $table['default']['keys']);

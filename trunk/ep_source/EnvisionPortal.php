@@ -271,7 +271,7 @@ function envisionPages()
 
 	// Let's grab the content from the DB.
 	$request = $smcFunc['db_query']('', '
-		SELECT title, type, body, permissions, status, page_views
+		SELECT title, type, body, permissions, status, page_views, header
 		FROM {db_prefix}ep_envision_pages
 		WHERE ' . $query . '
 		LIMIT 1',
@@ -291,7 +291,8 @@ function envisionPages()
 		'permissions' => explode(', ', $row['permissions']),
 		'status' => $row['status'],
 		'type' => $row['type'],
-		'page_views' => $row['page_views']
+		'page_views' => $row['page_views'],
+		'header' => $row['header'],
 	);
 
 	// Are you allowed to see the page?
@@ -341,7 +342,10 @@ function envisionPages()
 
 		$context['page_title'] = $context['page_data']['title'];
 		$context['page_title_html_safe'] = $context['page_data']['title'];
-
+		if(!empty($context['page_data']['header']))
+			$context['html_headers'] .= '
+' . $context['page_data']['header'];
+		
 		if (!isset($_SESSION['viewed_page_' . $call]))
 		{
 			$smcFunc['db_query']('','
