@@ -309,6 +309,7 @@ function SavePage()
 		$groups = isset($_REQUEST['permissions']) ? implode(', ', $_REQUEST['permissions']) : '';
 		$status = isset($_REQUEST['status']) ? $_REQUEST['status'] : '';
 		$body = isset($_REQUEST['body']) ? $_REQUEST['body'] : '';
+		$header = isset($_REQUEST['ep_header']) ? $_REQUEST['ep_header'] : '';
 
 		// These fields are required!
 		foreach ($required_fields as $required_field)
@@ -357,6 +358,7 @@ function SavePage()
 						'groups' => $groups,
 						'status' => (int) $status,
 						'body' => $body,
+						'header' => $header,
 					)
 				);
 			}
@@ -366,10 +368,10 @@ function SavePage()
 				$smcFunc['db_insert']('insert',
 					'{db_prefix}ep_envision_pages',
 					array(
-						'page_name' => 'string-255', 'type' => 'int', 'title' => 'string-255', 'permissions' => 'string-255', 'status' => 'int', 'body' => 'string',
+						'page_name' => 'string-255', 'type' => 'int', 'title' => 'string-255', 'permissions' => 'string-255', 'status' => 'int', 'body' => 'string', 'header' => 'string'
 					),
 					array(
-						$name, (int) $type, $title, $groups, (int) $status, $body,
+						$name, (int) $type, $title, $groups, (int) $status, $body, $header
 					),
 					array('id_page')
 				);
@@ -384,7 +386,17 @@ function SavePage()
 			$context['error_title'] = empty($id) ? 'ep_envision_pages_errors_create' : 'ep_envision_pages_errors_modify';
 
 			// Now create the editor.
-			$editorOptions = array(
+			$editorOptions_header = array(
+				'id' => 'ep_header',
+				'labels' => array(
+				),
+				'value' => $header,
+				'height' => '250px',
+				'width' => '100%',
+				'preview_type' => 2,
+				'rich_active' => false,
+			);
+			$editorOptions_body = array(
 				'id' => 'body',
 				'labels' => array(
 				),
@@ -410,9 +422,11 @@ function SavePage()
 				'status' => $status,
 				'id' => $id,
 			);
-
-			create_control_richedit($editorOptions);
-			$context['page_content'] = $editorOptions['id'];
+			
+			create_control_richedit($editorOptions_header);
+			create_control_richedit($editorOptions_body);
+			$context['ep_header_content'] = $editorOptions_header['id'];
+			$context['page_content'] = $editorOptions_body['id'];
 			$context['page_title'] = $txt['ep_envision_pages_edit_title'];
 		}
 	}
@@ -433,7 +447,16 @@ function prepareContext()
 	require_once($sourcedir . '/Subs-Editor.php');
 
 	// Now create the editor.
-	$editorOptions = array(
+	$editorOptions_header = array(
+		'id' => 'ep_header',
+		'labels' => array(
+		),
+		'height' => '250px',
+		'width' => '100%',
+		'preview_type' => 2,
+		'rich_active' => false,
+	);
+	$editorOptions_body = array(
 		'id' => 'body',
 		'labels' => array(
 		),
@@ -446,7 +469,7 @@ function prepareContext()
 	if (isset($_GET['pid']))
 	{
 		$request = $smcFunc['db_query']('', '
-			SELECT page_name, type, title, body, permissions, status
+			SELECT page_name, type, title, body, permissions, status, header
 			FROM {db_prefix}ep_envision_pages
 			WHERE id_page = {int:page}
 			LIMIT 1',
@@ -461,6 +484,8 @@ function prepareContext()
 
 		$row = $smcFunc['db_fetch_assoc']($request);
 
+		$smcFunc['db_free_result']($request);
+		
 		$context['page_data'] = array(
 			'page_name' => $row['page_name'],
 			'type' => $row['type'],
@@ -470,7 +495,8 @@ function prepareContext()
 			'id' => $_GET['pid'],
 		);
 
-		$editorOptions['value'] = $row['body'];
+		$editorOptions_header['value'] = $row['header'];
+		$editorOptions_body['value'] = $row['body'];
 
 		$context['page_title'] = $txt['ep_envision_pages_edit_title'];
 	}
@@ -485,13 +511,16 @@ function prepareContext()
 			'id' => 0,
 		);
 
-		$editorOptions['value'] = '';
+		$editorOptions_header['value'] = '';
+		$editorOptions_body['value'] = '';
 
 		$context['page_title'] = $txt['ep_envision_pages_add_title'];
 	}
 
-	create_control_richedit($editorOptions);
-	$context['page_content'] = $editorOptions['id'];
+	create_control_richedit($editorOptions_header);
+	create_control_richedit($editorOptions_body);
+	$context['ep_header_content'] = $editorOptions_header['id'];
+	$context['page_content'] = $editorOptions_body['id'];
 }
 
 /**

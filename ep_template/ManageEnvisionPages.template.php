@@ -131,6 +131,12 @@ function template_main()
 							<input type="radio" class="input_check" name="status" value="0"', $context['page_data']['status'] == 0 ? ' checked="checked"' : '', ' />', $txt['ep_envision_pages_page_nactive'], '
 						</dd>
 						<dt>
+							', $txt['ep_envision_pages_page_header'], ':
+						</dt>
+						<dd>
+							', template_control_richedit($context['ep_header_content']), '
+						</dd>
+						<dt>
 							', $txt['ep_envision_pages_page_body'], ':
 						</dt>
 						<dd>

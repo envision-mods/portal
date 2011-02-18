@@ -37,6 +37,7 @@ $txt['ep_envision_pages_page_guest'] = 'Guests';
 $txt['ep_envision_pages_page_views'] = 'Page Views';
 $txt['ep_envision_pages_page_active'] = 'Active';
 $txt['ep_envision_pages_page_nactive'] = 'Non-Active';
+$txt['ep_envision_pages_page_header'] = 'Header';
 $txt['ep_envision_pages_page_body'] = 'Body';
 $txt['ep_envision_pages_success_title'] = 'Success!';
 $txt['ep_envision_pages_success_edit'] = 'Your Envision Page was edited successfully.';
