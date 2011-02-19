@@ -95,9 +95,6 @@ $txt['ep_pages_not_exist'] = 'That page does not exist!';
 $txt['ep_pages_ajax_available'] = ' is <span style="color: #009933">available!</span>';
 $txt['ep_pages_ajax_navailable'] = ' is <span style="color: #CC0000">not available!</span>';
 
-// File Input
-$txt['file_not_found'] = 'File Not Found.';
-
 // Module's file or function can't be found.
 // %1$s = the name of the module, %2$s = the location of the module.
 $txt['ep_modfile_not_exist'] = 'The module %1$s is missing it&#039;s file which should be located at: %2$s';

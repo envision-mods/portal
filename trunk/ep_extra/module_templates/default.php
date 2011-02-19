@@ -69,7 +69,7 @@ function ep_template_default($module, $style, $location = 0)
 
 		echo '
 							<div id="', $module['type'], 'module_', $module['id'], '" style="padding: 0.5em 4px;', $module['is_collapsed'] && !empty($modSettings['ep_collapse_modules']) && !empty($module['header_display']) ? ' display: none;' : '', '">
-								', !empty($module['params']) ? $module['function']($module['params']) : $module['function'](), '
+								', !empty($module['fields']) ? $module['function']($module['fields']) : $module['function'](), '
 							</div>';
 	}
 }

@@ -17,299 +17,120 @@ function template_modify_modules()
 {
 	global $txt, $context, $scripturl, $settings, $modSettings, $boardurl;
 
-	/*
-	// Playing with an idea to split Options up when modifying modules into separate pages.  Not sure I like it.  Will get back to it...
-	// Build the normal button array.
-	$envision_modify = array(
-		'general' => array('text' => 'ep_modify_section_general', 'image' => 'reply.gif', 'lang' => true, 'url' => $scripturl . '?action=admin;area=epmodules;sa=modifymod;' . ($context['is_clone'] ? 'module' : 'modid') . '=' . $context['ep_modid'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-		'custom' => array('text' => 'ep_modify_section_custom', 'image' => 'reply.gif', 'lang' => true, 'url' => $scripturl . '?action=admin;area=epmodules;sa=modifymod;' . ($context['is_clone'] ? 'module' : 'modid') . '=' . $context['ep_modid'] . ';custom;' . $context['session_var'] . '=' . $context['session_id']),
-	);
-
-	if (count($context['config_params']) < 1)
-		unset($envision_modify['custom']);
-	*/
-
 	echo '
 	<div id="admincenter">
-		<form name="epModule" id="epModule" ', isset($context['ep_file_input']) ? 'enctype="multipart/form-data" ' : '', 'action="', $scripturl, '?action=admin;area=epmodules;sa=modifymod;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">';
+		<form name="epmodule" id="epmodule" action="', $scripturl, '?action=admin;area=epmodules;sa=modify2;in=', $_GET['in'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">';
 
-	// Load the module title.
-	if (isset($context['mod_info'][$context['ep_modid']]))
-	{
-		echo '
+	echo '
 			<div class="title_bar">
 				<h3 class="titlebg">
-					', !empty($context['mod_info'][$context['ep_modid']]['help']) ? '<a href="' . $scripturl . '?action=helpadmin;help=' . $context['mod_info'][$context['ep_modid']]['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" /></a>' : '', $txt[$context['mod_info'][$context['ep_modid']]['titlebar']] . $txt['ep_modsettings'], '
+					', /*(!empty($context['mod_info'][$context['ep_modid']]['help']) ? '<a href="' . $scripturl . '?action=helpadmin;help=' . $context['mod_info'][$context['ep_modid']]['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" /></a>' : ''), */$txt['ep_module_' . $context['ep_module_type']] . $txt['ep_modsettings'], '
 				</h3>
 			</div>';
-	}
-	// Brief description of the module!
-	if (!empty($context['mod_info'][$context['ep_modid']]['info']))
+
+	if (isset($txt['epmodinfo_' . $context['ep_module_type']]))
 		echo '
-			<div class="information">', $context['mod_info'][$context['ep_modid']]['info'], '</div>';
-
-	/*
-	// Playing with an idea to split Options up when modifying modules into separate pages.  Not sure I like it.  Will get back to it...
-	echo '
-			<ul style="width: 100%;">' .
-				template_button_strip($envision_modify, 'left') . '</ul>';
-	*/
+			<p class="information">', $txt['epmodinfo_' . $context['ep_module_type']], '</p>';
 
 	echo '
-			<div class="windowbg2">
-					<span class="topslice"><span></span></span>
-					<div class="content">
-						<dl class="settings">';
+			<span class="upperframe"><span></span></span>
+			<div class="roundframe">
+			<dl class="settings">';
 
-	// Get Module Icon, Title and URL.
-	if (isset($context['mod_info'][$context['ep_modid']]))
+	// Now loop through all the parameters.
+	foreach ($context['ep_module'] as $key => $field)
 	{
-		// All Envision Module Icons.
 		echo '
-			<dt>
-				<a id="setting_modicon" href="', $scripturl, '?action=helpadmin;help=ep_module_icon" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a>
-				<span>
-					<label for="mod_icon">', $txt['ep_module_icon'], '</label>
-				</span>
-			</dt>
-			<dd>';
+				<dt>';
 
-		echo '
-			<div id="mod_icon">
-				<span>
-					<select name="cat" id="cat" size="10" onchange="changeSel(\'\');">';
-		foreach ($context['icons'] as $icon)
+		if (!empty($field['help']))
 			echo '
-							<option value="', $icon['filename'] . ($icon['is_dir'] ? '/' : ''), '"', ($icon['checked'] ? ' selected="selected"' : ''), '>', $icon['name'], '</option>';
-		echo '
-					</select>
-				</span>
-				<span>
-					<select name="file" id="file" size="10" style="display: none;" onchange="showEnvisionIcon()"><option></option></select>
-				</span>
-
-				<span id="ep_icon_holder">
-					<img name="icon" style="display: none;" id="ep_icon" src="" alt="', $txt['no_icon'], '" border="0" />
-				</span>
-				<script type="text/javascript"><!-- // --><![CDATA[
-					var files = ["' . implode('", "', $context['epicon_list']) . '"];
-					var icon = document.getElementById("ep_icon");
-					var cat = document.getElementById("cat");
-					var selicon = "' . $context['icon_selected'] . '";
-					var icondir = "' . $context['epmod_icon_url'] . '";
-					var size = icon.alt.substr(3, 2) + " " + icon.alt.substr(0, 2) + String.fromCharCode(117, 98, 116);
-					var file = document.getElementById("file");
-
-					if (icon.name.indexOf("icon") == 0)
-						changeSel(selicon);
-
-					function changeSel(selected)
-					{
-						if (cat.selectedIndex == -1)
-							return;
-
-						if (cat.options[cat.selectedIndex].value.length >= 1)
-						{
-							if (cat.options[cat.selectedIndex].value.indexOf("/") > 0)
-							{
-								var i;
-								var count = 0;
-
-								file.style.display = "inline";
-								file.disabled = false;
-
-								for (i = file.length; i >= 0; i = i - 1)
-									file.options[i] = null;
-
-								for (i = 0; i < files.length; i++)
-									if (files[i].indexOf(cat.options[cat.selectedIndex].value) == 0)
-									{
-										var filename = files[i].substr(files[i].indexOf("/") + 1);
-										var showFilename = filename.substr(0, filename.lastIndexOf("."));
-										showFilename = showFilename.replace(/[_]/g, " ");
-
-										file.options[count] = new Option(showFilename, files[i]);
-
-										if (filename == selected)
-										{
-											if (file.options.defaultSelected)
-												file.options[count].defaultSelected = true;
-											else
-												file.options[count].selected = true;
-										}
-
-										count++;
-									}
-
-								if (file.selectedIndex == -1 && file.options[0])
-									file.options[0].selected = true;
-
-								showEnvisionIcon();
-							}
-							else
-							{
-								file.style.display = "none";
-								file.disabled = true;
-								icon.name = "epicon";
-								icon.style.display = "";
-								icon.src = icondir + cat.options[cat.selectedIndex].value;
-								icon.style.width = "";
-								icon.style.height = "";
-							}
-						}
-						else
-						{
-							icon.name = "icon";
-							icon.style.display = "none";
-							file.style.display = "none";
-							file.disabled = true;
-							icon.src = icondir + cat.options[cat.selectedIndex].value;
-							icon.style.width = "";
-							icon.style.height = "";
-						}
-					}
-
-					function showEnvisionIcon()
-					{
-
-						if (file.selectedIndex == -1)
-							return;
-
-						icon.style.display = "";
-						icon.src = icondir + file.options[file.selectedIndex].value;
-						icon.name = "epicon";
-						icon.alt = file.options[file.selectedIndex].text;
-						icon.alt += file.options[file.selectedIndex].text == size ? "!" : "";
-						icon.style.width = "";
-						icon.style.height = "";
-					}
-
-				// ]]></script>
-			</div>';
+					<a id="setting_' . $key . '" href="' . $scripturl . '?action=helpadmin;help=' . $field['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" border="0" /></a>
+					<span>';
 
 		echo '
-			</dd>
-			<dt>
-				<a id="setting_modtemplate" href="', $scripturl, '?action=helpadmin;help=ep_module_template" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a>
-				<span>
-					<label for="mod_template">
-						', $txt['ep_module_template'], '
-					</label>
-				</span>
-			</dt>
-			<dd>
-				<select name="module_template" id="mod_template" class="smalltext">';
+						<label for="', $field['label'], '">', $txt[$field['label']], '</label>
+					</span>
+				</dt>
+				<dd>';
 
-		foreach ($context['epmod_templates'] as $key => $template)
-			echo '
-					<option value="'.$template.'" '.($template == $context['mod_info'][$context['ep_modid']]['template'] ? 'selected="selected"' : '').'>'.$template.'</option>';
+		switch ($field['type'])
+		{
+			case 'text':
+				echo '
+					<input type="text" name="', $key, '" id="', $field['label'], '"value="', $field['value'], '" class="input_text" />';
+				break;
 
-		echo '
-				</select>
-			</dd>
-			<dt>
-				<a id="setting_modheader" href="', $scripturl, '?action=helpadmin;help=ep_module_header_display" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a>
-				<span>
-					<label for="mod_header_display">
-						', $txt['ep_module_header_display'], '
-					</label>
-				</span>
-			</dt>
-			<dd>
-				<select name="module_header" id="mod_header" class="smalltext">
-					<option value="1"', (!empty($context['mod_info'][$context['ep_modid']]['header_display']) && $context['mod_info'][$context['ep_modid']]['header_display'] == 1 ? ' selected="selected"' : ''), '>'.$txt['ep_module_enabled'].'</option>
-					<option value="0"', (empty($context['mod_info'][$context['ep_modid']]['header_display']) ? ' selected="selected"' : ''), '>'.$txt['ep_module_disable'].'</option>
-					<option value="2"', (!empty($context['mod_info'][$context['ep_modid']]['header_display']) && $context['mod_info'][$context['ep_modid']]['header_display'] == 2 ? ' selected="selected"' : ''), '>'.$txt['ep_module_collapse'].'</option>
-				</select>
-			</dd>
-			<dt>
-				<a id="setting_modgroups" href="', $scripturl, '?action=helpadmin;help=ep_module_groups" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a>
-				<span>
-					<label for="mod_groups">
-						', $txt['ep_module_groups'], '
-					</label>
-				</span>
-			</dt>
-			<dd>
-				<fieldset id="group_perms">
-					<legend>
-						<a href="javascript:void(0);" onclick="document.getElementById(\'group_perms\').style.display = \'none\';document.getElementById(\'group_perms_groups_link\').style.display = \'block\'; return false;">', $txt['avatar_select_permission'], '</a>
-					</legend>';
+			case 'large_text': case 'html':
+				echo '
+					<textarea class="w100" name="', $key, '" id="', $field['label'], '">', $field['value'], '</textarea>';
+				break;
+
+			case 'check':
+				echo '
+					<input type="checkbox" name="', $key, '" id="', $field['label'], '"', (!empty($field['value']) ? ' checked="checked"' : ''), ' value="1" class="input_check" />';
+				break;
+
+			case 'select': case 'file_select': case 'icon_select':
+				echo '
+					<select name="', $key, '" id="', $field['label'], '"';
+
+				if ($field['type'] == 'icon_select')
+					echo ' onchange="javascript:document.getElementById(\'', $field['label'], '_preview\').src = \'', $field['url'], '\' + this.options[this.selectedIndex].value;"';
+
+				echo '>';
+
+				foreach ($field['options'] as $option)
+					echo '
+						<option value="', $option, '"', ($option == $field['value'] ? ' selected="selected"' : ''), '>', $txt['ep_' . $key . '_' . $option], '</option>';
+
+				echo '
+					</select>';
+
+				if ($field['type'] == 'icon_select')
+					echo '
+					<img id="', $field['label'], '_preview" class="iconpreview" src="', $field['url'], $field['value'], '" />';
+				break;
+
+			case 'list_groups':
+				echo '
+					<fieldset id="', $field['label'], '_group_perms">
+						<legend>
+							<a href="#" onclick="document.getElementById(\'', $field['label'], '_group_perms\').style.display = \'none\';document.getElementById(\'', $field['label'], '_group_perms_groups_link\').style.display = \'block\'; return false;">', $txt['avatar_select_permission'], '</a>
+						</legend>';
 
 		$all_checked = true;
 
 		// List all the groups to configure permissions for.
-		foreach ($context['mod_info'][$context['ep_modid']]['groups'] as $group)
+		foreach ($field['options'] as $group)
 		{
 			echo '
-						<div id="permissions_', $group['id'], '">
-							<label for="check_group', $group['id'], '">
-								<input type="checkbox" class="input_check" name="groups[]" value="', $group['id'], '" id="check_group', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
-								<span', ($group['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $group['name'], '</span>
-							</label>
-						</div>';
+							<div id="permissions_', $group['id'], '">
+								<label for="check_group', $group['id'], '">
+									<input type="checkbox" class="input_check" name="', $key, '[]" value="', $group['id'], '" id="check_group', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
+									<span', ($group['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $group['name'], '</span>
+								</label>
+							</div>';
 
 			if (!$group['checked'])
 				$all_checked = false;
 		}
 
 		echo '
-					<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'groups[]\');" id="check_group_all"', $all_checked ? ' checked="checked"' : '', ' />
-					<label for="check_group_all">
-						<em>', $txt['check_all'], '</em>
-					</label>
-					<br />
-				</fieldset>
-				<a href="javascript:void(0);" onclick="document.getElementById(\'group_perms\').style.display = \'block\'; document.getElementById(\'group_perms_groups_link\').style.display = \'none\'; return false;" id="group_perms_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
-				<script type="text/javascript"><!-- // --><![CDATA[
-					document.getElementById("group_perms").style.display = "none";
-					document.getElementById("group_perms_groups_link").style.display = "";
-				// ]]></script>
-			</dd>';
-
-		echo '
-			<dt>
-				<a id="setting_modtitle" href="', $scripturl, '?action=helpadmin;help=ep_module_title" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a>
-				<span>
-					<label for="mod_title">', $txt['ep_module_title'], '</label>
-				</span>
-			</dt>
-			<dd>
-				<input type="text" name="module_title" id="mod_title" value="', $context['mod_info'][$context['ep_modid']]['title'], '" size="35" class="input_text" />
-			</dd>
-			<dt>
-				<a id="setting_modlink" href="', $scripturl, '?action=helpadmin;help=ep_module_link" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a>
-				<span>
-					<label for="mod_link">', $txt['ep_module_link'], '</label>
-				</span>
-			</dt>
-			<dd>';
-		$target = $context['mod_info'][$context['ep_modid']]['target'];
-		echo '
-				<span>&nbsp;
-					<select name="module_link_target" id="mod_link_target" class="smalltext">
-						<optgroup label="Target">
-							<option value="0"', empty($target) ? ' selected="selected"' : '', '>_blank</option>
-							<option value="1"', $target == 1 ? ' selected="selected"' : '', '>_self</option>
-							<option value="2"', $target == 2 ? ' selected="selected"' : '', '>_parent</option>
-							<option value="3"', $target == 3 ? ' selected="selected"' : '', '>_top</option>
-						</optgroup>
-					</select>
-				</span>';
-
-		echo '
-				<input type="text" name="module_link" id="mod_link" value="', $context['mod_info'][$context['ep_modid']]['title_link'], '" size="35" class="floatleft input_text" />
-			</dd>';
+						<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'', $field['label'], '_groups[]\');" id="check_group_all"', $all_checked ? ' checked="checked"' : '', ' />
+						<label for="check_group_all">
+							<em>', $txt['check_all'], '</em>
+						</label>
+						<br />
+					</fieldset>
+					<a href="#" onclick="document.getElementById(\'', $field['label'], '_group_perms\').style.display = \'block\'; document.getElementById(\'', $field['label'], '_group_perms_groups_link\').style.display = \'none\'; return false;" id="', $field['label'], '_group_perms_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
+					<script type="text/javascript"><!-- // --><![CDATA[
+						document.getElementById("', $field['label'], '_group_perms").style.display = "none";
+						document.getElementById("', $field['label'], '_group_perms_groups_link").style.display = "";
+					// ]]></script>';
+		}
 	}
 
-	// Show a separator.
-	if (count($context['config_params']) >= 1)
-		echo '
-			</dl>
-				<hr class="hrcolor" />
-			<dl class="settings">';
-
-	// Now loop through all the parameters.
 	$counter = 0;
 	$hiddentags = '';
 	foreach ($context['config_params'] as $config_id => $config_param)
@@ -596,75 +417,6 @@ function template_modify_modules()
 								<input type="hidden" id="order' . $checkid . '_' . $counter . '" name="order' . $checkid . '_' . $counter . '" value="' . $context[$checkname . '_order' . $config_param['id']] . '" />' : ''), '
 							</dd>';
 			}
-			// File Input
-			elseif ($config_param['type'] == 'file_input')
-			{
-				$file_count = !empty($context['current_files'][$config_param['id']]) ? ($config_param['file_count'] - count($context['current_files'][$config_param['id']])) : $config_param['file_count'];
-
-			// Has any files been uploaded for this parameter already?
-			if (!empty($context['current_files'][$config_param['id']]))
-			{
-					echo '
-					<div>
-						<div>
-						', $txt['files'], '</div>
-						<div class="smalltext">
-							<input type="hidden" name="file_del', $counter, '[]" value="0" />
-							(', $txt['uncheck_unwanted_files'], ')
-						</div>';
-					foreach ($context['current_files'][$config_param['id']] as $key => $file)
-						echo '
-							<div class="smalltext">
-								<label for="file_', $file['id'], '"><input type="checkbox" id="file_', $file['id'], '" name="file_del', $counter, '[]" value="', $file['id'], '" checked="checked" class="input_check" /> ', $file['name'], '</label>
-							</div>';
-
-					echo '
-						</div>';
-			}
-
-		// Show more file inputs only if they aren't approaching their limit.
-		if ($file_count >= 1 || empty($config_param['file_count']))
-				echo '
-							<input type="file" name="', $config_param['name'], '[]" size="38" class="input_file" />';
-
-		if ($file_count > 1 || empty($config_param['file_count']))
-		{
-			echo '
-			<script language="JavaScript" type="text/javascript"><!-- // --><![CDATA[
-
-				var allowed_files', $counter, ' = ', $file_count, ' - 1;
-				var exception', $counter, ' = ', empty($config_param['file_count']) ? 'true' : 'false', ';
-
-				function addFile' . $counter . '()
-				{
-					if (allowed_files', $counter, ' <= 0 && !exception', $counter, ')
-						return alert("', $txt['more_files_error'], '");
-
-					if (allowed_files', $counter, ' >= 1 || exception', $counter, ')
-						setOuterHTML(document.getElementById("moreFiles', $counter, '"), \'<div><input type="file" size="38" name="', $config_param['name'], '[]" class="input_file" /><\' + \'/div><div id="moreFiles', $counter, '"><a href="#" onclick="addFile', $counter, '(); return false;">(', $txt['more_files'], ')<\' + \'/a><\' + \'/div>\');
-
-					if (allowed_files', $counter, ' == 1 && !exception', $counter, ')
-						document.getElementById("moreFiles', $counter, '").style.display = "none";
-
-					if (!exception', $counter, ')
-						allowed_files', $counter, ' = allowed_files', $counter, ' - 1;
-
-					return true;
-				}
-
-			// ]]></script>';
-
-
-				echo '
-								<div id="moreFiles', $counter, '"><a href="#" onclick="addFile', $counter, '(); return false;">(', $txt['more_files'], ')</a></div>';
-			}
-
-						echo '
-							<input type="hidden" name="file_mimes', $counter, '" value="', $config_param['file_mimes'], '" />
-							<input type="hidden" name="file_count', $counter, '" value="', $config_param['file_count'], '" />
-							<input type="hidden" name="file_dimensions', $counter, '" value="', $config_param['file_dimensions'], '" />';
-
-			}
 			// Just show a regular textbox.
 			else
 			{
@@ -685,16 +437,12 @@ function template_modify_modules()
 	echo '
 		</dl>
 			<hr class="hrcolor" />
-		<dl class="settings"></dl>
 		<p class="righttext">
 		<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />
 		</p>
 		</div>
-		<span class="botslice"><span></span></span>
+		<span class="lowerframe"><span></span></span>
 			</div>
-			<input type="hidden" name="', ($context['is_clone'] ? 'module' : 'modid'), '" value="', $context['ep_modid'], '" />
-			<input type="hidden" name="modname" value="', $context['mod_info'][$context['ep_modid']]['name'], '" />
-			<input type="hidden" name="moeparams_count" value="', $counter, '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</form>
 			</div>
@@ -789,7 +537,7 @@ function template_manage_modules()
 
 					if (!empty($column_data['modules']))
 					{
-						foreach($column_data['modules'] as $module => $id)
+						foreach ($column_data['modules'] as $module => $id)
 						{
 							if ($id['is_smf'])
 							{
