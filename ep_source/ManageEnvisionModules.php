@@ -81,6 +81,7 @@ function Modules()
 		'epuninstallmodule' => 'UninstallEnvisionModule',
 		'epdeletemodule' => 'DeleteEnvisionModule',
 		'modify' => 'ModifyModule',
+		'modify2' => 'ModifyModule2',
 		'removemodule' => 'RemoveModule',
 		'epaddlayout' => 'AddEnvisionLayout',
 		'epaddlayout2' => 'AddEnvisionLayout2',
@@ -162,7 +163,7 @@ function ManageEnvisionModules()
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$context['ep_all_modules'][] = array(
 			'type' => $row['type'],
-			'module_title' => !empty($row['module_title']) ? $row['module_title'] : $module_context[$row['type']]['module_title'],
+			'module_title' => $module_context[$row['type']]['module_title']['value'],
 		);
 
 	/*if (!isset($context['ep_columns']))
@@ -272,7 +273,183 @@ function SaveEnvisionModules()
  */
 function ModifyModule()
 {
-	// Look behind you, a three headed monkey!
+	global $context, $smcFunc, $txt, $helptxt;
+
+	// Load the default module configurations.
+	$module_context = ep_load_module_context();
+
+	// Load user-defined module configurations.
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			name, emf.type, options, em.type AS module_type, value
+		FROM {db_prefix}ep_module_positions AS emp
+			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
+			LEFT JOIN {db_prefix}ep_module_field_data AS emd ON (emd.id_module_position = emp.id_position)
+			LEFT JOIN {db_prefix}ep_module_fields AS emf ON (emf.id_field = emd.id_field)
+		WHERE emp.id_position = {int:id_position}',
+		array(
+			'id_position' => $_GET['in'],
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$module_type = $row['module_type'];
+
+		if (!empty($row['type']))
+			$data[$row['name']] = array(
+				'type' => $row['type'],
+				'value' => $row['value'],
+		);
+
+		if (!empty($row['options']))
+			$data[$row['name']['options']] = $row['options'];
+	}
+
+	// Merge the default and custom configs together.
+	$info = $module_context[$module_type];
+	ep_fill_default_fields($info);
+
+	if (!empty($data))
+		$data = array_replace_recursive($info, $data);
+	else
+		$data = $info;
+
+	foreach ($data as $key => &$field)
+	{
+		$field += array(
+			'help' => isset($helptxt['epmod_' . $module_type . '_' . $key]) ? 'epmod_' . $module_type . '_' . $key : 'ep_' . $key,
+			'label' => isset($txt['epmod_' . $module_type . '_' . $key]) ? 'epmod_' . $module_type . '_' . $key : 'ep_' . $key,
+		);
+
+		switch ($field['type'])
+		{
+			case 'list_groups':
+				$field['options'] = ep_list_groups($field['value']);
+				break;
+
+			case 'file_select': case 'icon_select':
+				$files = array();
+				ep_list_files__recursive($field['options'], $files);
+				$field['options'] = array();
+
+				foreach ($files as $file)
+				{
+					if ($file != 'index.php')
+					{
+						$new_file = explode('.', $file);
+						$field['options'][] = $file;
+						$txt['ep_' . $key . '_' . $file] = $smcFunc['ucfirst']($new_file[0]);
+					}
+				}
+		}
+	}
+
+	$context['ep_module'] = $data;
+	$context['ep_module_type'] = $module_type;
+	$context['page_title'] = $txt['ep_modify_mod'];
+	$context['sub_template'] = 'modify_modules';
+}
+
+function ModifyModule2()
+{
+	global $smcFunc, $context;
+
+	// Figure out which fields did not change and remove them.
+	$request = $smcFunc['db_query']('', '
+		SELECT
+			name, emf.type, options, em.type AS module_type, value
+		FROM {db_prefix}ep_module_positions AS emp
+			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
+			LEFT JOIN {db_prefix}ep_module_field_data AS emd ON (emd.id_module_position = emp.id_position)
+			LEFT JOIN {db_prefix}ep_module_fields AS emf ON (emf.id_field = emd.id_field)
+		WHERE emp.id_position = {int:id_position}',
+		array(
+			'id_position' => $_GET['in'],
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$module_type = $row['module_type'];
+
+		if (!empty($row['type']))
+			$data[$row['name']] = array(
+				'type' => $row['type'],
+				'value' => $row['value'],
+		);
+
+		if (!empty($row['options']))
+			$data[$row['name']['options']] = $row['options'];
+	}
+
+	$module_context = ep_load_module_context();
+	$info = $module_context[$module_type];
+	ep_fill_default_fields($info);
+
+	if (!empty($data))
+		$data = array_replace_recursive($info, $data);
+	else
+		$data = $info;
+
+	foreach ($_POST as $key => $field)
+	{
+		if (is_array($field))
+			$field = implode(',', $field);
+
+		if (isset($data[$key]) && $field == $data[$key]['value'])
+			unset($_POST[$key]);
+	}
+
+	// Update them, ignoring the ones they left alone.
+	foreach ($_POST as $key => $field)
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				id_field
+			FROM {db_prefix}ep_module_fields
+			WHERE name = {string:key}',
+			array(
+				'key' => $key,
+			)
+		);
+		list ($id_field) = $smcFunc['db_fetch_row']($request);
+
+		// If the field's value is an array, concatenate it.
+		if (is_array($field))
+			$field = implode(',', $field);
+
+		if (!empty($id_field))
+		{
+			$request = $smcFunc['db_query']('', '
+				UPDATE {db_prefix}ep_module_field_data
+				SET value = {string:value}
+				WHERE id_field = {int:id_field}
+					AND id_module_position = {int:id_module_position}',
+				array(
+					'id_field' => $id_field,
+					'value' => $field,
+					'id_module_position' => $_GET['in'],
+				)
+			);
+
+			// Are we out of luck? Maybe it's a new field...
+			if ($smcFunc['db_affected_rows']() != 1)
+				$smcFunc['db_insert']('replace',
+					'{db_prefix}ep_module_field_data',
+					array(
+						'id_field' => 'int', 'id_module_position' => 'int', 'value' => 'string'
+					),
+					array(
+						$id_field, $_GET['in'], $field
+					),
+					array('id_field', 'id_module_position')
+				);
+		}
+	}
+
+	// Looks like were done here. Depart.
+	redirectexit('action=admin;area=epmodules;sa=modify;in=' . $_GET['in']);
 }
 
 /**
@@ -425,21 +602,24 @@ function ListChecks($checked = array(), $checkStrings = array(), $order = array(
 /**
  * Gets all membergroups and filters them according to the parameters.
  *
- * @param array $checked integer list of all id_groups to be checked (have a mark in the checkbox). Default is an empty array.
- * @param array $unallowed integer list of all id_groups that are skipped. Default is an empty array.
+ * @param string $checked comma-seperated list of all id_groups to be checked (have a mark in the checkbox). Default is an empty array.
+ * @param string $unallowed comma-seperated list of all id_groups that are skipped. Default is an empty array.
  * @param array $order integer list specifying the order of id_groups to be displayed. Default is an empty array.
  * @param string $param_name the name of the paameter being used.
  * @param int $param_id the parameter's ID.
  * @return array all the membergroups filtered according to the parameters; empty array if something went wrong.
  * @since 1.0
  */
-function ListGroups($checked = array(), $unallowed = array(), $order = array(), $param_id = 0)
+function ep_list_groups($checked, $unallowed = '', $order = array(), $param_id = 0)
 {
 	global $context, $smcFunc, $txt;
 
 	// We'll need this for loading up the names of each group.
 	if (!loadLanguage('ManageBoards'))
 		loadLanguage('ManageBoards');
+
+	$checked = explode(',', $checked);
+	$unallowed = explode(',', $unallowed);
 
 	$ep_groups = array();
 
@@ -2703,6 +2883,74 @@ function EnvisionDeleteLayout($id_layout)
 	unset($_SESSION['selected_layout']);
 	unset($_SESSION['layouts']);
 	return true;
+}
+
+/**
+ * Populates the module's field list with standard fields. The field list which is passed as the parameter is added onto the default fields defined by this function.
+ *
+ * @param array $fields array of fields passed by reference
+ * @since 1.0
+ * */
+function ep_fill_default_fields(&$fields)
+{
+	global $context;
+
+	$new_fields = array(
+		'module_title' => array(
+			'type' => 'text',
+		),
+		'module_template' => array(
+			'type' => 'file_select',
+			'options' => $context['epmod_template'],
+			'value' => 'default.php',
+		),
+		'module_header_display' => array(
+			'type' => 'select',
+			'options' => array('enabled', 'disable', 'collapse'),
+			'value' => 'enabled',
+		),
+		'module_icon' => array(
+			'type' => 'icon_select',
+			'options' => $context['epmod_icon_dir'],
+			'url' => $context['epmod_icon_url'],
+			'value' => '',
+		),
+		'module_link' => array(
+			'type' => 'text',
+			'value' => '',
+		),
+		'module_target' => array(
+			'type' => 'select',
+			'options' => array('_self', '_parent', '_blank'),
+			'value' => '_self',
+		),
+		'module_groups' => array(
+			'type' => 'list_groups',
+			'value' => '-3',
+		),
+	);
+
+	$fields = array_replace_recursive($new_fields, $fields);
+}
+
+/**
+ * Gets a list of all files in a given folder and calls itself recursively to list files in its subfollders.
+ *
+ * @param string $dir the directory to search in
+ * @param array $files array of filenames passed by reference
+ * @since 1.0
+ */
+
+function ep_list_files__recursive($dir, &$files)
+{
+	if (is_dir($dir))
+		if ($current_dir = scandir($dir))
+			foreach ($current_dir as $file)
+				if ($file !== '.' && $file !== '..' && $file !== '.htaccess')
+					if (!is_file($dir . $file))
+						list_files__recursive($dir . $file . "/", $files);
+					else
+						$files[] = $file;
 }
 
 ?>

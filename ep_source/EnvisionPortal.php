@@ -36,7 +36,7 @@ function ep_init($init_action = '')
 
 	// Software Version.
 	// !!! Revise this on each commit!
-	$portal_ver = '1.0 DEV r23';
+	$portal_ver = '1.0 DEV r24';
 
 	// Unallowed Envision names.
 	$envision_names = array('announce', 'usercp', 'stats', 'online', 'news', 'topics', 'posts', 'search', 'calendar', 'poll', 'top_posters', 'theme_select', 'new_members', 'staff', 'sitemenu', 'shoutbox', 'custom');
@@ -342,10 +342,11 @@ function envisionPages()
 
 		$context['page_title'] = $context['page_data']['title'];
 		$context['page_title_html_safe'] = $context['page_data']['title'];
-		if(!empty($context['page_data']['header']))
+
+		if (!empty($context['page_data']['header']))
 			$context['html_headers'] .= '
 ' . $context['page_data']['header'];
-		
+
 		if (!isset($_SESSION['viewed_page_' . $call]))
 		{
 			$smcFunc['db_query']('','
@@ -364,9 +365,7 @@ function envisionPages()
 		$context['sub_template'] = 'envision_pages';
 	}
 	else
-	{
 		fatal_lang_error('ep_pages_no_access', false);
-	}
 }
 
 ?>

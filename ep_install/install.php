@@ -47,7 +47,7 @@ function DatabasePopulation()
 					'unsigned' => true,
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_layout')
@@ -83,7 +83,7 @@ function DatabasePopulation()
 					'size' => 40,
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_layout, action(40)')
@@ -137,7 +137,7 @@ function DatabasePopulation()
 					'default' => 'active',
 				)
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_layout_position')
@@ -181,7 +181,7 @@ function DatabasePopulation()
 						'size' => 80,
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_module')
@@ -245,7 +245,7 @@ function DatabasePopulation()
 					'size' => 2,
 				)
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_position')
@@ -312,12 +312,27 @@ function DatabasePopulation()
 					'default' => 'no',
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_field')
 				),
 			),
+			'default' => array(
+				'columns' => array(
+					'name' => 'int',
+					'type' => 'int',
+				),
+				'values' => array(
+					array('module_title', 'text'),
+					array('module_template', 'file_select'),
+					array('module_header_display', 'select'),
+					array('module_icon', 'icon_select'),
+					array('module_link', 'text'),
+					array('module_target', 'select'),
+					array('module_groups', 'list_groups'),
+				),
+				'keys' => array('id_field')
 		),
 		array(
 			'name' => 'module_field_data',
@@ -339,7 +354,7 @@ function DatabasePopulation()
 					'type' => 'text',
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_field', 'id_module_position')
@@ -373,10 +388,6 @@ function DatabasePopulation()
 					'size' => 255,
 				),
 				array(
-					'name' => 'header',
-					'type' => 'longtext',
-				),
-				array(
 					'name' => 'body',
 					'type' => 'longtext',
 				),
@@ -398,7 +409,7 @@ function DatabasePopulation()
 					'unsigned' => true,
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_page')
@@ -465,7 +476,7 @@ function DatabasePopulation()
 					'size' => 65,
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_button')
@@ -488,7 +499,7 @@ function DatabasePopulation()
 					'size' => 255,
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_shoutbox')
@@ -545,7 +556,7 @@ function DatabasePopulation()
 					'default' => 1,
 				),
 			),
-			'indices' => array(
+			'indexes' => array(
 				array(
 					'type' => 'primary',
 					'columns' => array('id_shout')
@@ -564,7 +575,7 @@ function DatabasePopulation()
 
 	foreach ($ep_tables as $table)
 	{
-		$smcFunc['db_create_table']('{db_prefix}ep_' . $table['name'], $table['columns'], $table['indices'], array(), 'update');
+		$smcFunc['db_create_table']('{db_prefix}ep_' . $table['name'], $table['columns'], $table['indexes'], array(), 'update');
 
 		if (isset($table['default']))
 			$smcFunc['db_insert']('ignore', '{db_prefix}ep_' . $table['name'], $table['default']['columns'], $table['default']['values'], $table['default']['keys']);
@@ -623,8 +634,8 @@ function DatabasePopulation()
 		'ep_module_enable_animations' => '1',
 		'ep_module_animation_speed' => '2',
 		'ep_enable_custommod_icons' => '1',
-		'ep_icon_directory' => 'envisionportal/module_icons',
-		'ep_image_directory' => 'envisionportal/module_images',
+		'ep_icon_directory' => 'ep_extra/module_icons',
+		'ep_image_directory' => 'ep_extra/module_images',
 	));
 
 	// Now presenting... *drumroll*

@@ -48,22 +48,6 @@ if (!defined('SMF'))
 		- log_error = whether or not to log the error into the Admin -> Error Log.
 		- If echo = true will output it directly, if false, returns the information to be used within a variable.
 
-	void loadFiles(array file_input = array())
-		- Loads up all files for any given id_param via the file_input parameter type.
-
-	void createFile(array fileOptions)
-		- Handles uploaded files via the file_input parameter type.
-		- Places the information for each file uploaded into the ep_module_files database table.
-
-	void AllowedFileExtensions(string file_mime)
-		- Returns all possible extensions for any given mime type supplied within the file_mime separated by commas.
-
-	void getFilename(string filename, string file_id, string path, boolean new = false, string file_hash = '')
-		- Gets/Sets a files encrypted filename via the file_input parameter type.
-
-	void getLegacyFilename(string filename, string file_id, string path, boolean new = false)
-		- Returns a clean, encrypted path and file hash.
-
 	void GetEnvisionModuleInfo(string scripts, string mod_functions, string dirname, string file, string name = '', boolean install = false)
 		- Gets all of the data from the info.xml file for a module.
 		- Returns an array of data, or false if an error occurred such as mandatory fields are missing, etc..
@@ -92,271 +76,318 @@ if (!defined('SMF'))
 	array load_envision_menu()
 		- Prepares all the user added buttons for the menu
 		- Returns an array of the data
-
-	array add($index, $position, $array, $add, $add_key)
-		- adds something to an array
 */
 
 function ep_load_module_context($installed_mods = array(), $new_layout = false)
 {
-	global $txt;
+	global $context, $txt;
 
 	// Default module configurations.
 	$envisionModules = array(
 		'announce' => array(
-			'module_title' => $txt['ep_module_announce'],
-			'module_icon' => 'world.png',
-			'fields' => array(
-				'msg' => array(
-					'type' => 'large_text',
-					'value' => 'Welcome to Envision Portal!',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_announce'],
+			),
+			'module_icon' => array(
+				'value' => 'world.png',
+			),
+			'msg' => array(
+				'type' => 'large_text',
+				'value' => 'Welcome to Envision Portal!',
 			),
 		),
 		'usercp' => array(
-			'module_title' => $txt['ep_module_usercp'],
-			'module_icon' => 'heart.png',
-			'module_link' => 'action=profile',
+			'module_title' => array(
+				'value' => $txt['ep_module_usercp'],
+			),
+			'module_icon' => array(
+				'value' => 'heart.png',
+			),
+			'module_link' => array(
+				'value' => 'action=profile',
+			),
 		),
 		'stats' => array(
-			'module_title' => $txt['ep_module_stats'],
-			'module_icon' => 'stats.png',
-			'module_link' => 'action=stats',
-			'fields' => array(
-				'stat_choices' => array(
-					'type' => 'checklist',
-					'value' => '0,1,2,5,6:members;posts;topics;categories;boards;ontoday;onever:order',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_stats'],
+			),
+			'module_icon' => array(
+				'value' => 'stats.png',
+			),
+			'module_link' => array(
+				'value' => 'action=stats',
+			),
+			'stat_choices' => array(
+				'type' => 'checklist',
+				'value' => '0,1,2,5,6:members;posts;topics;categories;boards;ontoday;onever:order',
 			),
 		),
 		'online' => array(
-			'module_title' => $txt['ep_module_online'],
-			'module_icon' => 'user.png',
-			'module_link' => 'action=who',
-			'fields' => array(
-				'online_pos' => array(
-					'type' => 'select',
-					'value' => '0:top;bottom',
-				),
-				'show_online' => array(
-					'type' => 'checklist',
-					'value' => '0,1,2:users;buddies;guests;hidden;spiders:order',
-				),
-				'online_groups' => array(
-					'type' => 'list_groups',
-					'value' => '-3:-1,0,3:order',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_online'],
+			),
+			'module_icon' => array(
+				'value' => 'user.png',
+			),
+			'module_link' => array(
+				'value' => 'action=who',
+			),
+			'online_pos' => array(
+				'type' => 'select',
+				'value' => '0:top;bottom',
+			),
+			'show_online' => array(
+				'type' => 'checklist',
+				'value' => '0,1,2:users;buddies;guests;hidden;spiders:order',
+			),
+			'online_groups' => array(
+				'type' => 'list_groups',
+				'value' => '-3:-1,0,3:order',
 			),
 		),
 		'news' => array(
-			'module_title' => $txt['ep_module_news'],
-			'module_icon' => 'cog.png',
-			'fields' => array(
-				'board' => array(
-					'type' => 'list_boards',
-					'value' => '1',
-				),
-				'limit' => array(
-					'type' => 'int',
-					'value' => '5',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_news'],
+			),
+			'module_icon' => array(
+				'value' => 'cog.png',
+			),
+			'board' => array(
+				'type' => 'list_boards',
+				'value' => '1',
+			),
+			'limit' => array(
+				'type' => 'int',
+				'value' => '5',
 			),
 		),
 		'recent' => array(
-			'module_title' => $txt['ep_module_topics'],
-			'module_icon' => 'pencil.png',
-			'module_link' => 'action=recent',
-			'fields' => array(
-				'post_topic' => array(
-					'type' => 'select',
-					'value' => '1:posts;topics',
-				),
-				'show_avatars' => array(
-					'type' => 'check',
-					'value' => '1',
-				),
-				'num_recent' => array(
-					'type' => 'int',
-					'value' => '10',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_topics'],
+			),
+			'module_icon' => array(
+				'value' => 'pencil.png',
+			),
+			'module_link' => array(
+				'value' => 'action=recent',
+			),
+			'post_topic' => array(
+				'type' => 'select',
+				'value' => '1:posts;topics',
+			),
+			'show_avatars' => array(
+				'type' => 'check',
+				'value' => '1',
+			),
+			'num_recent' => array(
+				'type' => 'int',
+				'value' => '10',
 			),
 		),
 		'search' => array(
-			'module_title' => $txt['ep_module_search'],
-			'module_icon' => 'magnifier.png',
-			'module_link' => 'action=search',
+			'module_title' => array(
+				'value' => $txt['ep_module_search'],
+			),
+			'module_icon' => array(
+				'value' => 'magnifier.png',
+			),
+			'module_link' => array(
+				'value' => 'action=search',
+			),
 		),
 		'calendar' => array(
-			'module_title' => $txt['ep_module_calendar'],
-			'module_icon' => 'cal.png',
-			'fields' => array(
-				'display' => array(
-					'type' => 'select',
-					'value' => '0:month;info',
-				),
-				'show_months' => array(
-					'type' => 'select',
-					'value' => '1:year;asdefined',
-				),
-				'previous' => array(
-					'type' => 'int',
-					'value' => '1',
-				),
-				'next' => array(
-					'type' => 'int',
-					'value' => '1',
-				),
-				'show_options' => array(
-					'type' => 'checklist',
-					'value' => '0,1,2:events;holidays;birthdays:order',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_calendar'],
+			),
+			'module_icon' => array(
+				'value' => 'cal.png',
+			),
+			'display' => array(
+				'type' => 'select',
+				'value' => '0:month;info',
+			),
+			'show_months' => array(
+				'type' => 'select',
+				'value' => '1:year;asdefined',
+			),
+			'previous' => array(
+				'type' => 'int',
+				'value' => '1',
+			),
+			'next' => array(
+				'type' => 'int',
+				'value' => '1',
+			),
+			'show_options' => array(
+				'type' => 'checklist',
+				'value' => '0,1,2:events;holidays;birthdays:order',
 			),
 		),
 		'poll' => array(
-			'module_title' => $txt['ep_module_poll'],
-			'module_icon' => 'comments.png',
-			'fields' => array(
-				'options' => array(
-					'type' => 'select',
-					'value' => '0:showPoll;topPoll;recentPoll',
-				),
-				'topic' => array(
-					'type' => 'int',
-					'value' => '0',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_poll'],
+			),
+			'module_icon' => array(
+				'value' => 'comments.png',
+			),
+			'options' => array(
+				'type' => 'select',
+				'value' => '0:showPoll;topPoll;recentPoll',
+			),
+			'topic' => array(
+				'type' => 'int',
+				'value' => '0',
 			),
 		),
 		'top_posters' => array(
-			'module_title' => $txt['ep_module_topPosters'],
-			'module_icon' => 'rosette.png',
-			'fields' => array(
-				'show_avatar' => array(
-					'type' => 'check',
-					'value' => '1',
-				),
-				'show_postcount' => array(
-					'type' => 'check',
-					'value' => '1',
-				),
-				'num_posters' => array(
-					'type' => 'int',
-					'value' => '10',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_topPosters'],
+			),
+			'module_icon' => array(
+				'value' => 'rosette.png',
+			),
+			'show_avatar' => array(
+				'type' => 'check',
+				'value' => '1',
+			),
+			'show_postcount' => array(
+				'type' => 'check',
+				'value' => '1',
+			),
+			'num_posters' => array(
+				'type' => 'int',
+				'value' => '10',
 			),
 		),
 		'theme_select' => array(
-			'module_title' => $txt['ep_module_theme_select'],
-			'module_icon' => 'palette.png',
-			'module_link' => 'action=theme;sa=pick',
+			'module_title' => array(
+				'value' => $txt['ep_module_theme_select'],
+			),
+			'module_icon' => array(
+				'value' => 'palette.png',
+			),
+			'module_link' => array(
+				'value' => 'action=theme;sa=pick',
+			),
 		),
 		'new_members' => array(
-			'module_title' => $txt['ep_module_new_members'],
-			'module_icon' => 'overlays.png',
-			'module_link' => 'action=stats',
-			'fields' => array(
-				'limit' => array(
-					'type' => 'int',
-					'value' => '3',
-				),
-				'list_type' => array(
-					'type' => 'select',
-					'value' => '0:0;1;2',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_new_members'],
+			),
+			'module_icon' => array(
+				'value' => 'overlays.png',
+			),
+			'module_link' => array(
+				'value' => 'action=stats',
+			),
+			'limit' => array(
+				'type' => 'int',
+				'value' => '3',
+			),
+			'list_type' => array(
+				'type' => 'select',
+				'value' => '0:0;1;2',
 			),
 		),
 		'staff' => array(
-			'module_title' => $txt['ep_module_staff'],
-			'fields' => array(
-				'list_type' => array(
-					'type' => 'select',
-					'value' => '1:0;1;2',
-				),
-				'name_type' => array(
-					'type' => 'select',
-					'value' => '0:0;1;2',
-				),
-				'groups' => array(
-					'type' => 'list_groups',
-					'value' => '1,2:-1,0:order',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_staff'],
+			),
+			'list_type' => array(
+				'type' => 'select',
+				'value' => '1:0;1;2',
+			),
+			'name_type' => array(
+				'type' => 'select',
+				'value' => '0:0;1;2',
+			),
+			'groups' => array(
+				'type' => 'list_groups',
+				'value' => '1,2:-1,0:order',
 			),
 		),
 		'sitemenu' => array(
-			'module_title' => $txt['ep_module_sitemenu'],
-			'module_icon' => 'star.png',
-			'fields' => array(
-				'onesm' => array(
-					'type' => 'check',
-					'value' => '0',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_sitemenu'],
+			),
+			'module_icon' => array(
+				'value' => 'star.png',
+			),
+			'onesm' => array(
+				'type' => 'check',
+				'value' => '0',
 			),
 		),
 		'shoutbox' => array(
-			'module_title' => $txt['ep_module_shoutbox'],
-			'module_icon' => 'comments.png',
-			'fields' => array(
-				'id' => array(
-					'type' => 'db_select',
-					'value' => '1;id_shoutbox:{db_prefix}ep_shoutboxes;name:custom',
-				),
-				'refresh_rate' => array(
-					'type' => 'int',
-					'value' => '1',
-				),
-				'max_count' => array(
-					'type' => 'int',
-					'value' => '15',
-				),
-				'max_chars' => array(
-					'type' => 'int',
-					'value' => '128',
-				),
-				'text_size' => array(
-					'type' => 'select',
-					'value' => '1:small;medium',
-				),
-				'member_color' => array(
-					'type' => 'check',
-					'value' => '1',
-				),
-				'message' => array(
-					'type' => 'text',
-					'value' => '',
-				),
-				'message_position' => array(
-					'type' => 'select',
-					'value' => '1:top;after;bottom',
-				),
-				'message_groups' => array(
-					'type' => 'list_groups',
-					'value' => '-3:3',
-				),
-				'mod_groups' => array(
-					'type' => 'list_groups',
-					'value' => '1:-1,0,3',
-				),
-				'mod_own' => array(
-					'type' => 'list_groups',
-					'value' => '0,1,2:-1,3',
-				),
-				'bbc' => array(
-					'type' => 'list_bbc',
-					'value' => 'b;i;u;s;pre;left;center;right;url;sup;sub;php;nobbc;me',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_shoutbox'],
+			),
+			'module_icon' => array(
+				'value' => 'comments.png',
+			),
+			'id' => array(
+				'type' => 'db_select',
+				'value' => '1;id_shoutbox:{db_prefix}ep_shoutboxes;name:custom',
+			),
+			'refresh_rate' => array(
+				'type' => 'int',
+				'value' => '1',
+			),
+			'max_count' => array(
+				'type' => 'int',
+				'value' => '15',
+			),
+			'max_chars' => array(
+				'type' => 'int',
+				'value' => '128',
+			),
+			'text_size' => array(
+				'type' => 'select',
+				'value' => '1:small;medium',
+			),
+			'member_color' => array(
+				'type' => 'check',
+				'value' => '1',
+			),
+			'message' => array(
+				'type' => 'text',
+				'value' => '',
+			),
+			'message_position' => array(
+				'type' => 'select',
+				'value' => '1:top;after;bottom',
+			),
+			'message_groups' => array(
+				'type' => 'list_groups',
+				'value' => '-3:3',
+			),
+			'mod_groups' => array(
+				'type' => 'list_groups',
+				'value' => '1:-1,0,3',
+			),
+			'mod_own' => array(
+				'type' => 'list_groups',
+				'value' => '0,1,2:-1,3',
+			),
+			'bbc' => array(
+				'type' => 'list_bbc',
+				'value' => 'b;i;u;s;pre;left;center;right;url;sup;sub;php;nobbc;me',
 			),
 		),
 		'custom' => array(
-			'module_title' => $txt['ep_module_custom'],
-			'module_icon' => 'comments.png',
-			'fields' => array(
-				'code_type' => array(
-					'type' => 'select',
-					'value' => '1:0;1;2',
-				),
-				'code' => array(
-					'type' => 'rich_edit',
-					'value' => '',
-				),
+			'module_title' => array(
+				'value' => $txt['ep_module_custom'],
+			),
+			'module_icon' => array(
+				'value' => 'comments.png',
+			),
+			'code_type' => array(
+				'type' => 'select',
+				'value' => '1:0;1;2',
+			),
+			'code' => array(
+				'type' => 'rich_edit',
+				'value' => '',
 			),
 		),
 	);
@@ -1169,88 +1200,84 @@ function ep_process_module($module_context, $data, $full_layout)
 {
 	global $context, $modSettings, $settings, $options, $txt, $user_info, $scripturl, $smcFunc;
 
-	$info = $module_context[$data['type']];
-	$data = array_merge_recursive($data, $info);
-
-	/*if ($data['id']==3) die(var_dump(array_merge_recursive($data, $info), $data, $info));
-	if ($data['id']==3){
-	// Now grab the custom fields assosiated with this module.
+	// Load user-defined module configurations.
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			name, type, options, value
-		FROM {db_prefix}ep_module_field_data AS emd
-			LEFT JOIN {db_prefix}ep_module_fields AS emf ON (emf.id_module_position = {in:id_position})
-		WHERE emd.id_field = emf.id_field',
+			name, emf.type, options, em.type AS module_type, value
+		FROM {db_prefix}ep_module_positions AS emp
+			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
+			LEFT JOIN {db_prefix}ep_module_field_data AS emd ON (emd.id_module_position = emp.id_position)
+			LEFT JOIN {db_prefix}ep_module_fields AS emf ON (emf.id_field = emd.id_field)
+		WHERE emp.id_position = {int:id_position}',
 		array(
 			'id_position' => $data['id'],
 		)
 	);
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$data['fields'][] = array(
-			$row['name'] => array(
+	{
+		$module_type = $row['module_type'];
+
+		if (!empty($row['type']))
+			$fields[$row['name']] = array(
 				'type' => $row['type'],
-				'options' => $row['options'],
 				'value' => $row['value'],
-			),
 		);
-}*/
 
-		if ($full_layout === false)
-			return $data;
+		if (!empty($row['options']))
+			$fields[$row['name']['options']] = $row['options'];
+	}
 
-		if (file_exists($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php'))
-			require_once($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php');
+	// Merge the default and custom configs together.
+	$info = $module_context[$module_type];
 
-		// Load the module template.
-		if (empty($data['template']) || !empty($data['template']) && !file_exists($context['epmod_template'] . $data['template'].'.php'))
-			$data['template'] = 'default';
+	if (!empty($fields))
+		$fields = array_replace_recursive($info, $fields);
+	else
+		$fields = $info;
 
-		require_once($context['epmod_template'] . $data['template'] . '.php');
+	$data['module_title'] = $fields['module_title']['value'];
 
-		// Correct the title target...
-		if (!isset($data['module_target']))
-			$data['module_target'] = 1;
+	if ($full_layout === false)
+		return $data;
 
-		switch ((int) $data['module_target'])
-		{
-			case 1:
-				$data['module_target'] = '_self';
-				break;
-			case 2:
-				$data['module_target'] = '_parent';
-				break;
-			case 3:
-				$data['module_target'] = '_top';
-				break;
-			default:
-				$data['module_target'] = '_blank';
-				break;
-		}
+	if (file_exists($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php'))
+		require_once($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php');
 
-		if (!empty($data['module_icon']));
-			$data['module_icon'] = '<img src="' . $context['epmod_icon_url'] . $data['module_icon'] . '" alt="" title="' . $data['module_title'] . '" class="icon" style="margin-left: 0px;" />&nbsp;';
+	// Load the module template.
+	if (empty($data['template']) || !empty($data['template']) && !file_exists($context['epmod_template'] . $data['template'].'.php'))
+		$data['template'] = 'default';
 
-		if (isset($data['module_link']))
-		{
-			$http = stristr($data['module_link'], 'http://') !== false || stristr($data['module_link'], 'www.') !== false;
+	require_once($context['epmod_template'] . $data['template'] . '.php');
 
-			if ($http)
-				$data['module_title'] = '<a href="' . $data['module_link'] . '" target="' . $data['module_target'] . '">' . $data['module_title'] . '</a>';
-			else
-				$data['module_title'] = '<a href="' . $scripturl . '?' . $data['module_link'] . '" target="' . $data['module_target'] . '">' . $data['module_title'] . '</a>';
-		}
+	// Correct the title target...
+	if (!isset($fields['module_target']['value']))
+		$data['module_target'] = '_self';
 
-		if (!empty($data['fields']))
-		{
-			$fields = $data['fields'];
-			$data['fields'] = array();
+	if (!empty($fields['module_icon']['value']));
+		$data['module_icon'] = '<img src="' . $context['epmod_icon_url'] . $fields['module_icon']['value'] . '" alt="" title="' . $data['module_title'] . '" class="icon" style="margin-left: 0px;" />&nbsp;';
 
-			foreach ($fields as $key => $field)
+	if (isset($fields['module_link']))
+	{
+		$http = stristr($fields['module_link']['value'], 'http://') !== false || stristr($fields['module_link']['value'], 'www.') !== false;
+
+		if ($http)
+			$data['module_title'] = '<a href="' . $fields['module_link']['value'] . '" target="' . $data['module_target'] . '">' . $data['module_title'] . '</a>';
+		else
+			$data['module_title'] = '<a href="' . $scripturl . '?' . $fields['module_link']['value'] . '" target="' . $data['module_target'] . '">' . $data['module_title'] . '</a>';
+	}
+
+	if (!empty($fields))
+	{
+		$fields2 = $fields;
+		$fields = array();
+
+		foreach ($fields2 as $key => $field)
+			if (isset($field['type']))
 				$data['fields'][$key] = loadParameter(array(), $field['type'], $field['value']);
-		}
+	}
 
-		$data['function'] = 'module_' . $data['type'];
+	$data['function'] = 'module_' . $data['type'];
 
 	$data['is_collapsed'] = $user_info['is_guest'] ? !empty($_COOKIE[$data['type'] . 'module_' . $data['id']]) : !empty($options[$data['type'] . 'module_' . $data['id']]);
 

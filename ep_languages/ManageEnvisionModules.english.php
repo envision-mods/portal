@@ -17,18 +17,6 @@ $txt['ep_admin_title_add_modules'] = 'Envision Portal - Add Modules';
 $txt['ep_admin_modules_desc'] = 'This page allows you to add modules, edit currently installed modules, and change the layout of the main page.';
 $txt['ep_admin_modules_help'] = 'Here you can edit the positions and settings of modules. To move modules around you can click and drag. All modules can be duplicated by clicking \'Clone\'. Each module has its own settings and clones have their own settings. There is a quick color changer on the right that you can use to change the white color on modules to something else, such as blue or black. Please note that only the modules displayed on this page change color and the modules displayed on the home page are not affected.';
 
-// Some ALT attributes here!
-$txt['ep_alt_module_colors'] = 'Module Colors';
-$txt['ep_alt_white'] = 'White';
-$txt['ep_alt_gray'] = 'Gray';
-$txt['ep_alt_blue'] = 'Blue';
-$txt['ep_alt_yellow'] = 'Yellow';
-$txt['ep_alt_green'] = 'Green';
-$txt['ep_alt_orange'] = 'Orange';
-$txt['ep_alt_red'] = 'Red';
-$txt['ep_alt_purple'] = 'Purple';
-$txt['ep_alt_black'] = 'Black';
-
 /***************************
 		Manage Modules
 ***************************/
@@ -40,14 +28,9 @@ $txt['ep_is_smf_section'] = 'SMF';
 $txt['ep_admin_modules_manage_modify'] = 'Modify';
 $txt['ep_admin_modules_manage_uninstall'] = '<span class="smalltext">Uninstall</span>';
 $txt['epmodule_uninstall_success'] = 'The module was successfully uninstalled!';
-$txt['epmodule_clone'] = 'Clone';
-$txt['epmodule_declone'] = 'Declone';
 $txt['error_string'] = 'Error';
-$txt['clone_made'] = 'The clone was made.';
-$txt['clone_deleted'] = 'The clone was deleted.';
 $txt['module_positions_saved'] = 'The module positions have been saved.';
 $txt['click_to_close'] = 'Click to close this message.';
-$txt['ep_module_colors'] = 'Modules background color selector.';
 
 /***************************
 		Modify Modules
@@ -64,17 +47,17 @@ $txt['ep_modsettings'] = '&nbsp;Settings';
 $txt['ep_module_title'] = 'Module&#039;s Title<div class="smalltext">(Can not be empty)</div>';
 $txt['ep_module_icon'] = 'Module&#039;s Icon';
 $txt['ep_module_link'] = 'Module&#039;s Title Link';
+$txt['ep_module_target'] = 'Module&#039;s target';
+$txt['ep_module_target__self'] = 'Same window';
+$txt['ep_module_target__parent'] = 'Paremt';
+$txt['ep_module_target__blank'] = 'New window';
 $txt['no_icon'] = '(no icon)';
 $txt['ep_module_template'] = 'Module&#039;s Template';
 $txt['ep_module_groups'] = 'Membergroups that can view this module';
 $txt['ep_module_header_display'] = 'Module&#039;s Header';
-$txt['ep_module_disable'] = 'Disable';
-$txt['ep_module_enabled'] = 'Enabled';
-$txt['ep_module_collapse'] = 'Title Only';
-
-// File input handling...
-$txt['more_files_error'] = 'Sorry, you aren\'t allowed to add any more files.';
-$txt['more_files'] = 'more files';
+$txt['ep_module_header_display_disable'] = 'Disable';
+$txt['ep_module_header_display_enabled'] = 'Enabled';
+$txt['ep_module_header_display_collapse'] = 'Title Only';
 
 // File error handling.
 $txt['module_file_timeout'] = 'Sorry, file(s) timed-out while uploading.  Please try again.';
