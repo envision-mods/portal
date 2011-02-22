@@ -339,6 +339,7 @@ $txt['confirm_remove_selected'] = 'Are you sure you want to remove the selected 
 $txt['ep_edit_remove_selected'] = 'Remove Selected';
 
 // Errors
+$txt['ep_cannot_modify_module'] = 'The module you are looking for does not exist.';
 $txt['cant_find_layout_id'] = 'Unable to edit this layout, either because there was no layout ID value supplied, or this was empty.';
 $txt['ep_cant_delete_all'] = 'Sorry, you are unable to delete all columns and/or rows.  If this was your intention, than just Delete the Layout instead!';
 $txt['ep_layout_invalid'] = 'Unable to edit this layout because of an inconsistent number of columns in each row.';
