@@ -306,6 +306,10 @@ function ModifyModule()
 			$data[$row['name']['options']] = $row['options'];
 	}
 
+	// If $module_type isn't set, the module could not be found.
+	if (!isset($module_type))
+		fatal_lang_error('ep_cannot_modify_module');
+
 	// Merge the default and custom configs together.
 	$info = $module_context[$module_type];
 	ep_fill_default_fields($info);
@@ -321,6 +325,9 @@ function ModifyModule()
 			'help' => isset($helptxt['epmod_' . $module_type . '_' . $key]) ? 'epmod_' . $module_type . '_' . $key : 'ep_' . $key,
 			'label' => isset($txt['epmod_' . $module_type . '_' . $key]) ? 'epmod_' . $module_type . '_' . $key : 'ep_' . $key,
 		);
+
+		if (isset($field['options']) && is_string($field['options']) && strpos($field['options'], ';'))
+			$field['options'] = explode(';', $field['options']);
 
 		switch ($field['type'])
 		{
@@ -392,12 +399,15 @@ function ModifyModule2()
 	else
 		$data = $info;
 
-	foreach ($_POST as $key => $field)
+	foreach ($data as $key => $field)
 	{
-		if (is_array($field))
-			$field = implode(',', $field);
+		if (isset($_POST[$key]) && is_array($_POST[$key]))
+			$_POST[$key] = implode(',', $_POST[$key]);
 
-		if (isset($data[$key]) && $field == $data[$key]['value'])
+		if ($field['type'] == 'check' && !isset($_POST[$key]))
+			$_POST[$key] = 0;
+
+		if ($field['value'] == $_POST[$key])
 			unset($_POST[$key]);
 	}
 

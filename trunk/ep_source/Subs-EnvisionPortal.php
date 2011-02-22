@@ -119,7 +119,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'stat_choices' => array(
 				'type' => 'checklist',
-				'value' => '0,1,2,5,6:members;posts;topics;categories;boards;ontoday;onever:order',
+				'value' => '0,1,2,5,6',
+				'options' => 'members;posts;topics;categories;boards;ontoday;onever:order',
 			),
 		),
 		'online' => array(
@@ -134,15 +135,18 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'online_pos' => array(
 				'type' => 'select',
-				'value' => '0:top;bottom',
+				'value' => '0',
+				'options' => 'top;bottom',
 			),
 			'show_online' => array(
 				'type' => 'checklist',
-				'value' => '0,1,2:users;buddies;guests;hidden;spiders:order',
+				'value' => '0,1,2',
+				'options' => 'users;buddies;guests;hidden;spiders:order',
 			),
 			'online_groups' => array(
 				'type' => 'list_groups',
-				'value' => '-3:-1,0,3:order',
+				'value' => '-3',
+				'options' => '-1,0,3:',
 			),
 		),
 		'news' => array(
@@ -173,7 +177,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'post_topic' => array(
 				'type' => 'select',
-				'value' => '1:posts;topics',
+				'value' => 'topics',
+				'options' => 'posts;topics',
 			),
 			'show_avatars' => array(
 				'type' => 'check',
@@ -204,11 +209,13 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'display' => array(
 				'type' => 'select',
-				'value' => '0:month;info',
+				'value' => '0',
+				'options' => 'month;info',
 			),
 			'show_months' => array(
 				'type' => 'select',
-				'value' => '1:year;asdefined',
+				'value' => '1',
+				'options' => 'year;asdefined',
 			),
 			'previous' => array(
 				'type' => 'int',
@@ -220,7 +227,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'show_options' => array(
 				'type' => 'checklist',
-				'value' => '0,1,2:events;holidays;birthdays:order',
+				'value' => '0,1,2',
+				'options' => 'events;holidays;birthdays:order',
 			),
 		),
 		'poll' => array(
@@ -232,7 +240,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'options' => array(
 				'type' => 'select',
-				'value' => '0:showPoll;topPoll;recentPoll',
+				'value' => '0',
+				'options' => 'showPoll;topPoll;recentPoll',
 			),
 			'topic' => array(
 				'type' => 'int',
@@ -286,7 +295,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'list_type' => array(
 				'type' => 'select',
-				'value' => '0:0;1;2',
+				'value' => '0',
+				'options' => '0;1;2',
 			),
 		),
 		'staff' => array(
@@ -295,15 +305,18 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'list_type' => array(
 				'type' => 'select',
-				'value' => '1:0;1;2',
+				'value' => '1',
+				'options' => '0;1;2',
 			),
 			'name_type' => array(
 				'type' => 'select',
-				'value' => '0:0;1;2',
+				'value' => '0',
+				'options' => '0;1;2',
 			),
 			'groups' => array(
 				'type' => 'list_groups',
-				'value' => '1,2:-1,0:order',
+				'value' => '1,2',
+				'options' => '-1,0:order',
 			),
 		),
 		'sitemenu' => array(
@@ -327,7 +340,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'id' => array(
 				'type' => 'db_select',
-				'value' => '1;id_shoutbox:{db_prefix}ep_shoutboxes;name:custom',
+				'value' => '1',
+				'options' => 'id_shoutbox;{db_prefix}ep_shoutboxes;name:custom',
 			),
 			'refresh_rate' => array(
 				'type' => 'int',
@@ -343,7 +357,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'text_size' => array(
 				'type' => 'select',
-				'value' => '1:small;medium',
+				'value' => '1',
+				'options' => 'small;medium',
 			),
 			'member_color' => array(
 				'type' => 'check',
@@ -355,19 +370,23 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'message_position' => array(
 				'type' => 'select',
-				'value' => '1:top;after;bottom',
+				'value' => '1',
+				'options' => 'top;after;bottom',
 			),
 			'message_groups' => array(
 				'type' => 'list_groups',
-				'value' => '-3:3',
+				'value' => '-3',
+				'options' => '3',
 			),
 			'mod_groups' => array(
 				'type' => 'list_groups',
-				'value' => '1:-1,0,3',
+				'value' => '1',
+				'options' => '-1,0,3',
 			),
 			'mod_own' => array(
 				'type' => 'list_groups',
-				'value' => '0,1,2:-1,3',
+				'value' => '0,1,2',
+				'options' => '-1,3',
 			),
 			'bbc' => array(
 				'type' => 'list_bbc',
@@ -383,7 +402,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			),
 			'code_type' => array(
 				'type' => 'select',
-				'value' => '1:0;1;2',
+				'value' => '1',
+				'options' => '0;1;2',
 			),
 			'code' => array(
 				'type' => 'rich_edit',
@@ -1146,7 +1166,7 @@ function loadLayout($url)
 
 			$ep_modules[$row['x_pos']][$row['y_pos']]['modules'][$row['position']] = array(
 				'is_smf' => $smf_col,
-				'modify_link' => $user_info['is_admin'] ? ' [<a href="' . $scripturl . '?action=admin;area=epmodules;sa=modify;in=' . $row['id_module'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['modify'] . '</a>]' : '',
+				'modify_link' => $user_info['is_admin'] ? ' [<a href="' . $scripturl . '?action=admin;area=epmodules;sa=modify;in=' . $row['id_position'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['modify'] . '</a>]' : '',
 				'type' => $row['type'],
 				'id' => $row['id_position'],
 			);
@@ -1580,6 +1600,23 @@ function envision_integrate_actions(&$action_array)
 	$action_array['forum'] = array('BoardIndex.php', 'BoardIndex');
 }
 
+function recurse($array, $array1)
+{
+	foreach ($array1 as $key => $value)
+	{
+		// Create new key in $array, if it is empty or not an array.
+		if (!isset($array[$key]) || (isset($array[$key]) && !is_array($array[$key])))
+			$array[$key] = array();
+
+		// Overwrite the value in the base array.
+		if (is_array($value))
+			$value = recurse($array[$key], $value);
+
+		$array[$key] = $value;
+	}
+	return $array;
+}
+
 function envision_integrate_pre_load()
 {
 	global $modSettings, $sourcedir;
@@ -1590,6 +1627,25 @@ function envision_integrate_pre_load()
 	require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
 	require_once($sourcedir . '/ep_source/EnvisionModules.php');
+
+	// Compatibility for PHP < 5.3.0 - http://www.php.net/manual/en/function.array-replace-recursive.php#92574
+	if (!function_exists('array_replace_recursive'))
+	{
+		function array_replace_recursive($array, $array1)
+		{
+			// Handle the arguments, merging them one by one.
+			$args = func_get_args();
+			$array = $args[0];
+			if (!is_array($array))
+				return $array;
+
+			for ($i = 1; $i < count($args); $i++)
+				if (is_array($args[$i]))
+					$array = recurse($array, $args[$i]);
+
+			return $array;
+		}
+	}
 }
 
 function envision_integrate_load_theme()

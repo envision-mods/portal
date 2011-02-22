@@ -24,7 +24,7 @@ function template_modify_modules()
 	echo '
 			<div class="title_bar">
 				<h3 class="titlebg">
-					', /*(!empty($context['mod_info'][$context['ep_modid']]['help']) ? '<a href="' . $scripturl . '?action=helpadmin;help=' . $context['mod_info'][$context['ep_modid']]['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" /></a>' : ''), */$txt['ep_module_' . $context['ep_module_type']] . $txt['ep_modsettings'], '
+					', /*(!empty($context['mod_info'][$context['ep_modid']]['help']) ? '<a href="' . $scripturl . '?action=helpadmin;help=' . $context['mod_info'][$context['ep_modid']]['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" /></a>' : ''), */$txt['epmod_' . $context['ep_module_type']] . $txt['ep_modsettings'], '
 				</h3>
 			</div>';
 
@@ -56,7 +56,7 @@ function template_modify_modules()
 
 		switch ($field['type'])
 		{
-			case 'text':
+			case 'text': case 'int':
 				echo '
 					<input type="text" name="', $key, '" id="', $field['label'], '"value="', $field['value'], '" class="input_text" />';
 				break;
@@ -82,7 +82,7 @@ function template_modify_modules()
 
 				foreach ($field['options'] as $option)
 					echo '
-						<option value="', $option, '"', ($option == $field['value'] ? ' selected="selected"' : ''), '>', $txt['ep_' . $key . '_' . $option], '</option>';
+						<option value="', $option, '"', ($option == $field['value'] ? ' selected="selected"' : ''), '>', (isset($txt['ep_' . $key . '_' . $option]) ? $txt['ep_' . $key . '_' . $option] : $txt[$field['label'] . '_' . $option]), '</option>';
 
 				echo '
 					</select>';
