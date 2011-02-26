@@ -591,3 +591,54 @@ div.epsitemenu div a.sm:hover
 {
 	clear: both;
 }
+/*Styles Specific to Manage Envision Modules Template*/ 
+#margin2
+{
+	margin-top: -2px;
+}
+.border-bottom
+{
+	border-bottom: 1px dotted;
+}
+.paddingleft10
+{
+	padding-left: 10px;
+}
+.margin-bot
+{
+	margin-bottom: 0;
+}
+.layout_width
+{
+	width: 295px;
+}
+.layout_width_max
+{
+	max-width: 300px;
+}
+.layout_style
+{
+	width: 300px;
+}
+.mod_user_action
+{
+	float: left; 
+	margin-left: 5px;
+}
+.r-align
+{
+	text-align: right;
+}
+.r-clear
+{
+	clear: right;
+}
+.display_none
+{
+	display: none;
+}
+.imgbox
+{
+	width: 12px; 
+	height: 11px;
+}

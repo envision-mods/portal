@@ -95,7 +95,7 @@ function template_module_column($style = 0, $column = array())
 	if (!empty($style))
 		echo '
 					</div></div>
-					<span class="lowerframe" style="margin-top: -2px;"><span></span></span>';
+					<span class="lowerframe margin2"><span></span></span>';
 }
 
 /**

@@ -108,7 +108,7 @@ function template_modify_modules()
 							<div id="permissions_', $group['id'], '">
 								<label for="check_group', $group['id'], '">
 									<input type="checkbox" class="input_check" name="', $key, '[]" value="', $group['id'], '" id="check_group', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
-									<span', ($group['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $group['name'], '</span>
+									<span', ($group['is_post_group'] ? ' class="border-bottom" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $group['name'], '</span>
 								</label>
 							</div>';
 
@@ -123,7 +123,7 @@ function template_modify_modules()
 						</label>
 						<br />
 					</fieldset>
-					<a href="#" onclick="document.getElementById(\'', $field['label'], '_group_perms\').style.display = \'block\'; document.getElementById(\'', $field['label'], '_group_perms_groups_link\').style.display = \'none\'; return false;" id="', $field['label'], '_group_perms_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
+					<a href="#" onclick="document.getElementById(\'', $field['label'], '_group_perms\').style.display = \'block\'; document.getElementById(\'', $field['label'], '_group_perms_groups_link\').style.display = \'none\'; return false;" id="', $field['label'], '_group_perms_groups_link" class="display_none">[ ', $txt['avatar_select_permission'], ' ]</a>
 					<script type="text/javascript"><!-- // --><![CDATA[
 						document.getElementById("', $field['label'], '_group_perms").style.display = "none";
 						document.getElementById("', $field['label'], '_group_perms_groups_link").style.display = "";
@@ -142,7 +142,7 @@ function template_modify_modules()
 		if (!empty($config_param['help']))
 			$help = '
 				<dt>
-					<a id="setting_' . $config_param['name'] . '" href="' . $scripturl . '?action=helpadmin;help=' . $config_param['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" border="0" /></a>
+					<a id="setting_' . $config_param['name'] . '" href="' . $scripturl . '?action=helpadmin;help=' . $config_param['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" /></a>
 					<span>';
 
 		echo $help, '
@@ -408,7 +408,7 @@ function template_modify_modules()
 				{
 					$checkCount++;
 		echo '
-							<div id="', $checkid, '_', $counter . '_' . $checkCount, '"><label for="', $checkname . 's_' . $counter . $check['id'], '"><input type="checkbox" name="', $checkname . 's' . $counter, '[]" value="', $check['id'], '" id="', $checkname . 's_' . $counter . $check['id'], '" ', ($check['checked'] ? 'checked="checked" ' : ''), 'class="input_check" /><span', ($config_param['type'] == 'list_groups' ? ($check['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : '') : ''), '>', $check['name'], '</span></label>', $config_param['check_order'] ? '<span style="padding-left: 10px;"><a href="javascript:void(0);" onClick="moveUp(this.parentNode.parentNode); orderChecks(\'' . $checkid . '_' . $counter . '_' . $checkCount . '\', \'order' . $checkid . '_' . $counter . '\');">' . $txt['checks_order_up'] . '</a> | <a href="javascript:void(0);" onClick="moveDown(this.parentNode.parentNode); orderChecks(\'' . $checkid . '_' . $counter . '_' . $checkCount . '\', \'order' . $checkid . '_' . $counter . '\');">' . $txt['checks_order_down'] . '</a></span>' : '', '</div>';
+							<div id="', $checkid, '_', $counter . '_' . $checkCount, '"><label for="', $checkname . 's_' . $counter . $check['id'], '"><input type="checkbox" name="', $checkname . 's' . $counter, '[]" value="', $check['id'], '" id="', $checkname . 's_' . $counter . $check['id'], '" ', ($check['checked'] ? 'checked="checked" ' : ''), 'class="input_check" /><span', ($config_param['type'] == 'list_groups' ? ($check['is_post_group'] ? ' class="border-bottom" title="' . $txt['mboards_groups_post_group'] . '"' : '') : ''), '>', $check['name'], '</span></label>', $config_param['check_order'] ? '<span class="padding-left10"><a href="javascript:void(0);" onClick="moveUp(this.parentNode.parentNode); orderChecks(\'' . $checkid . '_' . $counter . '_' . $checkCount . '\', \'order' . $checkid . '_' . $counter . '\');">' . $txt['checks_order_up'] . '</a> | <a href="javascript:void(0);" onClick="moveDown(this.parentNode.parentNode); orderChecks(\'' . $checkid . '_' . $counter . '_' . $checkCount . '\', \'order' . $checkid . '_' . $counter . '\');">' . $txt['checks_order_down'] . '</a></span>' : '', '</div>';
 				}
 	echo '
 								<em>', $txt['check_all'], '</em> <input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'', $checkname . 's' . $counter, '[]\');" /><br />
@@ -642,7 +642,7 @@ function template_add_modules()
 				<div class="windowbg">
 					<span class="topslice"><span></span></span>
 					<div class="content">
-						<form action="', $scripturl, '?action=admin;area=epmodules;sa=epaddmodules" method="post" accept-charset="', $context['character_set'], '" enctype="multipart/form-data" style="margin-bottom: 0;">
+						<form action="', $scripturl, '?action=admin;area=epmodules;sa=epaddmodules" method="post" accept-charset="', $context['character_set'], '" enctype="multipart/form-data" class="margin-bot">
 							<dl class="settings">
 								<dt>
 									<strong>', $txt['module_to_upload'], '</strong>
@@ -710,7 +710,7 @@ function template_add_layout()
 								<a id="setting_layoutname" href="', $scripturl, '?action=helpadmin;help=ep_layout_name" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a><span', (isset($context['layout_error']['no_layout_name']) || isset($context['layout_error']['layout_exists']) ? ' class="error"' : ''), '>', $txt['ep_layout_name'], ':</span>
 							</dt>
 							<dd>
-									<input type="text" name="layout_name" ', (!empty($context['layout_name']) ? 'value="' . $context['layout_name'] . '" ' : ''), 'class="input_text" style="width: 295px;" />
+									<input type="text" name="layout_name" ', (!empty($context['layout_name']) ? 'value="' . $context['layout_name'] . '" ' : ''), 'class="input_text" class="layout_width" />
 							<dd>
 							<dt>
 							<a id="setting_actions" href="', $scripturl, '?action=helpadmin;help=ep_layout_actions" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a><span><strong>', $txt['ep_action_type'], '</strong><br />
@@ -719,7 +719,7 @@ function template_add_layout()
 							</dt>
 							<dd>
 							<div class="floatleft" id="action_smf_actions">
-									<select id="actions" name="epLayout_smf_actions" style="max-width: 300px;" onfocus="selectRadioByName(document.forms.epFlayouts.action_choice, \'smf_actions\');">';
+									<select id="actions" name="epLayout_smf_actions" class="layout_width_max" onfocus="selectRadioByName(document.forms.epFlayouts.action_choice, \'smf_actions\');">';
 									foreach($context['available_actions'] as $action)
 										echo '
 											<option value="', $action, '">', $action, '</option>';
@@ -730,7 +730,7 @@ function template_add_layout()
 							<div class="floatleft" id="action_user_defined">
 								<input id="udefine" type="text" name="epLayout_user_defined" size="34" value="" onfocus="selectRadioByName(document.forms.epFlayouts.action_choice, \'user_defined\');" class="input_text" />
 							</div>
-							<div style="float: left; margin-left: 5px;"><input type="button" value="', $txt['ep_add_action'], '" onclick="javascript:addAction();" class="button_submit smalltext"></div>';
+							<div class="mod_user_action"><input type="button" value="', $txt['ep_add_action'], '" onclick="javascript:addAction();" class="button_submit smalltext"></div>';
 			echo '
 								<script type="text/javascript"><!-- // --><![CDATA[
 								// This is shown by default.
@@ -753,7 +753,7 @@ function template_add_layout()
 							</dd>
 							<dt><span><a id="setting_layout_style" href="', $scripturl, '?action=helpadmin;help=ep_layout_style" onclick="return reqWin(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" /></a>', $txt['layout_style'], '</span></dt>
 							<dd>
-									<select name="layout_style" style="width: 300px;">';
+									<select name="layout_style" class="layout_style">';
 
 		foreach ($context['layout_styles'] as $num => $layout_style)
 			echo '
@@ -842,7 +842,7 @@ function template_edit_layout()
 							</dt>
 							<dd>
 							<div class="floatleft" id="action_smf_actions">
-									<select id="actions" name="epLayout_smf_actions" style="max-width: 300px;" onfocus="selectRadioByName(document.forms.epFlayouts.action_choice, \'smf_actions\');">';
+									<select id="actions" name="epLayout_smf_actions" class="layout_width_max" onfocus="selectRadioByName(document.forms.epFlayouts.action_choice, \'smf_actions\');">';
 
 		foreach ($context['available_actions'] as $action)
 			echo '
@@ -855,7 +855,7 @@ function template_edit_layout()
 							<div class="floatleft" id="action_user_defined">
 								<input id="udefine" type="text" name="epLayout_user_defined" size="34" value="" onfocus="selectRadioByName(document.forms.epFlayouts.action_choice, \'user_defined\');" class="input_text" />
 							</div>
-							<div style="float: left; margin-left: 5px;"><input type="button" value="', $txt['ep_add_action'], '" onclick="javascript:addAction();" class="button_submit smalltext"></div>';
+							<div class="mod_user_action"><input type="button" value="', $txt['ep_add_action'], '" onclick="javascript:addAction();" class="button_submit smalltext"></div>';
 
 		echo '
 								<script type="text/javascript"><!-- // --><![CDATA[
@@ -940,7 +940,7 @@ function template_edit_layout()
 
 	echo '
 							<tr class="windowbg', $windowbg, '" id="tr_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '">
-								<td id="tdcolumn_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '"><div class="floatleft"><a href="javascript:void(0);" onclick="javascript:columnUp(this.parentNode.parentNode.parentNode);" onfocus="if(this.blur)this.blur();"><img src="' . $context['epadmin_image_url'] . '/ep_up.gif" style="width: 12px; height: 11px;" border="0" /></a> <a href="javascript:void(0);" onclick="javascript:columnDown(this.parentNode.parentNode.parentNode);" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/ep_down.gif" style="width: 12px; height: 11px;" border="0" /></a></div><span class="ep_edit_column" id="column_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '">', $txt['ep_column'], ' ', $pCol + 1, '</span></td>
+								<td id="tdcolumn_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '"><div class="floatleft"><a href="javascript:void(0);" onclick="javascript:columnUp(this.parentNode.parentNode.parentNode);" onfocus="if(this.blur)this.blur();"><img src="' . $context['epadmin_image_url'] . '/ep_up.gif" style="width: 12px; height: 11px;" border="0" /></a> <a href="javascript:void(0);" onclick="javascript:columnDown(this.parentNode.parentNode.parentNode);" onfocus="if(this.blur)this.blur();"><img src="', $context['epadmin_image_url'], '/ep_down.gif" class="imgbox" border="0" /></a></div><span class="ep_edit_column" id="column_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '">', $txt['ep_column'], ' ', $pCol + 1, '</span></td>
 								<td id="tdcspans_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '" style="text-align: center;"><input type="text" id="cspans_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '" name="colspans[', $section['id_layout_position'], ']" size="5" value="', (isset($_POST['colspans'][$section['id_layout_position']]) ? $_POST['colspans'][$section['id_layout_position']] : $section['colspans']), '"', (in_array($section['id_layout_position'], $context['colspans_error_ids']) ? ' style="border: 1px solid red;"' : ''), ' class="input_text" /></td>
 								<td style="text-align: center;" id="tdenabled_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '">', (!$section['is_smf'] ? '<input type="checkbox" id="enabled_' . $xRow . '_' . $pCol . '_' . $section['id_layout_position'] . '" name="enabled[' . $section['id_layout_position'] . ']"' . ($section['enabled'] ? ' checked="checked"' : '') . ' class="input_check" />' : ''), '</td>';
 
@@ -998,7 +998,7 @@ if ($context['show_smf'])
 			echo '
 			</dl>
 			<div class="floatright">
-			<p style="text-align: right;"><label for="add_column">', $txt['ep_add_column'], '</label> <select id="selAddColumn">';
+			<p class="r-align"><label for="add_column">', $txt['ep_add_column'], '</label> <select id="selAddColumn">';
 
 					foreach($rows as $key => $value)
 						echo '
@@ -1007,11 +1007,11 @@ if ($context['show_smf'])
 		echo '
 			</select> <input type="button" class="button_submit" value="', $txt['ep_add_column_button'], '" onclick="javascript:addColumn();" />
 			</p>
-			<p style="text-align: right;">
+			<p class="r-align">
 			<input type="button" class="button_submit" value="', $txt['ep_add_row'], '" onclick="javascript:addRow();" /> <input type="button" class="button_submit" value="', $txt['ep_edit_remove_selected'], '" onclick="javascript:deleteSelected(\'', $txt['confirm_remove_selected'], '\');" />
 			</p></div>
 
-					<div style="clear: right;">
+					<div class="r-clear">
 						<hr class="hrcolor">
 						<div id="lay_right" class="righttext">', ($context['show_smf'] ? '
 							<input type="hidden" id="smf_section" name="smf_id_layout_position" value="' . $smf_section . '" />' : ''), '
