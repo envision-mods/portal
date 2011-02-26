@@ -35,15 +35,11 @@ $txt['ep_outdated'] = 'You are using an outdated version of Envision Portal. Ple
 // Credits strings.
 $txt['ep_credits'] = 'Credits';
 $txt['ep_credits_info'] = 'The Envision Portal Team would like to thank everyone who has made what Envision Portal is today. We also thank Simple Machines for making the software that this portal was built for as well as thanking YOU, the user, for using the portal.';
-$txt['ep_credits_groups_pm'] = 'Project Managers';
 $txt['ep_credits_groups_dev'] = 'Developers';
-$txt['ep_credits_groups_support'] = 'Supporters';
 $txt['ep_credits_groups_custom'] = 'Customization';
-$txt['ep_credits_groups_qa'] = 'Quality Assurance';
-$txt['ep_credits_groups_pr'] = 'Public Relations';
-$txt['ep_credits_groups_docs'] = 'Documentation Writers';
-$txt['ep_credits_groups_lang'] = 'Globalizers';
-$txt['ep_credits_translators_thanks'] = 'A big <u>THANK YOU</u> to our <strong>Translators</strong> who make Envision Portal possible in many different languages!';
+$txt['ep_credits_groups_mar'] = 'Marketing';
+$txt['ep_credits_groups_docs'] = 'Documentation';
+$txt['ep_credits_groups_global'] = 'Globalization';
 $txt['ep_credits_special'] = 'Special Thanks';
 $txt['ep_credits_fam_fam'] = 'Icons';
 $txt['ep_credits_fam_fam_message'] = 'Mark James for his <a href="http://www.famfamfam.com/lab/icons/silk/" target="_blank">Fam Fam Fam Silk Icons</a>.';
