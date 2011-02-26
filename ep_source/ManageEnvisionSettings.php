@@ -165,89 +165,43 @@ function EnvisionPortalInfo()
 			'pretext' => $txt['ep_credits_info'],
 			'groups' => array(
 				array(
-					'title' => $txt['ep_credits_groups_pm'],
-					'members' => array(
-						'<span onclick="alert(\'THE KING\');">Solomon &quot;SoLoGHoST&quot; Closson</span>',
-						'Chris &quot;ccbtimewiz&quot; Batista',
-					),
-				),
-				array(
 					'title' => $txt['ep_credits_groups_dev'],
 					'members' => array(
-						'<span onclick="alert(\'THE SHERIFF\');">John &quot;live627&quot; Rayes</span>',
-						'Russell &quot;nend&quot; Najar',
-						'Alexander &quot;Bugo&quot; Kordjukov',
-					),
-				),
-				array(
-					'title' => $txt['ep_credits_groups_support'],
-					'members' => array(
+						'<a href="http://envisionportal.net/index.php?action=profile;u=9" target="_blank">John &quot;live627&quot; Rayes</a>',
+						'<a href="http://envisionportal.net/index.php?action=profile;u=1" target="_blank">Aldo &quot;hadesflames&quot; Barreras</a>',
+						'<a href="http://envisionportal.net/index.php?action=profile;u=13" target="_blank">Marcus &quot;cookiemonster&quot; Forsberg</a>',
+						'<a href="http://envisionportal.net/index.php?action=profile;u=5" target="_blank">Jay &quot;JBlaze&quot; Clemmons</a>',
 					),
 				),
 				array(
 					'title' => $txt['ep_credits_groups_custom'],
 					'members' => array(
+						'<a href="http://envisionportal.net/index.php?action=profile;u=3" target="_blank">Gary M. Gadsdon</a>',
 					),
 				),
 				array(
-					'title' => $txt['ep_credits_groups_qa'],
+					'title' => $txt['ep_credits_groups_mar'],
 					'members' => array(
-						'MC73',
-						'Ruediger',
-					),
-				),
-				array(
-					'title' => $txt['ep_credits_groups_pr'],
-					'members' => array(
-						'Matt Westlake-Toms',
-						'Tumbleweed',
+						'<a href="http://envisionportal.net/index.php?action=profile;u=2" target="_blank">Bryan &quot;Runic&quot; Deakin</a>',
 					),
 				),
 				array(
 					'title' => $txt['ep_credits_groups_docs'],
 					'members' => array(
-						'Xarcell',
+						'<a href="http://envisionportal.net/index.php?action=profile;u=4" target="_blank">Bigguy</a>',
+						'<a href="http://envisionportal.net/index.php?action=profile;u=6" target="_blank">Drunken Clam</a>',
 					),
 				),
 				array(
-					'title' => $txt['ep_credits_groups_lang'],
+					'title' => $txt['ep_credits_groups_global'],
 					'members' => array(
-						'Micha &quot;chilly&quot; Heiderich',
+						'<a href="http://envisionportal.net/index.php?action=profile;u=11" target="_blank">Micha &quot;chilly&quot; Heiderich</a>',
 					),
 				),
 				array(
 					'title' => $txt['ep_credits_special'],
 					'members' => array(
-						'Robert &quot;xero&quot; Stamm',
-						'<span onclick="alert(\'WALUIGI TIME\');">Tyler &quot;tyty1234&quot; Asuncion</span>',
-						'Aldo &quot;hadesflames&quot; Barreras',
-						'Steve &quot;Bluto&quot; Fox',
-						'<span onclick="alert(\'Not known as Gaz or Gazman.\');">Gary M. Gadsdon</span>',
-						'Jerry Osborne',
-						'Marcus &quot;Nas&quot; Forsberg',
-						'Hugo &quot;Costa&quot; Costa',
-						'Relyana',
-						'Dzonny',
-						'Adriana &quot;adribetty394&quot; Medina',
-						'Colin &quot;Shadow82x&quot; Blaber',
-						'Bryan &quot;Runic&quot; Deakin',
-						'xTmDarren',
-						'Fox',
-						'Deezel',
-						'bigguy',
-						'Eliana Tamerin',
-						'JBlaze',
-						'Jeff',
-						'Marcel',
-						'margarett',
-						'metallica48423',
-						'Nathaniel',
-						'necrit',
-						'Relyana',
-						'Steven &quot;Fustrate&quot; Hoffman',
-						'Shortie',
-						'Trekkie101',
-						'[n3rve]',
+						'All of the Envision Portal Friends'
 					),
 				),
 				array(
@@ -257,7 +211,6 @@ function EnvisionPortalInfo()
 					),
 				),
 			),
-			'translators' => $txt['ep_credits_translators_thanks'],
 			'posttext' => $txt['ep_credits_anyone'],
 		),
 	);
