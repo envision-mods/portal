@@ -55,9 +55,9 @@ function template_portal_info()
 						<div id="ep_version_details">
 							<strong>', $txt['ep_admin_config_version_info'], '</strong><br />
 							', $txt['ep_admin_config_installed_version'], ':
-							<em id="ep_installed_version" style="white-space: nowrap;">', $portal_ver, '</em><br />
+							<em id="ep_installed_version" class="no_wrap">', $portal_ver, '</em><br />
 							', $txt['ep_admin_config_latest_version'], ':
-							<em id="ep_latest_version" style="white-space: nowrap;">??</em><br />
+							<em id="ep_latest_version" class="no_wrap">??</em><br />
 							<br />
 							<strong>', $txt['administrators'], ':</strong>
 							', implode(', ', $context['administrators']);
@@ -120,7 +120,7 @@ function template_portal_info()
 		// Thanking our translators!
 		if (isset($section['translators']))
 			echo '
-			<div style="text-align: center;"><span class="smalltext">', $section['translators'], '</span></div>';
+			<div class="c-align"><span class="smalltext">', $section['translators'], '</span></div>';
 
 		// And for some "post text".
 		if (isset($section['posttext']))

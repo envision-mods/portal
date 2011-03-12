@@ -58,19 +58,19 @@ function template_main()
 							<strong>', $txt['ep_envision_menu_button_name'], ':</strong>
 						</dt>
 						<dd>
-							<input type="text" name="name" id="bnbox" value="', $context['button_data']['name'], '" tabindex="1" class="input_text" style="width: 100%;" />
+							<input type="text" name="name" id="bnbox" value="', $context['button_data']['name'], '" tabindex="1" class="input_text" class="full_width" />
 							<div id="bn"></div>
 						</dd>
 						<dt>
 							<strong>', $txt['ep_envision_menu_button_position'], ':</strong>
 						</dt>
 						<dd>
-							<select name="position" size="10" style="width: 20%;" onchange="this.form.position.disabled = this.options[this.selectedIndex].value == \'\';">
+							<select name="position" size="10" class="a_fifth" onchange="this.form.position.disabled = this.options[this.selectedIndex].value == \'\';">
 								<option value="after"', $context['button_data']['position'] == 'after' ? ' selected="selected"' : '', '>' . $txt['mboards_order_after'] . '...</option>
 								<option value="child_of"', $context['button_data']['position'] == 'child_of' ? ' selected="selected"' : '', '>' . $txt['mboards_order_child_of'] . '...</option>
 								<option value="before"', $context['button_data']['position'] == 'before' ? ' selected="selected"' : '', '>' . $txt['mboards_order_before'] . '...</option>
 							</select>
-							<select name="parent" size="10" style="width: 75%;">';
+							<select name="parent" size="10" class="three_quarters">';
 
 	foreach ($context['menu_buttons'] as $buttonIndex => $buttonData)
 	{
@@ -111,7 +111,7 @@ function template_main()
 							<strong>', $txt['ep_envision_menu_button_link'], ':</strong><br />
 						</dt>
 						<dd>
-							<input type="text" name="link" value="', $context['button_data']['link'], '" tabindex="1" class="input_text" style="width: 100%;" />
+							<input type="text" name="link" value="', $context['button_data']['link'], '" tabindex="1" class="input_text" class="full_width" />
 							<span class="smalltext">', $txt['ep_envision_menu_button_link_desc'], '</span>
 						</dd>
 						<dt>
@@ -130,7 +130,7 @@ function template_main()
 								<div id="permissions_', $permission['id'], '">
 									<label for="check_group', $permission['id'], '">
 										<input type="checkbox" class="input_check" name="permissions[]" value="', $permission['id'], '" id="check_group', $permission['id'], '"', $permission['checked'] ? ' checked="checked"' : '', ' />
-										<span', ($permission['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $permission['name'], '</span>
+										<span', ($permission['is_post_group'] ? ' class="border-bottom" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $permission['name'], '</span>
 									</label>
 								</div>';
 
@@ -142,7 +142,7 @@ function template_main()
 								<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'permissions[]\');" id="check_group_all"', $all_checked ? ' checked="checked"' : '', ' />
 								<label for="check_group_all"><em>', $txt['check_all'], '</em></label><br />
 							</fieldset>
-							<a href="javascript:void(0);" onclick="document.getElementById(\'group_perms\').style.display = \'block\'; document.getElementById(\'group_perms_groups_link\').style.display = \'none\'; return false;" id="group_perms_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
+							<a href="javascript:void(0);" onclick="document.getElementById(\'group_perms\').style.display = \'block\'; document.getElementById(\'group_perms_groups_link\').style.display = \'none\'; return false;" id="group_perms_groups_link" class="display_none">[ ', $txt['avatar_select_permission'], ' ]</a>
 							<script type="text/javascript"><!-- // --><![CDATA[
 								document.getElementById("group_perms").style.display = "none";
 								document.getElementById("group_perms_groups_link").style.display = "";
