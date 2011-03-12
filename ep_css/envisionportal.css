@@ -629,6 +629,10 @@ div.epsitemenu div a.sm:hover
 {
 	text-align: right;
 }
+.c-align
+{
+	text-align: center;
+}
 .r-clear
 {
 	clear: right;
@@ -641,4 +645,22 @@ div.epsitemenu div a.sm:hover
 {
 	width: 12px; 
 	height: 11px;
+}
+/*No wrapping*/
+.no_wrap
+{
+	white-space: nowrap;
+}
+/*width of 100% .... simples*/
+.full_width
+{
+	width: 100%;
+}
+.a_fifth
+{
+	width: 20%;
+}
+.three_quarters
+{
+	width: 75%;
 }

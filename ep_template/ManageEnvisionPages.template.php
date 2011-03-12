@@ -72,7 +72,7 @@ function template_main()
 							', $txt['ep_envision_pages_page_name'], ':
 						</dt>
 						<dd>
-							<input type="text" name="page_name" id="pnbox" value="', $context['page_data']['page_name'], '" tabindex="1" class="input_text" style="width: 100%;" />
+							<input type="text" name="page_name" id="pnbox" value="', $context['page_data']['page_name'], '" tabindex="1" class="input_text" class="full_width" />
 							<div id="pn"></div>
 						</dd>
 						<dt>
@@ -87,7 +87,7 @@ function template_main()
 							', $txt['ep_envision_pages_page_title'], ':
 						</dt>
 						<dd>
-							<input type="text" name="title" value="', $context['page_data']['title'], '" tabindex="1" class="input_text" style="width: 100%;" />
+							<input type="text" name="title" value="', $context['page_data']['title'], '" tabindex="1" class="input_text" class="full_width" />
 						</dd>
 						<dt>
 							', $txt['ep_envision_pages_page_perms'], ':
@@ -105,7 +105,7 @@ function template_main()
 								<div id="permissions_', $permission['id'], '">
 									<label for="check_group', $permission['id'], '">
 										<input type="checkbox" class="input_check" name="permissions[]" value="', $permission['id'], '" id="check_group', $permission['id'], '"', $permission['checked'] ? ' checked="checked"' : '', ' />
-										<span', ($permission['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $permission['name'], '</span>
+										<span', ($permission['is_post_group'] ? ' class="border-bottom" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $permission['name'], '</span>
 									</label>
 								</div>';
 
