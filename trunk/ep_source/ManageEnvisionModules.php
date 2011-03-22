@@ -1932,12 +1932,16 @@ function layoutPostError($layout_errors, $sub_template, $layout_name = '', $curr
 
 	// Need to add all actions, except this layouts actions to the exceptions within this group, so we don't add them twice for different layouts.
 	$request = $smcFunc['db_query']('', '
-		SELECT dl.actions
-		FROM {db_prefix}ep_groups AS dg
-		LEFT JOIN {db_prefix}ep_layouts AS dl ON (dl.id_group = dg.id_group' . (isset($context['edit_layout']) ? ' AND dl.id_layout != {int:curr_layout}' : '') . ')
-		WHERE dg.id_member = {int:zero} AND dg.id_group = {int:one}',
-		$query_array
-	);
+		SELECT action
+			FROM {db_prefix}ep_layouts AS el
+				LEFT JOIN {db_prefix}ep_layout_actions AS ela ON (ela.id_layout = el.id_layout)
+			WHERE ela.action = {int:current_layout}
+				AND el.id_member = {int:zero}',
+			array(
+				'current_layout' => $_SESSION['selected_layout']['id_layout'],
+				'zero' => 0,
+			)
+		);
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$exceptions = array_merge($exceptions, explode(',', $row['actions']));
@@ -1987,10 +1991,10 @@ function AddEnvisionLayout()
 	global $context, $txt, $smcFunc;
 
 	// Just a few precautionary measures.
-	 if (!allowedTo('admin_forum'))
-	  return;
+	if (!allowedTo('admin_forum'))
+		return;
 
-	 validateSession();
+	validateSession();
 
 	$context['page_title'] = $txt['add_layout_title'];
 	$context['sub_template'] = 'add_layout';
@@ -2036,22 +2040,24 @@ function AddEnvisionLayout()
 		'removetopic2'
 	);
 
-	$edit_layout_query = array('curr_layout' => $_SESSION['selected_layout']['id_layout']);
-	$query_array = isset($context['edit_layout']) ? array_merge(array('one' => 1, 'zero' => 0), $edit_layout_query) : array('one' => 1, 'zero' => 0);
+	// If editing a layout, find actions associated with it and add them to the exceptions list.
+	if (isset($context['edit_layout']))
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT action
+			FROM {db_prefix}ep_layouts AS el
+				LEFT JOIN {db_prefix}ep_layout_actions AS ela ON (ela.id_layout = el.id_layout)
+			WHERE ela.action = {int:current_layout}
+				AND el.id_member = {int:zero}',
+			array(
+				'current_layout' => $_SESSION['selected_layout']['id_layout'],
+				'zero' => 0,
+			)
+		);
 
-	// Need to add current action to the exceptions within this group, so we don't add them twice.
-	$request = $smcFunc['db_query']('', '
-		SELECT dl.actions
-		FROM {db_prefix}ep_groups AS dg
-		LEFT JOIN {db_prefix}ep_layouts AS dl ON (dl.id_group = dg.id_group' . (isset($context['edit_layout']) ? ' AND dl.id_layout != {int:curr_layout}' : '') . ')
-		WHERE dg.id_member = {int:zero} AND dg.id_group = {int:one}',
-		$query_array
-	);
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$exceptions = array_merge($exceptions, explode(',', $row['actions']));
-
-	$smcFunc['db_free_result']($request);
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$exceptions += explode(',', $row['actions']);
+	}
 
 	$countActions = count($context['smf_actions']);
 
@@ -2095,8 +2101,8 @@ function AddEnvisionLayout2()
 	global $context, $txt, $smcFunc;
 
 	// Just a few precautionary measures.
-	 if (!allowedTo('admin_forum'))
-	  return;
+	if (!allowedTo('admin_forum'))
+		return;
 
 	validateSession();
 
@@ -2108,43 +2114,20 @@ function AddEnvisionLayout2()
 	$layout_actions = array();
 	$selected_layout = 0;
 
-	if (isset($_POST['layout_name']) && !empty($_POST['layout_name']))
-		$layout_name = trim($_POST['layout_name']);
+	ep_call_hook('add_layout', array(&$_POST));
+
+	if (!empty($_POST['layout_name']))
+		$layout_name = checkLayoutName(trim($_POST['layout_name']));
 	else
-	{
-		$layout_name = '';
 		$layout_errors[] = 'no_layout_name';
-	}
 
-	// We need to make sure that the layout name doesn't exist in any of the other layouts.
-	if (!empty($layout_name))
-	{
-		$request = $smcFunc['db_query']('', '
-			SELECT dl.id_layout
-			FROM {db_prefix}ep_groups AS dg
-			INNER JOIN {db_prefix}ep_layouts AS dl ON (dl.id_group = dg.id_group AND LOWER(dl.name) = {string:layout_name})
-			WHERE dg.id_member = {int:zero} AND dg.id_group = {int:one}',
-			array(
-				'one' => 1, // This needs to change to the current group that the user is working on. USE a $_SESSION variable 4 this!
-				'zero' => 0,
-				'layout_name' => strtolower($layout_name),
-			)
-		);
-		if ($smcFunc['db_num_rows']($request) !== 0)
-		{
-			$layout_errors[] = 'layout_exists';
-			$layout_name = '';
-		}
-
-		$smcFunc['db_free_result']($request);
-		// Now let's use html_entities on it before placing into the database.
-		$layout_name = $smcFunc['htmlspecialchars'](un_htmlspecialchars($layout_name));
-	}
+	if ($layout_name === false)
+		$layout_name = '';
 
 	$i = 0;
 
 	if (!empty($_POST['layout_actions']))
-		foreach($_POST['layout_actions'] as $laction)
+		foreach ($_POST['layout_actions'] as $laction)
 		{
 			preg_match('/((?:\[topic\]=)\d+)/', $laction, $matches);
 			if (!empty($matches))
@@ -2156,10 +2139,9 @@ function AddEnvisionLayout2()
 		$layout_errors[] = 'no_actions';
 
 	// Finally get the layout style they chose.
-	// Should compare this to the advanced layout style selection POST, if advanced is selected, $layout_style = -1;
-	$selected_layout = !empty($_POST['layout_style']) ? (int) $_POST['layout_style'] : 0;
+	$selected_layout = (int) $_POST['layout_style'];
 
-	if (count($layout_errors) >= 1)
+	if (!empty($layout_errors))
 		return layoutPostError($layout_errors, 'add_layout', $layout_name, $layout_actions, $selected_layout);
 
 	// Prevent double submission of this form.
@@ -2167,45 +2149,61 @@ function AddEnvisionLayout2()
 
 	$id_group = 1;
 
-	$selected_layout = !empty($_POST['layout_style']) ? (int) $_POST['layout_style'] : 0;
-
 	if (!empty($selected_layout))
-		$insert_positions = epPredefined_Layouts($selected_layout);
+		$insert_positions = ep_get_predefined_layouts($selected_layout);
 	else
 		fatal_lang_error('ep_layout_unknown', false);
 
-	$ep_actions = implode(',', $layout_actions);
-	$layout_name = $smcFunc['htmlspecialchars'](un_htmlspecialchars(trim($_POST['layout_name'])));
+	$layout_name = $smcFunc['htmlspecialchars']($_POST['layout_name']);
 
 	// Add the module info to the database
 	$columns = array(
 		'name' => 'string-65',
-		'actions' => 'string',
-		'id_group' => 'int',
-	);
-
-	$keys = array(
-		'id_layout',
-		'id_group'
 	);
 
 	$data = array(
 		$layout_name,
-		$ep_actions,
-		$id_group,
+	);
+
+	$keys = array(
+		'id_layout',
 	);
 
 	$smcFunc['db_insert']('insert', '{db_prefix}ep_layouts',  $columns, $data, $keys);
 
-	// We need to tell the positions table which ID was inserted
+	// We need to tell the actions table which ID was inserted
 	$iid = $smcFunc['db_insert_id']('{db_prefix}ep_layouts', 'id_layout');
+
+	// Add the module info to the database
+	$columns = array(
+		'id_layout' => 'int',
+		'action' => 'string',
+	);
+	if (count($layout_actions) == 1)
+		$data = array(
+			$iid,
+			$layout_actions[0],
+		);
+	else
+		foreach ($layout_actions as $layout_action)
+			$data[] = array(
+				$iid,
+				$layout_action,
+			);
+
+	$keys = array(
+		'id_layout',
+	);
+
+	$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_actions',  $columns, $data, $keys);
 
 	// One more to go - insert the layout.
 	$columns = array(
 		'id_layout' => 'int',
-		'column' => 'string',
-		'row' => 'string',
-		'enabled' => 'int',
+		'x_pos' => 'int',
+		'y_pos' => 'int',
+		'colspan' => 'int',
+		'status' => 'string',
 	);
 
 	$keys = array(
@@ -2213,37 +2211,25 @@ function AddEnvisionLayout2()
 		'id_layout_position',
 	);
 
-	// Add the Disabled Modules section to the layout style.
-	$insert_positions = array_merge($insert_positions, array(array('column' => '0:0', 'row' => '0:0', 'enabled' => -1)));
-
 	foreach ($insert_positions as $insert_position)
 	{
 		$data = array(
 			$iid,
-			$insert_position['column'],
-			$insert_position['row'],
-			$insert_position['enabled'],
+			$insert_position['x_pos'],
+			$insert_position['y_pos'],
+			$insert_position['colspan'],
+			$insert_position['status'],
 		);
 
 		$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_positions',  $columns, $data, $keys);
-
-		// We need to get the id_layout_position of the SMF section.
-		if (isset($insert_position['smf']))
-			$smf_id = $smcFunc['db_insert_id']('{db_prefix}ep_layout_positions', 'id_layout_position');
 	}
 
-	$iid2 = $smcFunc['db_insert_id']('{db_prefix}ep_layout_positions', 'id_layout_position');
-
 	$_SESSION['selected_layout'] = array(
-		'id_layout' => (int) $iid,
+		'id_layout' => $iid,
 		'name' => $layout_name,
 	);
 
 	$_SESSION['layouts'][$iid] = $layout_name;
-
-	// Only needs 1 parameter passed to it since the rest is in the $_SESSION.
-	// and don't bother with actual modules, we are cloning from an array instead!
-	EnvisionClone($iid2, $smf_id);
 
 	redirectexit('action=admin;area=epmodules;sa=epmanmodules');
 }
@@ -2264,7 +2250,7 @@ function DeleteEnvisionLayout()
 
 	$id_layout = isset($_POST['layout_picker']) && !empty($_POST['layout_picker']) ? (int) $_POST['layout_picker'] : fatal_lang_error('no_layout_selected', false);
 
-	if (!EnvisionDeleteLayout($id_layout))
+	if (!deleteLayout($id_layout))
 		fatal_lang_error('no_layout_selected', false);
 	else
 		redirectexit('action=admin;area=epmodules;sa=epmanmodules');
@@ -2303,71 +2289,18 @@ function EditEnvisionLayout()
 		$context['colspans_error_ids'] = array();
 	}
 
-	$request = $smcFunc['db_query']('', '
-		SELECT dl.name, dl.actions, dlp.id_layout_position, dlp.row, dlp.column, dlp.enabled, dmp.id_module, dmp.id_clone, dmp.id_position
-		FROM {db_prefix}ep_groups AS dg
-			INNER JOIN {db_prefix}ep_layouts AS dl ON (dl.id_group = dg.id_group AND dl.id_layout = {int:id_layout})
-			LEFT JOIN {db_prefix}ep_layout_positions AS dlp ON (dlp.id_layout = dl.id_layout' . (!empty($context['layout_errors']) ? '' : ' AND dlp.enabled != {int:invisible_layout}') . ')
-			LEFT JOIN {db_prefix}ep_module_positions AS dmp ON (dmp.id_layout = dl.id_layout AND dmp.id_layout_position = dlp.id_layout_position)
-		WHERE dg.id_member = {int:zero} AND dg.id_group = {int:one}',
-		array(
-			'one' => 1, // This needs to change to the current group that the user is working on. USE a $_SESSION variable 4 this!
-			'zero' => 0,
-			'invisible_layout' => -2,
-			'id_layout' => $selected_layout,
-		)
-	);
+	loadLayout($selected_layout);
 
-	$context['total_columns'] = 0;
-	$context['total_rows'] = 0;
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		if ($row['enabled'] != -1)
+	foreach ($context['ep_columns'] as &$row_data)
+		foreach ($row_data as &$column_data)
 		{
-			if (isset($_POST['remove_positions']))
-			{
-				$was_deleted = strstr($_POST['remove_positions'], $row['id_layout_position']);
-				if ($was_deleted !== false)
-					continue;
-			}
-
-			$context['layout_name'] = un_htmlspecialchars($row['name']);
-			$context['current_actions'] = explode(',', $row['actions']);
-			$cols = explode(':', $row['column']);
-			$rows = explode(':', $row['row']);
-			$cols[0] = !empty($cols[0]) ? $cols[0] : 0;
-			$rows[0] = !empty($rows[0]) ? $rows[0] : 0;
-
-			$smf = (int) $row['id_clone'] + (int) $row['id_module'];
-			$smf_col = empty($smf) && !is_null($row['id_position']);
-
-			if (!isset($context['current_sections'][$rows[0]][$cols[0]]))
-				$context['total_columns']++;
-
-			if (!isset($context['current_sections'][$rows[0]]))
-				$context['total_rows']++;
-
-			$context['current_sections'][$rows[0]][$cols[0]] = array(
-				'is_smf' => $smf_col,
-				// 'has_modules' => !empty($smf),
-				'id_layout_position' => $row['id_layout_position'],
-				'id_position' => $row['id_position'],
-				'colspans' => !empty($cols[1]) ? $cols[1] : 0,
-				'rowspans' => !empty($rows[1]) ? $rows[1] : 0,
-				'enabled' => !empty($row['enabled']),
+			$column_data += array(
+				'colspan' => $column_data['extra']['colspan'],
+				'enabled' => $column_data['extra']['status'] == 'active',
 			);
+
+			unset($column_data['extra']);
 		}
-		else
-			if (!isset($context['disabled_section']))
-				$context['disabled_section'] = $row['id_layout_position'];
-	}
-
-	$smcFunc['db_free_result']($request);
-
-	ksort($context['current_sections']);
-	foreach ($context['current_sections'] as $key => $value)
-		ksort($context['current_sections'][$key]);
 
 	$context['show_smf'] = strpos(strtolower(implode(',', $context['current_actions'])), '[home]') === false;
 	$_SESSION['show_smf'] = strpos(strtolower(implode(',', $context['current_actions'])), '[home]') === false;
@@ -2393,7 +2326,8 @@ function EditEnvisionLayout2()
 	// We need to pass the user's ID (zero, admin :P)
 	$_POST['id_member'] = 0;
 
-	// 	die(var_dump($_POST));
+	ep_call_hook('edit_layout', array(&$_POST));
+
 	$layout_errors = array();
 	$layout_name = '';
 	$layout_actions = array();
@@ -2401,40 +2335,13 @@ function EditEnvisionLayout2()
 
 	if ($_SESSION['show_smf'])
 	{
-		if (isset($_POST['layout_name']) && !empty($_POST['layout_name']) )
-			$layout_name = trim($_POST['layout_name']);
+		if (!empty($_POST['layout_name']))
+			$layout_name = checkLayoutName(trim($_POST['layout_name']));
 		else
-		{
-			$layout_name = '';
 			$layout_errors[] = 'no_layout_name';
-		}
 
-		// We need to make sure that the layout name doesn't exist in any of the other layouts.
-		if (!empty($layout_name))
-		{
-			$request = $smcFunc['db_query']('', '
-				SELECT dl.id_layout
-				FROM {db_prefix}ep_groups AS dg
-				INNER JOIN {db_prefix}ep_layouts AS dl ON (dl.id_group = dg.id_group AND LOWER(dl.name) = {string:layout_name} AND dl.id_layout != {int:id_layout})
-				WHERE dg.id_member = {int:zero} AND dg.id_group = {int:one}',
-				array(
-					'one' => 1, // This needs to change to the current group that the user is working on. USE a $_SESSION variable 4 this!
-					'zero' => 0,
-					'layout_name' => strtolower($layout_name),
-					'id_layout' => $selected_layout,
-				)
-			);
-			if ($smcFunc['db_num_rows']($request) !== 0)
-			{
-				$layout_errors[] = 'layout_exists';
-				$layout_name = '';
-			}
-
-			$smcFunc['db_free_result']($request);
-
-			// Now let's use html_entities on it before placing into the database.
-			$layout_name = $smcFunc['htmlspecialchars'](un_htmlspecialchars($layout_name));
-		}
+		if ($layout_name === false)
+			$layout_name = '';
 
 		$i = 0;
 
@@ -2451,83 +2358,35 @@ function EditEnvisionLayout2()
 			$layout_errors[] = 'no_actions';
 	}
 
-	$update_query = '';
-	$update_params = array();
-	$id_layout_positions = array();
 	$regulatory_check = array();
 	$val = 0;
 	$context['row_pos_error_ids'] = array();
 	$context['col_pos_error_ids'] = array();
 	$context['colspans_error_ids'] = array();
 
-	$update_query .= '
-			dlp.column = CASE dlp.id_layout_position';
-
-	foreach ($_POST['cId'] as $value)
+	foreach ($_POST['cId'] as $data)
 	{
-		$data = explode('_', $value);
-		if (!is_numeric($_POST['colspans'][$data[2]]))
+		list ($row, $col, $id_layout_position) = explode('_', $data);
+
+		// Colspans must be integers
+		if (!is_numeric($_POST['colspans'][$id_layout_position]))
 		{
-			$context['colspans_error_ids'][] = $data[2];
+			$context['colspans_error_ids'][] = $id_layout_position;
 			$layout_errors[104] = 'colspans_invalid';
 		}
 
-		if (!isset($regulatory_check[$data[0]]))
+		// Customs? "Please remove your shoes, sir." Um, no, this is no airport!
+		if (!isset($regulatory_check[$row]))
 			$val = 0;
 
-		$val = $val + ($_POST['colspans'][$data[2]] == 0 ? 1 : $_POST['colspans'][$data[2]]);
+		$val = $val + ($_POST['colspans'][$id_layout_position] == 0 ? 1 : $_POST['colspans'][$id_layout_position]);
+		$regulatory_check[$row] = $val;
 
-		$regulatory_check[$data[0]] = $val;
-
-
-		$update_query .= '
-				WHEN {int:id_layout_position' . $data[2] . '} THEN {string:column' . $data[2] . '}';
-
-		$update_params = array_merge($update_params, array(
-			'id_layout_position' . $data[2] => $data[2],
-			'column' . $data[2] => $data[1] . ':' . $_POST['colspans'][$data[2]],
-		));
-
-		$id_layout_positions[] = $data[2];
-	}
-
-	$update_query .= '
-				END,
-			dlp.row = CASE dlp.id_layout_position';
-
-	foreach ($_POST['cId'] as $value)
-	{
-		$data = explode('_', $value);
-
-		$update_query .= '
-				WHEN {int:id_layout_position' . $data[2] . '} THEN {string:row' . $data[2] . '}';
-
-		$update_params = array_merge($update_params, array(
-			'id_layout_position' . $data[2] => $data[2],
-			'row' . $data[2] => $data[0] . ':0',
-		));
-
-		$id_layout_positions[] = $data[2];
-	}
-
-	$update_query .= '
-				END,
-			dlp.enabled = CASE dlp.id_layout_position';
-	foreach ($_POST['cId'] as $value)
-	{
-		$data = explode('_', $value);
-		if (!empty($_POST['enabled'][$data[2]]))
-			$value = 1;
-		else
-			$value = 0;
-
-		$update_query .= '
-				WHEN {int:id_layout_position' . $data[2] . '} THEN {string:enabled' . $data[2] . '}';
-
-		$update_params = array_merge($update_params, array(
-			'id_layout_position' . $data[2] => $data[2],
-			'enabled' . $data[2] => $value,
-		));
+		// Oh, this is the way we wash our variables....
+		$x_pos[$id_layout_position] = (int) $row;
+		$y_pos[$id_layout_position] = (int) $col;
+		$colspans[$id_layout_position] = (int) $_POST['colspans'][$id_layout_position];
+		$status[$id_layout_position] = !empty($_POST['enabled'][$id_layout_position]) ? 'active' : 'inactive';
 	}
 
 	foreach ($regulatory_check as $key => $compare)
@@ -2544,33 +2403,104 @@ function EditEnvisionLayout2()
 	// Prevent double submission of this form.
 	checkSubmitOnce('check');
 
-	$id_group = 1;
-
-	$ep_actions = ($_SESSION['show_smf'] ? implode(',', $layout_actions) : '');
 	$layout_name = ($_SESSION['show_smf'] ? $smcFunc['htmlspecialchars'](un_htmlspecialchars(trim($_POST['layout_name']))) : '');
 
+	// Update the name
 	$smcFunc['db_query']('', '
-		UPDATE {db_prefix}ep_layouts AS dl, {db_prefix}ep_layout_positions AS dlp
-		SET ' . ($_SESSION['show_smf'] ? 'dl.name = {string:layout_name},
-			dl.actions = {string:layout_actions},' : '') . $update_query . '
-				END
-		WHERE dl.id_layout = {int:id_layout} AND dlp.id_layout_position IN({array_int:id_layout_positions})',
-		array_merge($update_params, array(
+		UPDATE {db_prefix}ep_layouts
+		SET name = {string:layout_name}
+		WHERE id_layout = {int:id_layout}',
+		array(
 			'layout_name' => $layout_name,
-			'layout_actions' => $ep_actions,
 			'id_layout' => $selected_layout,
-			'id_layout_positions' => $id_layout_positions,
-		))
+		)
 	);
+
+	// Delete old actions
+	$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}ep_layout_actions
+		WHERE id_layout = {int:id_layout}',
+		array(
+			'id_layout' => $selected_layout,
+		)
+	);
+
+	// Add the layout actions to the database
+	$columns = array(
+		'id_layout' => 'int',
+		'action' => 'string',
+	);
+
+	if (count($layout_actions) == 1)
+		$data = array(
+			$selected_layout,
+			$layout_actions[0],
+		);
+	else
+		foreach ($layout_actions as $layout_action)
+			$data[] = array(
+				$selected_layout,
+				$layout_action,
+			);
+
+	$keys = array(
+		'id_layout',
+	);
+
+	$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_actions',  $columns, $data, $keys);
+
+	// Update or add positions
+	foreach ($_POST['cId'] as $data)
+	{
+		list (, , $id_layout_position) = explode('_', $data);
+
+		if (strpos($id_layout_position, 'add') !== false)
+		{
+			// We have a new one to add.
+			$columns = array(
+				'id_layout' => 'int',
+				'x_pos' => 'int',
+				'y_pos' => 'int',
+				'colspan' => 'int',
+				'status' => 'string',
+			);
+
+			$keys = array(
+				'id_layout',
+				'id_layout_position',
+			);
+
+			$data = array(
+				$selected_layout,
+				$x_pos[$id_layout_position],
+				$y_pos[$id_layout_position],
+				$colspan[$id_layout_position],
+				$status[$id_layout_position],
+			);
+
+			$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_positions',  $columns, $data, $keys);
+		}
+
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}ep_layout_positions
+			SET x_pos = {int:x_pos},
+				y_pos = {int:y_pos},
+				colspan = {int:colspan},
+				status = {string:status}
+			WHERE id_layout_position = {int:id_layout_position}',
+			array(
+				'id_layout_position' => $id_layout_position,
+				'x_pos' => $x_pos[$id_layout_position],
+				'y_pos' => $y_pos[$id_layout_position],
+				'colspan' => $colspans[$id_layout_position],
+				'status' => $status[$id_layout_position],
+			)
+		);
+	}
 
 	if ($_SESSION['show_smf'] && $_POST['old_smf_pos'] != $_POST['smf_radio'])
 	{
-		/*
-		The Admin has chosen to move SMF - this is done in a three step manner.
-			First we get rid of the old position, then any modules standing in the
-			way must move; and finally, we insert the new position into the database.
-		*/
-
+		// The admin has chosen to move SMF.
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}ep_module_positions
 			WHERE id_layout_position = {int:id_layout_position}',
@@ -2578,51 +2508,11 @@ function EditEnvisionLayout2()
 				'id_layout_position' => $_POST['old_smf_pos'],
 			)
 		);
-
-		// Make way for the mighty SMF, O ye little modules!
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}ep_module_positions AS dmp, {db_prefix}ep_layout_positions AS dlp
-			SET dmp.id_layout_position = dlp.id_layout_position, dmp.position = dmp.id_position
-			WHERE dmp.id_layout = {int:selected_layout}
-				AND dlp.id_layout = {int:selected_layout}
-				AND dlp.enabled = -1
-				AND dmp.id_layout_position = {int:id_layout_position}',
-			array(
-				'selected_layout' => $selected_layout,
-				'id_layout_position' => $_POST['smf_radio'],
-			)
-		);
-
-		$columns = array(
-			'id_layout_position' => 'int',
-			'id_layout' => 'int',
-			'id_module' => 'int',
-			'id_clone' => 'int',
-			'position' => 'int',
-		);
-
-		$values = array(
-			$_POST['smf_radio'],
-			$selected_layout,
-			0,
-			0,
-			0,
-		);
-
-		$keys = array(
-			'id_position',
-			'id_layout_position',
-			'id_layout',
-			'id_module',
-			'id_clone',
-		);
-
-		$smcFunc['db_insert']('insert', '{db_prefix}ep_module_positions', $columns, $values, $keys);
 	}
 
 	if (!empty($_POST['remove_positions']))
 	{
-		// The Admin has chosen to remove some columns.
+		// The admin has chosen to remove some columns.
 		$killdata = explode('_', $_POST['remove_positions']);
 
 		// Remove the empty item
@@ -2635,31 +2525,12 @@ function EditEnvisionLayout2()
 				'remove_ids' => $killdata,
 			)
 		);
-
-		// Any modules that were in these deleted sections must be moved to the disabled section.
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}ep_module_positions AS dmp, {db_prefix}ep_layout_positions AS dlp
-			SET dmp.id_layout_position = dlp.id_layout_position, dmp.position = dmp.id_position
-			WHERE dmp.id_layout = {int:selected_layout}
-				AND dlp.id_layout = {int:selected_layout}
-				AND dlp.enabled = -1
-				AND dmp.id_layout_position IN({array_int:remove_ids})',
-			array(
-				'selected_layout' => $selected_layout,
-				'remove_ids' => $killdata,
-			)
-		);
 	}
 
 	// Cleanup...
 	unset($_SESSION['show_smf']);
 	unset($regulatory_check);
 	unset($val);
-
-	// We need to empty the cache now, but make sure it is in the correct format, first.
-	foreach ($_POST['layout_actions'] as $action)
-		if (is_array(cache_get_data('envision_columns_' . md5(md5($action)), 3600)))
-			cache_put_data('envision_columns_' . md5(md5($action)), 0, 3600);
 
 	// Update the session with the new name.
 	if (!empty($layout_name))
@@ -2733,7 +2604,7 @@ function RemoveUndefinedFunctions($source, $functions = array())
  *
  * @since 1.0
  */
-function epPredefined_Layouts($style)
+function ep_get_predefined_layouts($style)
 {
 	// Here's Envision's default layout:
 	switch ((int) $style)
@@ -2743,62 +2614,73 @@ function epPredefined_Layouts($style)
 			return array(
 				// row 0
 				array(
-					'column' => '0:0',
-					'row' => '0:0',
-					'enabled' => 1,
+					'x_pos' => 0,
+					'y_pos' => 0,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				array(
-					'column' => '1:0',
-					'row' => '0:0',
-					'enabled' => 1,
+					'x_pos' => 0,
+					'y_pos' => 1,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				array(
-					'column' => '2:0',
-					'row' => '0:0',
-					'enabled' => 1,
+					'x_pos' => 0,
+					'y_pos' => 2,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				array(
-					'column' => '3:0',
-					'row' => '0:0',
-					'enabled' => 1,
+					'x_pos' => 0,
+					'y_pos' => 3,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				// row 1
 				array(
-					'column' => '0:0',
-					'row' => '1:0',
-					'enabled' => 1,
+					'x_pos' => 1,
+					'y_pos' => 0,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				array(
 					'smf' => true,
-					'column' => '1:2',
-					'row' => '1:0',
-					'enabled' => 1,
+					'x_pos' => 1,
+					'y_pos' => 1,
+					'colspan' => 2,
+					'status' => 'active',
 				),
 				array(
-					'column' => '3:0',
-					'row' => '1:0',
-					'enabled' => 1,
+					'x_pos' => 1,
+					'y_pos' => 3,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				// row 2
 				array(
-					'column' => '0:0',
-					'row' => '2:0',
-					'enabled' => 1,
+					'x_pos' => 2,
+					'y_pos' => 0,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				array(
-					'column' => '1:0',
-					'row' => '2:0',
-					'enabled' => 1,
+					'x_pos' => 2,
+					'y_pos' => 1,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				array(
-					'column' => '2:0',
-					'row' => '2:0',
-					'enabled' => 1,
+					'x_pos' => 2,
+					'y_pos' => 2,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				array(
-					'column' => '3:0',
-					'row' => '2:0',
-					'enabled' => 1,
+					'x_pos' => 2,
+					'y_pos' => 3,
+					'colspan' => 0,
+					'status' => 'active',
 				)
 			);
 			break;
@@ -2807,34 +2689,39 @@ function epPredefined_Layouts($style)
 			return array(
 				// top
 				array(
-					'column' => '0:3',
-					'row' => '0:0',
-					'enabled' => 1,
+					'x_pos' => 0,
+					'y_pos' => 0,
+					'colspan' => 3,
+					'status' => 'active'
 				),
 				// left
 				array(
-					'column' => '0:0',
-					'row' => '1:0',
-					'enabled' => 1,
+					'x_pos' => 1,
+					'y_pos' => 0,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				// middle
 				array(
 					'smf' => true,
-					'column' => '1:0',
-					'row' => '1:0',
-					'enabled' => 1,
+					'x_pos' => 1,
+					'y_pos' => 1,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				// right
 				array(
-					'column' => '2:0',
-					'row' => '1:0',
-					'enabled' => 1,
+					'x_pos' => 1,
+					'y_pos' => 2,
+					'colspan' => 0,
+					'status' => 'active',
 				),
 				// bottom
 				array(
-					'column' => '0:3',
-					'row' => '2:0',
-					'enabled' => 1,
+					'x_pos' => 2,
+					'y_pos' => 0,
+					'colspan' => 3,
+					'status' => 'inactive',
 				)
 			);
 			break;
@@ -2845,10 +2732,10 @@ function epPredefined_Layouts($style)
  * Removes all traces of a layout.
  *
  * @param int $id_layout the layout to delete
- * @return bool true on success; false  otherwise.
+ * @return bool true on success; false otherwise.
  * @since 1.0
  */
-function EnvisionDeleteLayout($id_layout)
+function deleteLayout($id_layout)
 {
 	global $smcFunc, $user_info;
 
@@ -2858,29 +2745,11 @@ function EnvisionDeleteLayout($id_layout)
 
 	checkSession('get');
 
-	$member_opt = 2;
+	// !!! TODO: Check if the layout exists and find module fields linke to this layout
 
-	$delete_modules = array();
-	$delete_clones = array();
+	ep_call_hook('add_layout', array(&$id_layout));
 
-	$request = $smcFunc['db_query']('', '
-		SELECT id_clone FROM {db_prefix}ep_module_positions
-		WHERE id_layout = {int:id_layout}',
-		array(
-			'id_layout' => $id_layout,
-		)
-	);
-
-	if ($smcFunc['db_num_rows']($request) == 0)
-		return false;
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		if (!empty($row['id_clone']))
-			$delete_clones[] = $row['id_clone'];
-
-	EnvisionDeclone($delete_clones, array(), $member_opt);
-
-	foreach (array('layouts', 'layout_positions', 'module_positions') as $table_name)
+	foreach (array('layouts', 'layout_positions', 'layout_actions') as $table_name)
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}ep_' . $table_name . '
 			WHERE id_layout = {int:id_layout}',
@@ -2892,6 +2761,7 @@ function EnvisionDeleteLayout($id_layout)
 	// Clear the sessions.
 	unset($_SESSION['selected_layout']);
 	unset($_SESSION['layouts']);
+
 	return true;
 }
 
@@ -2963,4 +2833,31 @@ function ep_list_files__recursive($dir, &$files)
 						$files[] = $file;
 }
 
+// We need to make sure that the layout name doesn't exist in any of the other layouts.
+function checkLayoutName($layout_name)
+{
+	global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_layout
+		FROM {db_prefix}ep_layouts
+		WHERE LOWER(name) = {string:layout_name}
+			AND id_member = {int:zero}',
+		array(
+			'zero' => 0,
+			'layout_name' => strtolower($layout_name),
+		)
+	);
+
+	if ($smcFunc['db_num_rows']($request) !== 0)
+	{
+		list ($id_layout) = $smcFunc['db_fetch_row']($request);
+		if (isset($_POST['layout_picker']) && $id_layout == $_POST['layout_picker'])
+			return $layout_name;
+		else
+			return false;
+	}
+	else
+		return $layout_name;
+}
 ?>
