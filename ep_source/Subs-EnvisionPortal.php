@@ -412,6 +412,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 		),
 	);
 
+	ep_call_hook('load_module_context', array(&$envisionModules));
+
 	// Any modules installed?
 	if (count($installed_mods) >= 1 || $new_layout)
 		return array_merge($envisionModules, GetEnvisionInstalledModules($installed_mods));
@@ -625,6 +627,8 @@ function module_error($type = 'error', $error_type = 'general', $log_error = fal
 		'empty' => $type == 'empty' ? 1 : 0,
 		'error' => $type == 'error' ? 1 : 0,
 	);
+
+	ep_call_hook('module_error', array(&$type));
 
 	$error_string = !empty($valid_types[$type]) ? $txt['ep_module_' . $type] : $type;
 	$error_html = $error_type == 'critical' ? array('<p class="error">', '</p>') : array('', '');
@@ -1064,7 +1068,7 @@ function ep_edit_db_select()
 
 }
 
-function loadLayout($url)
+function loadLayout($url, $return = false)
 {
 	global $smcFunc, $context, $scripturl, $txt, $user_info;
 
@@ -1072,7 +1076,7 @@ function loadLayout($url)
 	{
 		$request = $smcFunc['db_query']('', '
 			SELECT
-				*
+				*, elp.id_layout_position
 			FROM {db_prefix}ep_layouts AS el
 				LEFT JOIN {db_prefix}ep_layout_positions AS elp ON (elp.id_layout = el.id_layout)
 				LEFT JOIN {db_prefix}ep_module_positions AS emp ON (emp.id_layout_position = elp.id_layout_position)
@@ -1117,9 +1121,9 @@ function loadLayout($url)
 		// Let's grab the data necessary to show the correct layout!
 		$request = $smcFunc['db_query']('', '
 			SELECT
-				*
+				*, elp.id_layout_position
 			FROM {db_prefix}ep_layouts AS el
-				JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action})
+				JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action} AND ela.id_layout = el.id_layout)
 				LEFT JOIN {db_prefix}ep_layout_positions AS elp ON (elp.id_layout = el.id_layout)
 				LEFT JOIN {db_prefix}ep_module_positions AS emp ON (emp.id_layout_position = elp.id_layout_position)
 				LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
@@ -1145,18 +1149,18 @@ function loadLayout($url)
 	{
 		$smf_col = empty($row['id_module']) && !is_null($row['id_position']);
 
-		if (!$smf_col && $row['status'] == 'inactive')
+		if (!is_int($url) && !$smf_col && $row['status'] == 'inactive')
 			continue;
 
 		if (!isset($ep_modules[$row['x_pos']][$row['y_pos']]) && !empty($row['id_layout_position']))
 			$ep_modules[$row['x_pos']][$row['y_pos']] = array(
-				'is_smf' => $smf_col,
+				'is_smf' => $row['is_smf'],
 				'id_layout_position' => $row['id_layout_position'],
-				'colspan' => $row['colspan'] >= 2 ? ' colspan="' . $row['colspan'] . '"' : '',
 				'html' => ($row['colspan'] >= 2 ? ' colspan="' . $row['colspan'] . '"' : '') . ($context['ep_home'] && in_array($row['y_pos'], array(0, 2)) || !$context['ep_home'] && $row['y_pos'] <= 1 && !$smf_col ? ' style="width: 200px;"' : ''),
+				'extra' => $row,
 			);
 
-		if (!is_null($row['id_position']) && !empty($row['id_layout_position']))
+		if (!is_int($url) && !is_null($row['id_position']) && !empty($row['id_layout_position']))
 		{
 			// Store $context variables for each module.  Mod Authors can use these for unique ID values, function names, etc.
 			// !!! Is this really needed?
@@ -1173,47 +1177,45 @@ function loadLayout($url)
 		}
 	}
 
-	// Shouldn't be empty, but we check anyways!
-	if (!empty($ep_modules))
+	// Open a script tag because some Javascript is coming... I wish I had no need to do this.
+	$context['insert_after_template'] .= '
+	<script type="text/javascript"><!-- // --><![CDATA[';
+
+	ksort($ep_modules);
+
+	foreach ($ep_modules as $k => $ep_module_rows)
 	{
-		// Open a script tag because some Javascript is coming... I wish I had no need to do this.
-		$context['insert_after_template'] .= '
-		<script type="text/javascript"><!-- // --><![CDATA[';
+		ksort($ep_modules[$k]);
+		foreach ($ep_modules[$k] as $key => $ep)
+			if (is_array($ep_modules[$k][$key]))
+				foreach($ep_modules[$k][$key] as $pos => $mod)
+				{
+					if ($pos != 'modules' || !is_array($ep_modules[$k][$key][$pos]))
+						continue;
 
-		ksort($ep_modules);
-
-		foreach ($ep_modules as $k => $ep_module_rows)
-		{
-			ksort($ep_modules[$k]);
-			foreach ($ep_modules[$k] as $key => $ep)
-				if (is_array($ep_modules[$k][$key]))
-					foreach($ep_modules[$k][$key] as $pos => $mod)
-					{
-						if ($pos != 'modules' || !is_array($ep_modules[$k][$key][$pos]))
-							continue;
-
-						ksort($ep_modules[$k][$key][$pos]);
-					}
-		}
-
-		$module_context = ep_load_module_context();
-
-		foreach ($ep_modules as $row_id => $row_data)
-			foreach ($row_data as $column_id => $column_data)
-				if (isset($column_data['modules']))
-						foreach ($column_data['modules'] as $module => $id)
-							if (!empty($id['type']))
-								$ep_modules[$row_id][$column_id]['modules'][$module] = ep_process_module($module_context, $id, !is_int($url));
-
-		if (is_int($url))
-			$context['ep_columns'] = $ep_modules;
-		else
-			$context['envision_columns'] = $ep_modules;
-
-		// We are done with the modules' Javascript, sir!
-		$context['insert_after_template'] .= '
-		// ]]></script>';
+					ksort($ep_modules[$k][$key][$pos]);
+				}
 	}
+
+	$module_context = ep_load_module_context();
+
+	foreach ($ep_modules as $row_id => $row_data)
+		foreach ($row_data as $column_id => $column_data)
+			if (isset($column_data['modules']))
+					foreach ($column_data['modules'] as $module => $id)
+						if (!empty($id['type']))
+							$ep_modules[$row_id][$column_id]['modules'][$module] = ep_process_module($module_context, $id, !is_int($url));
+
+	ep_call_hook('load_layout', array(&$ep_modules, $url));
+
+	if (is_int($url))
+		$context['ep_columns'] = $ep_modules;
+	else
+		$context['envision_columns'] = $ep_modules;
+
+	// We are done with the modules' Javascript, sir!
+	$context['insert_after_template'] .= '
+	// ]]></script>';
 }
 
 function ep_process_module($module_context, $data, $full_layout)
@@ -1324,6 +1326,8 @@ function ep_process_module($module_context, $data, $full_layout)
 	else
 		$toggleModule .= ');';
 
+	ep_call_hook('ep_process_module', array(&$data));
+
 	if (!$data['hide_upshrink'])
 		$context['insert_after_template'] .= '
 		var ' . $data['type'] . 'toggle_' . $data['id'] . ' = new smc_Toggle({
@@ -1413,6 +1417,7 @@ function load_envision_menu($menu_buttons)
 	if (!empty($new_menu_buttons))
 		$menu_buttons = $new_menu_buttons;
 
+	ep_call_hook('load_envision_menu', array(&$menu_buttons));
 	return $menu_buttons;
 }
 
@@ -1627,6 +1632,7 @@ function envision_integrate_pre_load()
 	require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
 	require_once($sourcedir . '/ep_source/EnvisionModules.php');
+	require_once($sourcedir . '/ep_source/Subs-EnvisionPlugins.php');
 
 	// Compatibility for PHP < 5.3.0 - http://www.php.net/manual/en/function.array-replace-recursive.php#92574
 	if (!function_exists('array_replace_recursive'))
