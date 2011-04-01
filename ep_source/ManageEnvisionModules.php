@@ -863,6 +863,12 @@ function getEnvisionIcons($directory, $level)
 /**
  * Uploads a module.
  *
+ * This function checks the file input for several issues.
+ * - an error is sent if thee upload did not work out.
+ * - The name is sanitized so all invalid characters aree removed.
+ * - Loads SMF's package extractor, read_tgz_file(), and extracts the stored files.
+ * - Redirects back when all is done.
+ *
  * @since 1.0
  * @todo finish this document
  */
@@ -876,40 +882,37 @@ function UploadModule($reservedNames = array(), $installed_functions = array())
 	if (!allowedTo('admin_forum'))
 		return;
 
-	require_once($sourcedir . '/ep_source/Subs-Package.php');
+	require_once($sourcedir . '/Subs-Package.php');
 
 	if ($_FILES['ep_modules']['error'] === UPLOAD_ERR_OK)
 	{
-		// Check for tar.gz or zip files.
-		$tar_gz_pos = strpos(strtolower($_FILES['ep_modules']['name']), '.tar.gz');
-		$zip_pos = strpos(strtolower($_FILES['ep_modules']['name']), '.zip');
-
-		if (($tar_gz_pos === false || $tar_gz_pos != strlen($_FILES['ep_modules']['name']) - 7) && ($zip_pos === false || $zip_pos != strlen($_FILES['ep_modules']['name']) - 4))
-			fatal_lang_error('module_upload_error_type', false);
-
 		// Make sure it has a valid filename.
-		$_FILES['ep_modules']['name'] = parseString($_FILES['ep_modules']['name'], 'uploaded_file');
+		$_FILES['ep_modules']['name'] = ep_parse_string($_FILES['ep_modules']['name'], 'uploaded_file');
 
 		// Extract it to this directory.
 		$pathinfo = pathinfo($_FILES['ep_modules']['name']);
-		$module_path = $boarddir . '/envisionportal/modules/' . basename($_FILES['ep_modules']['name'],'.'.$pathinfo['extension']);
+
+		// We need to do this for PHP < 5.2.0...
+		if (empty($pathinfo['filename']))
+			$pathinfo['filename'] = basename($_FILES['ep_modules']['name']);
+
+		$module_path = $context['epmod_modules_dir'] . '/' . $pathinfo['filename'];
 
 		// Check if name already exists, or restricted, or doesn't have a name.
-		if (is_dir($module_path) || in_array(substr($_FILES['ep_modules']['name'], 0, strpos($_FILES['ep_modules']['name'], '.')), $reservedNames) || substr($_FILES['ep_modules']['name'], 0, strpos($_FILES['ep_modules']['name'], '.')) == '')
+		if (is_dir($module_path) || in_array($pathinfo['filename'], $reservedNames) || $pathinfo['filename'] == '')
 			fatal_lang_error('module_restricted_name', false);
 
 		// Extract the package.
 		$context['extracted_files'] = read_tgz_file($_FILES['ep_modules']['tmp_name'], $module_path);
 
 		foreach ($context['extracted_files'] as $file)
-			if (basename($file['filename']) == 'info.xml')
+			if (basename($file['filename']) == 'module.xml')
 			{
 				// Parse it into an xmlArray.
 				loadClassFile('Class-Package.php');
-				$moduleInfo = new xmlArray(file_get_contents($module_path . '/' . $file['filename']));
+				$module_info = new xmlArray(file_get_contents($module_path . '/' . $file['filename']));
 
-				// !!! Error message of some sort?
-				if (!$moduleInfo->exists('module[0]'))
+				if (!$module_info->exists('module[0]'))
 					fatal_lang_error('module_package_corrupt', false);
 
 				// End the loop. We found our man!
@@ -918,41 +921,8 @@ function UploadModule($reservedNames = array(), $installed_functions = array())
 			else
 				continue;
 
-		$moduleInfo = $moduleInfo->path('module[0]');
-		$module = $moduleInfo->to_array();
-
-
-		if (isset($module['name']) && trim($module['name']) != '')
-		{
-			if (!isset($p_mod_name))
-				$p_mod_name = $module['name'];
-		}
-		else
-			fatal_lang_error('module_restricted_name', false);
-
-		// Module already exists, remove it entire package and error out.
-		if (is_dir($boarddir . '/envisionportal/modules/' . $p_mod_name))
-		{
-			function unlinkModule($dir)
-			{
-				if($dh = @opendir($dir))
-				{
-					while (false !== ($obj = readdir($dh)))
-					{
-						if($obj == '.' || $obj == '..')
-							continue;
-
-						if (!@unlink($dir . '/' . $obj))
-							unlinkModule($dir.'/'.$obj);
-					}
-					closedir($dh);
-					@rmdir($dir);
-				}
-				return;
-			}
-			unlinkModule($module_path);
-			fatal_lang_error('module_restricted_name', false);
-		}
+		$module_info = $module_info->path('module[0]');
+		$module = $module_info->to_array();
 
 		// Handle the title and description of the module.
 		if (trim($module['title']) == '')
@@ -960,203 +930,6 @@ function UploadModule($reservedNames = array(), $installed_functions = array())
 
 		if (trim($module['description']) == '')
 			fatal_lang_error('module_no_description', false);
-
-		$main_count = 0;
-		$all_functions = array();
-		$all_files = array();
-		$func_files = array();
-
-		// Whoaa, some MAJOR ERROR CHECKING HERE!
-		if ($moduleInfo->exists('file'))
-		{
-			$filetag = $moduleInfo->set('file');
-
-			foreach ($filetag as $files => $path)
-			{
-				if ($path->exists('function'))
-				{
-					$functag = $path->set('function');
-
-					foreach($functag as $func => $function)
-					{
-						if ($function->exists('main'))
-						{
-							$main_func = $function->fetch('main');
-
-							// We'll need to check the function name and see if it's safe to use.
-							if (trim($main_func) == '')
-								fatal_lang_error('invalid_function_name', false);
-
-							// Only letters, numbers, and underscores for function names.
-							if (parseString($main_func, 'function_name', false) == 1)
-								fatal_lang_error('invalid_function_name', false);
-
-							$all_functions[] = $main_func;
-
-							$main_count++;
-						}
-						else
-						{
-							$other_funcs = $function->fetch('');
-
-							if (trim($other_funcs) == '')
-								fatal_lang_error('invalid_other_function_name', false);
-
-							// Only letters, numbers, and underscores for function names.
-							if (parseString($other_funcs, 'function_name', false) == 1)
-								fatal_lang_error('invalid_other_function_name', false);
-
-							$all_functions[] = $other_funcs;
-						}
-					}
-				}
-				else
-					fatal_lang_error('file_missing_functions', false);
-
-				// Now checking all filepaths.
-				if (!$path->exists('@path'))
-					fatal_lang_error('module_missing_files', false);
-				else
-				{
-					$filepath = $path->fetch('@path');
-					$filepath = trim($filepath);
-
-					// Checking for a valid filepath here.
-					if (parseString($filepath, 'filepath', false) == 1)
-						fatal_lang_error('module_invalid_filename', false);
-
-					$extension = strtolower(substr($filepath, -4));
-					if ($extension !== false && $extension == '.php' && $filepath != '')
-					{
-						if (in_array($filepath, $all_files))
-							fatal_lang_error('module_has_file_defined_already', false);
-						else
-						{
-							$all_files[] = $filepath;
-
-							foreach($all_functions as $funcVal)
-								$func_files[$funcVal] = $filepath;
-						}
-					}
-					else
-						fatal_lang_error('module_invalid_filename', false);
-				}
-			}
-		}
-
-		if (count($all_files) < 1)
-			fatal_lang_error('module_has_no_files', false);
-
-		if (empty($main_count) || $main_count >= 2)
-			fatal_lang_error('module_has_no_main_function', false);
-
-		if (!isset($module['name']))
-			fatal_lang_error('module_has_no_name', false);
-
-		// Checking current functions
-		foreach($all_functions as $funcName)
-			if (function_exists($funcName))
-				fatal_lang_error('module_function_already_exists', false);
-
-		// Checking functions for modules that are installed.
-		if (count($installed_functions) > 1)
-		{
-			foreach ($installed_functions as $tempfunc)
-			{
-				$split_functions = explode('+', $tempfunc);
-				foreach ($split_functions as $temp)
-					if (in_array($temp, $all_functions))
-						fatal_lang_error('module_function_already_exists', false);
-			}
-		}
-
-		if (isset($module['iconsdir']) && trim($module['iconsdir']) != '')
-		{
-			$module['iconsdir'] = trim($module['iconsdir']);
-			$module['iconsdir'] = parseString($module['iconsdir'], 'folderpath');
-		}
-
-		$mod_langs = array();
-
-		if (isset($module['languages']['english']['main']) && parseString($module['languages']['english']['main'], 'filepath', false) != 1 && is_array($module['languages']))
-			$languages_dir = $settings['default_theme_dir'] . '/languages';
-		else
-			fatal_lang_error('invalid_language_filepath', false);
-
-		// Make sure the language files are good and add them to the master.
-		foreach($module['languages'] as $lang => $langFile)
-			foreach ($langFile as $type => $value)
-			{
-				$lFile = trim($value);
-
-				if (parseString($lFile, 'filepath', false) == 1)
-					fatal_lang_error('invalid_language_filepath', false);
-
-				writeLanguage($module_path, $lFile, strtolower(trim($lang)) . (strtolower(trim($type)) == 'utf8' ? '-utf8' : ''), $module['name']);
-			}
-
-		// Handling the icons and the icon path.
-		$valid_icons = array('gif', 'jpg', 'jpeg', 'png', 'bmp');
-
-		foreach ($context['extracted_files'] as $file)
-		{
-			$file_contents = file_get_contents($module_path . '/' . $file['filename']);
-			$filename = basename($file['filename']);
-			$is_icon = isset($module['iconsdir']) ? $file['filename'] != $module['iconsdir'] . '/' && strpos($file['filename'], $module['iconsdir'] . '/') !== false : false;
-			$extension = $is_icon ? substr(strrchr($filename, '.'), 1) : '';
-
-			// Uploading icons...
-			if (!empty($extension) && !empty($module['iconsdir']) && empty($modSettings['ep_disable_custommod_icons']))
-			{
-				// All valid icon images.
-				if (in_array(strtolower($extension), $valid_icons))
-				{
-					$icon_path = $context['epmod_icon_dir'] . $module['name'];
-
-					// Only if the directory doesn't exist already.
-					if (!is_dir($context['epmod_icon_dir'] . $module['name']))
-						@mkdir($icon_path, 0755);
-
-					// Protect the new icons directory!
-					if (!file_exists($icon_path . '/index.php'))
-						@copy($context['epmod_icon_dir'] . 'index.php', $icon_path . '/index.php');
-
-					// Cache it!
-					if (!file_exists($context['epmod_icon_dir'] . $module['name'] . '/.htaccess'))
-						@copy($context['epmod_icon_dir'] . '.htaccess', $icon_path . '/.htaccess');
-
-					// Place the icons.
-					file_put_contents($icon_path . '/' . $filename, $file_contents);
-
-					// Set the rights
-					@chmod($icon_path . '/' . $filename, 0666);
-
-					// Escape outta here.
-					continue;
-				}
-			}
-
-			if (isset($module['iconsdir']) && $file['filename'] == $module['iconsdir'] . '/')
-				continue;
-
-			// Looping through each function here.
-			foreach($all_files as $phpfile)
-			{
-				$fPath = strpos($phpfile, '/') !== false ? '/' : '' . $phpfile;
-
-				if ($file['filename'] != $fPath)
-					continue;
-
-				// Build the array of functions for this file.
-				$file_func_names = array();
-				foreach($func_files as $funcName => $funcFile)
-					if ($funcFile == $phpfile)
-						$file_func_names[] = $funcName;
-
-				// Get rid of functions that are not defined within info.xml.
-				RemoveUndefinedFunctions($module_path . '/' . $file['filename'], $file_func_names);
-			}
-		}
 	}
 	else
 	{
@@ -1166,75 +939,9 @@ function UploadModule($reservedNames = array(), $installed_functions = array())
 			fatal_lang_error('epamerr_unknown', false);
 	}
 
-	// This should always return true because we already checked this earlier, but what the hell.
-	if (!is_dir($boarddir . '/envisionportal/modules/' . $p_mod_name))
-		rename($module_path, $boarddir . '/envisionportal/modules/' . $p_mod_name);
-
 	// Time to go...
 	redirectexit('action=admin;area=epmodules;sa=epaddmodules');
 }
-
-/**
- * Adds module language strings to the main module file
- *
- * @param string $dir the path to the file you want to write using file_put_contents.
- * @param string $contents the file data.
- * @since 1.0
- */
-
-function writeLanguage($module_path, $lFile, $language, $mod_name)
-{
-	global $settings;
-
-	$languages_dir = $settings['default_theme_dir'] . '/languages';
-
-	// This holds the current file we are working on.
-	$curr_lang_file = $languages_dir . '/EnvisionModules.' . $language . '.php';
-
-	// If the language file doesn't exist, skip it.
-	if (!file_exists($curr_lang_file))
-		return false;
-
-	// Open for reading the contents, 8 MB should be more than enough size.
-	$ffile = fopen($module_path . '/' . $lFile, 'rb');
-	$fcontent = fread($ffile, 8192);
-	fclose($ffile);
-
-	// Strip out php tags if they exist.
-	$fcontent = parseString($fcontent, 'phptags');
-
-	if (trim($fcontent) != '')
-	{
-		// So we start off with no code.
-		$code = '';
-
-		// Reading the current language file.
-		$fp = fopen($curr_lang_file, 'rb');
-		while (!feof($fp))
-		{
-			$output = fgets($fp, 16384);
-
-			// get rid of all opening and closing php tags...
-			$output = parseString($output, 'phptags');
-			$code .= $output;
-		}
-		fclose($fp);
-
-		// Write it into the file.
-		$fo = fopen($curr_lang_file, 'wb');
-
-		// This will help for when we have to remove the language strings for the module.
-		$module_begin_comment = '// ' . ' Envision Portal Module - ' . $mod_name . ' BEGIN...';
-		$module_end_comment = '// ' . ' Envision Portal Module - ' . $mod_name . ' END!';
-
-		fwrite($fo, '<?php' . "\n" . $code . "\n" . $module_begin_comment . "\n" . $fcontent . $module_end_comment . "\n\n" . '?>');
-		fclose($fo);
-	}
-
-	// Clean the cache so that the language strings are ready to be used.
-	clean_cache();
-}
-
 
 /**
  * Handles installation of a module and custom creation of a module.
@@ -1252,13 +959,9 @@ function AddEnvisionModules()
 	validateSession();
 
 	$context['page_title'] = $txt['ep_admin_title_add_modules'];
-
 	$context['sub_template'] = 'add_modules';
 
-	// We'll just require it, since if Envision is disabled, would be a problem with this.
-	require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');
-
-	$context['module_info'] = GetEnvisionAddedModules();
+	$context['module_info'] = listModules();
 
 	// Saving?
 	if (isset($_POST['upload']))
@@ -1266,27 +969,14 @@ function AddEnvisionModules()
 		// Get all Installed functions.
 		$request = $smcFunc['db_query']('', '
 		SELECT
-			name, functions
-		FROM {db_prefix}ep_modules
-		WHERE functions != {string:empty_string}',
-			array(
-				'empty_string' => '',
-			)
-		);
+			type
+		FROM {db_prefix}ep_modules');
 
-		$installed_functions = array();
 		$installed_names = array();
 		while ($row = $smcFunc['db_fetch_assoc']($request))
-		{
-			$installed_functions[] = $row['functions'];
-			$installed_names[] = $row['name'];
-		}
-		$smcFunc['db_free_result']($request);
+			$installed_names[] = $row['type'];
 
-		UploadModule(array_merge($restrictedNames, $installed_names), $installed_functions);
-
-		// Clean the cache so that the language strings are ready to be used.
-		clean_cache();
+		uploadModule($installed_names);
 		redirectexit('action=admin;area=epmodules;sa=epaddmodules');
 	}
 }
@@ -1315,7 +1005,7 @@ function InstallEnvisionModule()
 		$dirs = array();
 		while ($file = readdir($dir))
 		{
-			$retVal = GetEnvisionModuleInfo('', '', $context['epmod_modules_dir'], $file, $name, true);
+			$retVal = ep_get_module_info('', '', $context['epmod_modules_dir'], $file, $name, true);
 			if ($retVal === false)
 				continue;
 			else
@@ -1323,190 +1013,22 @@ function InstallEnvisionModule()
 		}
 	}
 
-	// Gives us all functions for that module, separated by a "+" sign.
-	$file_functions = $module_info[$name]['functions'];
-
-	// Now let's get all installed functions from modules.
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			functions
-		FROM {db_prefix}ep_modules
-		WHERE functions != {string:empty_string}',
-		array(
-				'empty_string' => '',
-		)
+	$columns = array(
+		'type' => 'string',
 	);
 
-	$installed_functions = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$installed_functions[] = $row['functions'];
-
-	$smcFunc['db_free_result']($request);
-
-	// Check for duplicate module function names, if found, can not install.
-	foreach($installed_functions as $key => $func)
-	{
-		foreach (explode('+', $installed_functions[$key]) as $fName)
-			if (in_array($fName, explode('+', $file_functions)))
-				fatal_lang_error('module_function_duplicates', false);
-	}
-
-	// Installing...
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			dg.id_group, dl.id_layout, dlp.id_layout_position, dmp.position
-		FROM {db_prefix}ep_groups AS dg
-			LEFT JOIN {db_prefix}ep_layouts AS dl ON (dl.id_group = dg.id_group)
-			LEFT JOIN {db_prefix}ep_layout_positions AS dlp ON (dlp.id_layout = dl.id_layout AND dlp.enabled = {int:disabled})
-			LEFT JOIN {db_prefix}ep_module_positions AS dmp ON (dmp.id_layout_position = dlp.id_layout_position)
-		WHERE dg.id_member = {int:zero}',
-		array(
-				'zero' => 0,
-				'disabled' => -1,
-		)
+	$data = array(
+		$name,
 	);
 
-	$disabled_sections = array();
-	$positions = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		if (!isset($disabled_sections[$row['id_group']][$row['id_layout']]))
-			$disabled_sections[$row['id_group']][$row['id_layout']] = array(
-				'info' => $module_info[$name],
-				'id_layout_position' => $row['id_layout_position']
-			);
+	$keys = array('id_module', 'type');
 
-		// Increment the positions...
-		if (!is_null($row['position']))
-		{
-			if (!isset($positions[$row['id_layout']][$row['id_layout_position']]))
-				$positions[$row['id_layout']][$row['id_layout_position']] = 1;
-			else
-				$positions[$row['id_layout']][$row['id_layout_position']]++;
-		}
-		else
-			$positions[$row['id_layout']][$row['id_layout_position']] = 0;
-	}
+	$smcFunc['db_insert']('ignore', '{db_prefix}ep_modules',  $columns, $data, $keys);
 
-	$smcFunc['db_free_result']($request);
-
-	ksort($disabled_sections, SORT_NUMERIC);
-		foreach($disabled_sections as $g => $layout)
-			ksort($disabled_sections[$g], SORT_NUMERIC);
-
-	foreach($disabled_sections as $group => $gLayout)
-	{
-		foreach($disabled_sections[$group] as $id => $module)
-		{
-			$default_layout = $group == 1 && $id == 1 ? true : false;
-
-			// We really need an id_module for clones.
-			if (!$default_layout && !isset($id_module))
-				continue;
-
-			// Add the module info to the database
-			$columns = array(
-				'name' => 'string',
-				'title' => 'string',
-				'title_link' => 'string',
-				'target' => 'int',
-				'icon' => 'string',
-				'functions' => 'string',
-				'files' => 'string',
-			);
-
-			$data = array(
-				(string) $name,
-				$module['info']['title'],
-				!empty($module['info']['title_link']) ? $module['info']['title_link'] : '',
-				!empty($module['info']['target']) ? $module['info']['target'] : 0,
-				$module['info']['icon'],
-				$file_functions,
-				$module['info']['files'],
-			);
-
-			if (!$default_layout)
-			{
-				$columns = array_merge($columns, array('id_module' => 'int', 'id_member' => 'int'));
-				$data = array_merge($data, array((int) $id_module, 0));
-			}
-
-			$keys = $default_layout ? array('id_module', 'name') : array('id_clone', 'id_module', 'id_member');
-
-			$table_name = $default_layout !== false ? 'ep_modules' : 'ep_module_clones';
-
-			$smcFunc['db_insert']('ignore', '{db_prefix}' . $table_name,  $columns, $data, $keys);
-
-			// We need to tell the parameters table which ID was inserted
-			$iid = $smcFunc['db_insert_id']('{db_prefix}' . $table_name, $default_layout !== false ? 'id_module' : 'id_clone');
-
-			if ($default_layout)
-				$id_module = $iid;
-
-			// parameters
-			$columns = array(
-				'id_module' => 'int',
-				'name' => 'string-255',
-				'type' => 'string-16',
-				'value' => 'string-65536',
-			);
-
-			$keys = array(
-				'id_param',
-				'id_clone',
-				'id_module',
-			);
-
-			if (!$default_layout)
-				$columns = array_merge(array('id_clone' => 'int'), $columns);
-
-			// Any parameters that came with the module are also processed
-			foreach ($module['info']['params'] as $param_name => $param)
-			{
-				$data = array(
-					$iid,
-					$id_module,
-					$param_name,
-					$param['type'],
-					$param['value'],
-				);
-
-				if ($default_layout)
-				{
-					unset($data[1]);
-					$data = array_values($data);
-				}
-
-				$smcFunc['db_insert']('ignore', '{db_prefix}ep_module_parameters', $columns, $data, $keys);
-			}
-
-			// One more to go - insert the layout.
-			$columns = array(
-				'id_layout_position' => 'int',
-				'id_layout' => 'int',
-				'id_module' => 'int',
-				'id_clone' => 'int',
-				'position' => 'int',
-			);
-
-			$data = array(
-				(int) $module['id_layout_position'],
-				(int) $id,
-				$default_layout !== false ? (int) $iid : 0,
-				$default_layout !== false ? 0 : (int) $iid,
-				empty($positions[$id][$module['id_layout_position']]) ? 0 : (int) $positions[$id][$module['id_layout_position']],
-			);
-
-			$keys = array(
-				'id_position',
-				'id_layout_position',
-				'id_layout',
-				'id_module',
-				'id_clone',
-			);
-			$smcFunc['db_insert']('ignore', '{db_prefix}ep_module_positions',  $columns, $data, $keys);
-		}
-	}
+	// Assuming they set their module up right, integrate it!
+	ep_add_hook('load_module_files', $name . '/scripts/script.php');
+	ep_add_hook('load_module_language_files', $name . '/languages');
+	ep_add_hook('load_module_fields', 'module_' . $name . '_fields');
 
 	// Time to go...
 	redirectexit('action=admin;area=epmodules;sa=epaddmodules');
@@ -1527,191 +1049,71 @@ function UninstallEnvisionModule()
 
 	validateSession();
 
-	// isset is better for this.
-	if (isset($_GET['name']))
-		$name = $_GET['name'];
-	elseif (isset($context['delete_modname']) && trim($context['delete_modname']) != '')
-		$name = $context['delete_modname'];
+	$name = $_GET['name'];
 
 	// Can't seem to find it.
-	if (!isset($name))
+	if (empty($name))
 		fatal_lang_error('epmod_uninstall_error', false);
+
+	uninstallModule($name);
+
+	redirectexit('action=admin;area=epmodules;sa=epaddmodules');
+}
+
+/**
+ * Uninstalls an added module from all layouts.
+ *
+ * @since 1.0
+ */
+function uninstallModule($name = '')
+{
+	global $context, $smcFunc, $txt, $restrictedNames;
 
 	// Does it exist, eg. is it installed?
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			dm.id_module, dmp.id_param, dmc.id_clone
-		FROM {db_prefix}ep_modules AS dm
-			LEFT JOIN {db_prefix}ep_module_parameters AS dmp ON (dmp.id_module = dm.id_module AND dmp.type = {string:file_input})
-			LEFT JOIN {db_prefix}ep_module_clones AS dmc ON (dmc.id_module = dm.id_module)
-		WHERE dm.name = {string:name}',
+			em.id_module, emp.id_position
+		FROM {db_prefix}ep_modules AS em
+			LEFT JOIN {db_prefix}ep_module_positions AS emp ON (emp.id_module = em.id_module)
+		WHERE em.type = {string:name}',
 		array(
-			'zero' => 0,
-			'file_input' => 'file_input',
 			'name' => $name,
 		)
 	);
 
 	// Trying to uninstall something that doesn't exist!
 	if ($smcFunc['db_num_rows']($request) == 0)
-		if (isset($context['delete_modname']))
-			return;
-		else
-			redirectexit('action=admin;area=epmodules;sa=epaddmodules');
-
-	$module_info = array();
+		return;
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if (!isset($module_info['id']))
-		{
-			$module_info['id'] = !empty($row['id_module']) ? $row['id_module'] : '';
-			$module_info['params'] = array();
-			$module_info['clones'] = array();
-		}
-
-		// Getting all file_input param ids.
-		if (!empty($row['id_param']))
-			$module_info['params'][] = $row['id_param'];
-
-		if (!empty($row['id_clone']))
-			$module_info['clones'][] = $row['id_clone'];
-	}
-	$smcFunc['db_free_result']($request);
-
-	// Check to be sure we have a module id value before continuing.
-	if (empty($module_info['id']))
-		if (isset($context['delete_modname']))
-			return;
-		else
-			redirectexit('action=admin;area=epmodules;sa=epaddmodules');
-
-	// Get rid of clones that = 0, cause we don't wanna trip over SMF.
-	$module_info['clones'] = array_values(array_filter($module_info['clones']));
-
-	// Selecting the positions.
-	if (isset($module_info['clones'][0]))
-		$query = 'id_module = {int:id_module} || id_clone IN ({array_int:id_clones})';
-	else
-		$query = 'id_module = {int:id_module}';
-
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			id_position, id_layout_position, id_layout, position
-		FROM {db_prefix}ep_module_positions
-		WHERE ' . $query,
-		array(
-			'zero' => 0,
-			'id_module' => $module_info['id'],
-			'id_clones' => $module_info['clones'],
-		)
-	);
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$module_info['position'][$row['id_layout']]['pos' . $row['id_position'] . $row['position'] . '_' . $row['id_layout_position']] = $row['position'];
-		$module_info['id_positions'][] = $row['id_position'];
-	}
-
-	$smcFunc['db_free_result']($request);
-
-	// Remove all module and clone positions from the layout!
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}ep_module_positions
-		WHERE id_position IN ({array_int:id_positions})',
-		array(
-			'id_positions' => $module_info['id_positions'],
-		)
-	);
-
-	foreach($module_info['position'] as $id_layout => $id_layout_pos)
-	{
-		foreach($id_layout_pos as $key => $position_val)
-		{
-			$lPos = explode('_', $key);
-			$lPosId = (int) $lPos[1];
-
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}ep_module_positions
-				SET
-					position = position - 1
-				WHERE position > {int:position} AND id_layout = {int:id_layout} AND id_layout_position = {int:id_layout_position}',
-				array(
-					'id_layout' => (int) $id_layout,
-					'position' => (int) $position_val,
-					'id_layout_position' => $lPosId,
-				)
-			);
-		}
-	}
-
-	// Let's remove rows via file_input parameter type.
-	if (isset($module_info['params'][0]))
-	{
+		// Remove all positions
 		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}ep_module_files
-			WHERE id_param IN ({array_int:id_params})',
+			DELETE FROM {db_prefix}ep_module_positions
+			WHERE id_module = {int:id_module}',
 			array(
-				'id_params' => $module_info['params'],
+				'id_module' => $row['id_module'],
 			)
 		);
 
-		function unlinkFiles($dir)
-		{
-			if($dh = @opendir($dir))
-			{
-				while (false !== ($obj = readdir($dh)))
-				{
-					if($obj == '.' || $obj == '..')
-						continue;
+		// Remove all modules
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}ep_modules
+			WHERE id_module = {int:id_module}',
+			array(
+				'id_module' => $row['id_module'],
+			)
+		);
 
-					if (!@unlink($dir . '/' . $obj))
-						unlinkFiles($dir.'/'.$obj);
-				}
-				closedir($dh);
-				@rmdir($dir);
-			}
-			return;
-		}
-
-		// Remove module's files via file_input.
-		unlinkFiles($context['epmod_files_dir'] . $name);
+		// Remove the parameters
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}ep_module_field_data
+			WHERE id_module_position = {int:id_position}',
+			array(
+				'id_position' => $row['id_position'],
+			)
+		);
 	}
-
-	// Remove all clones
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}ep_module_clones
-		WHERE id_module={int:id_module}',
-		array(
-			'id_module' => $module_info['id'],
-		)
-	);
-
-	// Remove all modules
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}ep_modules
-		WHERE id_module = {int:id_module}',
-		array(
-			'id_module' => $module_info['id'],
-		)
-	);
-
-	// Remove the parameters
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}ep_module_parameters
-		WHERE id_module = {int:id_module}',
-		array(
-			'id_module' => $module_info['id'],
-		)
-	);
-
-	// Deleting a module.
-	if (isset($context['delete_modname']))
-		return;
-
-	// Where did they uninstall from?
-	$redirect = 'action=admin;area=epmodules;sa=epaddmodules';
-	redirectexit($redirect);
 }
 
 /**
@@ -1740,7 +1142,7 @@ function RemoveModule()
 	);
 
 	die($_POST['data']);
-	}
+}
 
 /**
  * Removes a module with all its files from the filesystem.
@@ -1749,7 +1151,7 @@ function RemoveModule()
  */
 function DeleteEnvisionModule()
 {
-	global $context, $modSettings, $txt, $settings;
+	global $context, $sourcedir;
 
 	// Extra security here.
 	if (!allowedTo('admin_forum'))
@@ -1760,98 +1162,11 @@ function DeleteEnvisionModule()
 	// We want to define our variables now...
 	$name = $_GET['name'];
 
-	$delete_icons = empty($modSettings['ep_enable_custommod_icons']);
-
-	function DeleteAllModuleData($dir, $deleteRootToo)
-	{
-		if(!$dh = @opendir($dir))
-			return;
-
-		while (false !== ($obj = readdir($dh)))
-		{
-			if($obj == '.' || $obj == '..')
-				continue;
-
-			if (!@unlink($dir . '/' . $obj))
-				DeleteAllModuleData($dir.'/'.$obj, true);
-		}
-		closedir($dh);
-		if ($deleteRootToo)
-			@rmdir($dir);
-
-		return;
-	}
-
-	// Before deleting, is it uninstalled?
-	$context['delete_modname'] = $name;
-	UninstallEnvisionModule();
-	unset($context['delete_modname']);
-
-	// Removing icons?
-	if ($delete_icons)
-		DeleteAllModuleData($context['epmod_icon_dir'] . $name, true);
-
-	// Now we need to get the language and strings that need to be removed.
-	$moduleInfo = file_get_contents($context['epmod_modules_dir'] . '/' . $name . '/info.xml');
-	loadClassFile('Class-Package.php');
-	$moduleInfo = new xmlArray($moduleInfo);
-
-	// !!! Error message of some sort?
-	if (!$moduleInfo->exists('module[0]'))
-		fatal_lang_error('module_package_corrupt', false);
-
-	$moduleInfo = $moduleInfo->path('module[0]');
-	$module = $moduleInfo->to_array();
-
-	if (isset($module['languages']) && is_array($module['languages']))
-	{
-		$languages_dir = $settings['default_theme_dir'] . '/languages';
-		$mod_langs = array();
-		$mod_langs = $module['languages'];
-		// So we'll do all languages they have defined in here.
-		foreach($mod_langs as $lang => $langFile)
-		{
-			// the language... english, british_english, russian, etc. etc.
-			$language = $lang;
-
-			foreach ($langFile as $utfType => $value)
-			{
-				$utf8 = $utfType == 'utf8' ? '-utf8' : '';
-
-				// This holds the current file we are working on.
-				$curr_lang_file = $languages_dir . '/EnvisionModules.' . $language . $utf8 . '.php';
-
-				// This will help for when we have to remove the language strings for the module.
-				$module_begin_comment = '// ' . ' Envision Portal Module - ' . $name . ' BEGIN...';
-				$module_end_comment = '// ' . ' Envision Portal Module - ' . $name . ' END!';
-
-				$fp = fopen($curr_lang_file, 'rb');
-				$content = fread($fp, 163845);
-				fclose($fp);
-
-				// Searching within the string, extracting only what we need.
-				$start = strpos($content, $module_begin_comment);
-				$end = strpos($content, $module_end_comment);
-
-				// We can't do this unless both are found.
-				if ($start !== false && $end !== false)
-				{
-					$begin = substr($content, 0, $start);
-					$finish = substr($content, $end + strlen($module_end_comment));
-
-					$new_content = $begin . $finish;
-
-					// Write it into the file, or create the file.
-					$fo = fopen($curr_lang_file, 'wb');
-					@fwrite($fo, $new_content);
-					fclose($fo);
-				}
-			}
-		}
-	}
+	uninstallModule($name);
 
 	// Last, but not least, remove the files.
-	DeleteAllModuleData($context['epmod_modules_dir'] . '/' . $name, true);
+	require_once($sourcedir . '/Subs-Package.php');
+	deltree($context['epmod_modules_dir'] . '/' . $name);
 
 	// A light heart and an easy step paves the way ;)
 	redirectexit('action=admin;area=epmodules;sa=epaddmodules');
@@ -2544,54 +1859,6 @@ function EditEnvisionLayout2()
 	}
 
 	redirectexit('action=admin;area=epmodules;sa=epmanmodules');
-}
-
-/**
- * Removes functions within a file that are not defined in the $functions array. But this will also remove functions within functions, so just don't do it!
- *
- * @param string $source absolute path to the file to check.
- * @param array $functions list of known functions to keep. All other functions are removed, including nested functions.
- * @since 1.0
- */
-function RemoveUndefinedFunctions($source, $functions = array())
-{
-	$code = '';
-	$remove = false;
-
-	$fp = fopen($source, 'rb');
-	while (!feof($fp))
-	{
-		$output = fgets($fp);
-		$funcStart = strpos(strtolower(ltrim($output)), 'function');
-
-		if ($funcStart !== false && $funcStart === 0)
-		{
-			foreach($functions as $funcName)
-			{
-				if (strpos($output, $funcName) !== false)
-				{
-					$code .= $output;
-					$remove = false;
-					break;
-				}
-				else
-					$remove = true;
-			}
-			continue;
-		}
-		else
-			if (substr($output, 0, 2) == '?>' || !$remove)
-				$code .= $output;
-	}
-	fclose($fp);
-
-	// Rewrite the file with the functions that are defined.
-	$fo = fopen($source, 'wb');
-
-	// Get rid of the extra lines...
-	fwrite($fo, str_replace("\r\n", "\n", $code));
-
-	fclose($fo);
 }
 
 /**
