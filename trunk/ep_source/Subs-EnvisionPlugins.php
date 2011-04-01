@@ -68,9 +68,9 @@ function ep_plugin_load_langfiles($hook = '')
 /**
  * Calls a given integration hook at the related point in the code.
  *
- * Each of the hooks is an array of functions within $modSettings['hooks'], to be called at relevant points in the code Do note that the file-inclusion hooks may not be called with this.
+ * Each of the hooks is an array of functions within $modSettings['hooks'], to be called at relevant points in the code. Do note that the file-inclusion hooks may not be called with this.
  *
- * The contents of the $modSettings['hooks'] value is a comma separated list of function names to be called at the relevant point. These are either procedural functions or static class methods (classname::method).
+ * The contents of the $modSettings['ep_hooks'] value is a comma separated list of function names to be called at the relevant point. These are either procedural functions or static class methods (classname::method).
  *
  * @param string $hook the name of the hook as given in $modSettings.
  * @param array $parameters parameters to be passed to the hooked functions. The list of parameters each method is exposed to is dependent on the calling code, and parameters passed by reference will be passed to hook functions as such.
@@ -80,16 +80,19 @@ function ep_call_hook($hook, $parameters = array())
 {
 	global $modSettings;
 
-	if (empty($modSettings['ep_hooks'][$hook]))
+	if (empty($modSettings['ep_hooks']))
+		$functions = unserialize($modSettings['ep_permanented_hooks']);
+	else
+		$functions = $modSettings['ep_hooks'] + unserialize($modSettings['ep_permanented_hooks']);
+
+	if (empty($functions[$hook]))
 		return array();
 
-	$results = array();
-
 	// Loop through each function.
-	foreach ($modSettings['ep_hooks'][$hook] as $function)
+	foreach ($functions[$hook] as $function)
 	{
 		$function = trim($function);
-		$call = strpos($fun, '::') !== false ? explode('::', $fun) : $fun;
+		$call = strpos($function, '::') !== false ? explode('::', $function) : $function;
 
 		// If it isn't valid, remove it from our list.
 		if (is_callable($call))
@@ -99,6 +102,87 @@ function ep_call_hook($hook, $parameters = array())
 	}
 
 	return $results;
+}
+
+/**
+ * {@sse ep_call_hook}
+ *
+ * The file-inclusion hooks should be called with this.
+ *
+ * The contents of the $modSettings['ep_hooks'] value is a comma separated list of files to be included at the relevant point.
+ *
+ * @param string $hook the name of the hook as given in $modSettings.
+ * @param array $base the base path of the file.
+ * @return bool true if the specified file was found and included; false otherwise.
+ */
+function ep_include_hook($hook, $base)
+{
+	global $modSettings;
+
+	if (empty($modSettings['ep_hooks']))
+		$files = unserialize($modSettings['ep_permanented_hooks']);
+	else
+		$files = $modSettings['ep_hooks'] + unserialize($modSettings['ep_permanented_hooks']);
+
+	if (empty($files[$hook]))
+		return false;
+
+	// Loop through each file and remove the odd strand if present...
+	foreach ($files[$hook] as $file)
+		if (file_exists($base . '/' . $file))
+			require_once($base . '/' . $file);
+		else
+		{
+			ep_remove_hook($hook, $file);
+			return false;
+		}
+
+	return true;
+}
+
+/**
+ * {@sse ep_call_hook}
+ *
+ * The file-inclusion hooks should be called with this.
+ *
+ * The contents of the $modSettings['ep_hooks'] value is a comma separated list of files to be included at the relevant point.
+ *
+ * @param string $hook the name of the hook as given in $modSettings.
+ * @param array $base the base path of the language file.
+ * @param array $lang a valid language string to use.
+ * $param int $try if first try will redo the function if language not found; second try will remove the hook entirely if the language specified wasn't found. It's highly recommended to leave this parameter alone.
+ * @return bool true if the specified language file was found and included; false otherwise.
+ */
+function ep_include_language_hook($hook, $base, $lang = '', $try = 1)
+{
+	global $modSettings, $language, $user_info;
+
+	if (empty($modSettings['ep_hooks']))
+		$files = unserialize($modSettings['ep_permanented_hooks']);
+	else
+		$files = $modSettings['ep_hooks'] + unserialize($modSettings['ep_permanented_hooks']);
+
+	if (empty($files[$hook]))
+		return false;
+
+	// Default to the user's language. Fall back to forum's global language
+	if ($lang == '')
+		$lang = isset($user_info['language']) ? $user_info['language'] : $language;
+
+	// Loop through each file and remove the odd strand if present...
+	foreach ($files[$hook] as $file)
+		if (file_exists($base . '/' . $file . '/' . $lang . '.php'))
+			template_include($base . '/' . $file . '/' . $lang . '.php');
+		else
+			if ($try == 1)
+				ep_include_language_hook($hook, $base, '', 2);
+			else
+			{
+				ep_remove_hook($hook, $file);
+				return false;
+			}
+
+	return true;
 }
 
 /**

@@ -24,7 +24,7 @@
 function template_portal_info()
 {
 	global $context, $txt, $portal_ver, $forum_version;
-	
+
 	echo '
 	<div id="ep_update_section"></div>
 	<div id="ep_admin_center">
@@ -61,12 +61,12 @@ function template_portal_info()
 							<br />
 							<strong>', $txt['administrators'], ':</strong>
 							', implode(', ', $context['administrators']);
-							
+
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
 		echo '
 							(', $context['more_admins_link'], ')';
-	
+
 	echo '
 						</div>
 					</div>
@@ -90,37 +90,37 @@ function template_portal_info()
 		if (isset($section['pretext']))
 			echo '
 				<p>', $section['pretext'], '</p><br />';
-					
+
 		// Show the section title.
 		if (isset($section['title']))
 			echo '
 				<p><strong>', $section['title'], '</strong></p>';
-					
+
 		// And now, list the members and groups.
 		foreach ($section['groups'] as $group)
 		{
 			// Make sure there are members first.
 			if (!empty($group['members']))
-			{	
+			{
 				echo '
 				<p>';
-				
+
 				// Show the title.
 				if (!empty($group['title']))
 					echo '
 					<strong>', $group['title'], '</strong>: ';
-				
+
 				echo '<span class="smalltext">' . implode(', ', $group['members']) . '</span>';
-				
+
 				echo '
 				</p>';
 			}
 		}
-		
+
 		// Thanking our translators!
 		if (isset($section['translators']))
 			echo '
-			<div class="c-align"><span class="smalltext">', $section['translators'], '</span></div>';
+			<div class="centertext"><span class="smalltext">', $section['translators'], '</span></div>';
 
 		// And for some "post text".
 		if (isset($section['posttext']))
@@ -133,7 +133,7 @@ function template_portal_info()
 				<p>', $txt['ep_credits_contribute'], '</p>
 			</div>
 			<span class="botslice"><span></span></span>
-		</div>		
+		</div>
 	</div>
 	<br class="clear" />';
 

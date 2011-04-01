@@ -28,7 +28,7 @@ if (!defined('SMF'))
 		  parameter type sent to it.
 		- returns the new value to be used for that parameter within the module's function.
 
-	void parseString(string str = '', string type = 'filepath', boolean replace = true)
+	void ep_parse_string(string str = '', string type = 'filepath', boolean replace = true)
 		- Reads the input string (str) and returns either a new string or an integer value.
 		- when replace = false, returns 1 if invalid characters are found within str, else 0.
 		- when replace = true, replaces all invalid characters with ''.
@@ -412,13 +412,12 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 		),
 	);
 
-	ep_call_hook('load_module_context', array(&$envisionModules));
+	// Let other modules hook in to the system.
+	ep_include_hook('load_module_files', $context['epmod_modules_dir']);
+	ep_include_language_hook('load_module_language_files', $context['epmod_modules_dir']);
+	ep_call_hook('load_module_fields', array(&$envisionModules));
 
-	// Any modules installed?
-	if (count($installed_mods) >= 1 || $new_layout)
-		return array_merge($envisionModules, GetEnvisionInstalledModules($installed_mods));
-	else
-		return $envisionModules;
+	return $envisionModules;
 }
 
 //!!! Loads up the modules parameters. Does some editing to the parameter value based on the type and outputs its new value.
@@ -566,7 +565,7 @@ function loadParameter($file_input = array(), $param_type, $param_value)
 	return $mod_param;
 }
 
-function parseString($str = '', $type = 'filepath', $replace = true)
+function ep_parse_string($str = '', $type = 'filepath', $replace = true)
 {
 	if ($str == '')
 		return '';
@@ -676,21 +675,24 @@ function envisionBuffer($buffer)
 	return (isset($_REQUEST['xml']) ? $buffer : str_replace($search_array, $replace_array, $buffer));
 }
 
-function GetEnvisionModuleInfo($scripts, $mod_functions, $dirname, $file, $name = '', $install = false)
+function ep_get_module_info($scripts, $mod_functions, $dirname, $file, $name = '', $install = false)
 {
 	global $boarddir, $context, $modSettings, $scripturl, $smcFunc;
 
 	// Are we allowed to use this name?
-	if (in_array($file, $context['ep_restricted_names'])) return false;
+	if (in_array($file, $context['ep_restricted_names']))
+		return false;
 
 	// Optional check: does it exist? (Mainly for installation)
-	if (!empty($name) && $name != $file) return false;
+	if (!empty($name) && $name != $file)
+		return false;
 
 	// If the required info file does not exist let's silently die...
-	if (!file_exists($dirname . '/' . $file . '/info.xml')) return false;
+	if (!file_exists($dirname . '/' . $file . '/module.xml'))
+		return false;
 
 	// And finally, get the file's contents
-	$file_info = file_get_contents($dirname . '/' . $file . '/info.xml');
+	$file_info = file_get_contents($dirname . '/' . $file . '/module.xml');
 
 	// Parse info.xml into an xmlArray.
 	loadClassFile('Class-Package.php');
@@ -701,137 +703,35 @@ function GetEnvisionModuleInfo($scripts, $mod_functions, $dirname, $file, $name 
 	if (!$module_info1->exists('title')) return false;
 	if (!$module_info1->exists('description')) return false;
 
-	if ($module_info1->exists('target'))
-	{
-		switch ($module_info1->fetch('target'))
-		{
-			case '_self':
-				$module_info2 = 1;
-			case '_parent':
-				$module_info2 = 2;
-			case '_top':
-				$module_info2 = 3;
-			case '_blank':
-				$module_info2 = 0;
-			default:
-				$module_info2 = 0;
-		}
-	}
-	else
-		$module_info2 = 0;
-
-	$other_functions = array();
-	$all_files = array();
-	$all_functions = array();
-	$main_function = array();
-
-	// Getting all functions and files.
-	if ($module_info1->exists('file'))
-	{
-		$filetag = $module_info1->set('file');
-
-		foreach ($filetag as $modfiles => $filepath)
-		{
-			if ($filepath->exists('function'))
-			{
-				$functag = $filepath->set('function');
-
-				foreach($functag as $func => $function)
-				{
-					if ($function->exists('main'))
-						$main_function[] = $function->fetch('main');
-					else
-						$other_functions[] = $function->fetch('');
-				}
-			}
-			else
-				return false;
-
-			// Now grabbing all filepaths for each file.
-			if ($filepath->exists('@path'))
-				$all_files[] = $filepath->fetch('@path');
-			else
-				return false;
-		}
-
-		$all_functions = array_merge($main_function, $other_functions);
-	}
-
-	// And now for the parameters. Remember, they are optional!
-	$param_array = array();
-	if ($module_info1->exists('param'))
-	{
-		$fields = $module_info1->set('param');
-		foreach ($fields as $name => $param)
-		{
-			if ($param->exists('@name') && $param->exists('@type'))
-				$param_array[$param->fetch('@name')] = array(
-					'type' => $param->fetch('@type'),
-					'value' => $param->fetch('.'),
-				);
-		}
-	}
-
-	// Grabbing it from the database here.
-	if (!empty($scripts) && !empty($mod_functions))
-	{
-		return array(
-			'title' => $module_info1->fetch('title'),
-			'files' => $scripts,
-			'target' => $module_info2,
-			'icon' => ($module_info1->exists('icon') ? $name . '/' . $module_info1->fetch('icon') : ''),
-			'title_link' => ($module_info1->exists('url') ? $module_info1->fetch('url') : ''),
-			'functions' => $mod_functions,
-			'fields' => $param_array,
-		);
-	}
-	else
-	{
-		return array(
-			'title' => $module_info1->fetch('title'),
-			'description' => ($module_info1->exists('description/@parsebbc')) ? ($module_info1->fetch('description/@parsebbc') ? parse_bbc($module_info1->fetch('description')) : $module_info1->fetch('description')) : $module_info1->fetch('description'),
-			'desc_parse_bbc' => ($module_info1->exists('description/@parsebbc') ? $module_info1->fetch('description/@parsebbc') : false),
-			'delete_link' => $scripturl . '?action=admin;area=epmodules;sa=epdeletemodule;name=' . $file . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'install_link' => $scripturl . '?action=admin;area=epmodules;sa=epinstallmodule;name=' . $file . ';' . $context['session_var'] . '=' . $context['session_id'],
-			'icon_link' => ($module_info1->exists('icon') ? $boarddir . '/' . $modSettings['ep_icon_directory'] . '/' . $module_info1->fetch('icon') : ''),
-			'icon' => ($module_info1->exists('icon') ? $module_info1->fetch('icon') : ''),
-			'target' => $module_info2,
-			'target_english' => ($module_info1->exists('target') ? $module_info1->fetch('target') : ''),
-			'files' => count($all_files) == 1 ? $all_files[0] : implode('+', $all_files),
-			'functions' => implode('+', $all_functions),
-			'title_link' => ($module_info1->exists('url') ? $module_info1->fetch('url') : ''),
-			'version' => ($module_info1->exists('version') ? $module_info1->fetch('version') : ''),
-			'author' => ($module_info1->exists('author') ? $module_info1->fetch('author') : ''),
-			'author_link' => ($module_info1->exists('author/@url') ? $module_info1->fetch('author/@url') : ''),
-			'fields' => $param_array,
-		);
-	}
+	return array(
+		'title' => $module_info1->fetch('title'),
+		'description' => ($module_info1->exists('description/@parsebbc')) ? ($module_info1->fetch('description/@parsebbc') ? parse_bbc($module_info1->fetch('description')) : $module_info1->fetch('description')) : $module_info1->fetch('description'),
+		'desc_parse_bbc' => ($module_info1->exists('description/@parsebbc') ? $module_info1->fetch('description/@parsebbc') : false),
+		'delete_link' => $scripturl . '?action=admin;area=epmodules;sa=epdeletemodule;name=' . $file . ';' . $context['session_var'] . '=' . $context['session_id'],
+		'install_link' => $scripturl . '?action=admin;area=epmodules;sa=epinstallmodule;name=' . $file . ';' . $context['session_var'] . '=' . $context['session_id'],
+	);
 }
 
-function GetEnvisionAddedModules()
+function listModules()
 {
 	global $boarddir, $context, $modSettings, $sourcedir, $scripturl, $smcFunc, $txt;
 
 	// We want to define our variables now...
 	$AvailableModules = array();
-
 	$added_mods = array();
 
 	// Let's loop throuugh each folder and get their module data. If anything goes wrong we shall skip it.
-	// !!! Use scandir()... don't tell me we're supporting PHP4!
-	if ($dir = @opendir($context['epmod_modules_dir']))
+	$files = scandir($context['epmod_modules_dir']);
+
+	foreach ($files as $file)
 	{
-		$dirs = array();
-		while ($file = readdir($dir))
+		$retVal = ep_get_module_info('', '', $context['epmod_modules_dir'], $file, false);
+		if ($retVal === false)
+			continue;
+		else
 		{
-			$retVal = GetEnvisionModuleInfo('', '', $context['epmod_modules_dir'], $file, false);
-			if ($retVal === false)
-				continue;
-			else
-			{
-				$added_mods[] = $file;
-				$module_info[$file] = $retVal;
-			}
+			$added_mods[] = $file;
+			$module_info[$file] = $retVal;
 		}
 	}
 
@@ -839,9 +739,9 @@ function GetEnvisionAddedModules()
 	{
 		// Find out if any of these are installed.
 		$request = $smcFunc['db_query']('', '
-			SELECT id_module, name
+			SELECT id_module, type
 			FROM {db_prefix}ep_modules
-			WHERE name IN ({array_string:module_names})',
+			WHERE type IN ({array_string:module_names})',
 			array(
 				'module_names' => $added_mods,
 			)
@@ -849,13 +749,13 @@ function GetEnvisionAddedModules()
 
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
-			if (!isset($info[$row['name']]))
+			if (!isset($info[$row['type']]))
 			{
 				// It's installed, so remove the install link, and add uninstall and settings links.
-				unset($module_info[$row['name']]['install_link']);
-				$module_info[$row['name']] += array(
-					'uninstall_link' => $scripturl . '?action=admin;area=epmodules;sa=epuninstallmodule;name=' . $row['name'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-					'settings_link' => $scripturl . '?action=admin;area=epmodules;sa=modifymod;modid=' . $row['id_module'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+				unset($module_info[$row['type']]['install_link']);
+				$module_info[$row['type']] += array(
+					'uninstall_link' => $scripturl . '?action=admin;area=epmodules;sa=epuninstallmodule;name=' . $row['type'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+					'settings_link' => $scripturl . '?action=admin;area=epmodules;sa=modify;in=' . $row['id_module'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				);
 			}
 		}
@@ -896,7 +796,7 @@ function GetEnvisionInstalledModules($installed_mods = array())
 		$smcFunc['db_free_result']($request);
 	}
 
-	foreach($installed_mods as $installed)
+	foreach ($installed_mods as $installed)
 	{
 		$retVal = GetEnvisionModuleInfo($installed['files'], $installed['functions'], $context['epmod_modules_dir'], $installed['name'], $installed['name']);
 		if ($retVal === false)
@@ -1160,7 +1060,7 @@ function loadLayout($url, $return = false)
 				'extra' => $row,
 			);
 
-		if (!is_int($url) && !is_null($row['id_position']) && !empty($row['id_layout_position']))
+		if (!is_null($row['id_position']) && !empty($row['id_layout_position']))
 		{
 			// Store $context variables for each module.  Mod Authors can use these for unique ID values, function names, etc.
 			// !!! Is this really needed?
