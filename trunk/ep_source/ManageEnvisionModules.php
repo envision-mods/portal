@@ -281,11 +281,10 @@ function ModifyModule()
 	// Load user-defined module configurations.
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			name, emf.type, options, em.type AS module_type, value
+			name, em.type AS module_type, value
 		FROM {db_prefix}ep_module_positions AS emp
 			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
 			LEFT JOIN {db_prefix}ep_module_field_data AS emd ON (emd.id_module_position = emp.id_position)
-			LEFT JOIN {db_prefix}ep_module_fields AS emf ON (emf.id_field = emd.id_field)
 		WHERE emp.id_position = {int:id_position}',
 		array(
 			'id_position' => $_GET['in'],
@@ -296,14 +295,10 @@ function ModifyModule()
 	{
 		$module_type = $row['module_type'];
 
-		if (!empty($row['type']))
+		if (!empty($row['name']))
 			$data[$row['name']] = array(
-				'type' => $row['type'],
 				'value' => $row['value'],
 		);
-
-		if (!empty($row['options']))
-			$data[$row['name']['options']] = $row['options'];
 	}
 
 	// If $module_type isn't set, the module could not be found.
@@ -328,6 +323,9 @@ function ModifyModule()
 
 		if (isset($field['options']) && is_string($field['options']) && strpos($field['options'], ';'))
 			$field['options'] = explode(';', $field['options']);
+
+		if (isset($field['preload']) && function_exists($field['preload']))
+			$field = array_replace_recursive($field, $field['preload']($field));
 
 		switch ($field['type'])
 		{
@@ -365,11 +363,10 @@ function ModifyModule2()
 	// Figure out which fields did not change and remove them.
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			name, emf.type, options, em.type AS module_type, value
+			name, em.type AS module_type, value
 		FROM {db_prefix}ep_module_positions AS emp
 			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
 			LEFT JOIN {db_prefix}ep_module_field_data AS emd ON (emd.id_module_position = emp.id_position)
-			LEFT JOIN {db_prefix}ep_module_fields AS emf ON (emf.id_field = emd.id_field)
 		WHERE emp.id_position = {int:id_position}',
 		array(
 			'id_position' => $_GET['in'],
@@ -380,14 +377,10 @@ function ModifyModule2()
 	{
 		$module_type = $row['module_type'];
 
-		if (!empty($row['type']))
+		if (!empty($row['name']))
 			$data[$row['name']] = array(
-				'type' => $row['type'],
 				'value' => $row['value'],
 		);
-
-		if (!empty($row['options']))
-			$data[$row['name']['options']] = $row['options'];
 	}
 
 	$module_context = ep_load_module_context();
@@ -434,10 +427,10 @@ function ModifyModule2()
 			$request = $smcFunc['db_query']('', '
 				UPDATE {db_prefix}ep_module_field_data
 				SET value = {string:value}
-				WHERE id_field = {int:id_field}
+				WHERE name = {string:key}
 					AND id_module_position = {int:id_module_position}',
 				array(
-					'id_field' => $id_field,
+					'key' => $key,
 					'value' => $field,
 					'id_module_position' => $_GET['in'],
 				)
@@ -448,17 +441,17 @@ function ModifyModule2()
 				$smcFunc['db_insert']('replace',
 					'{db_prefix}ep_module_field_data',
 					array(
-						'id_field' => 'int', 'id_module_position' => 'int', 'value' => 'string'
+						'id_module_position' => 'int', 'name' => 'string', 'value' => 'string'
 					),
 					array(
-						$id_field, $_GET['in'], $field
+						$_GET['in'], $key, $field
 					),
-					array('id_field', 'id_module_position')
+					array('name', 'id_module_position')
 				);
 		}
 	}
 
-	// Looks like were done here. Depart.
+	// Looks like we're done here. Depart.
 	redirectexit('action=admin;area=epmodules;sa=modify;in=' . $_GET['in']);
 }
 
@@ -1114,6 +1107,10 @@ function uninstallModule($name = '')
 			)
 		);
 	}
+
+	ep_remove_hook('load_module_files', $name . '/scripts/script.php');
+	ep_remove_hook('load_module_language_files', $name . '/languages');
+	ep_remove_hook('load_module_fields', 'module_' . $name . '_fields');
 }
 
 /**
@@ -2047,8 +2044,25 @@ function ep_fill_default_fields(&$fields)
 			'type' => 'text',
 		),
 		'module_template' => array(
-			'type' => 'file_select',
-			'options' => $context['epmod_template'],
+			'type' => 'select',
+			'preload' => create_function('$field', '
+				global $context, $smcFunc, $txt;
+
+				$files = array();
+				ep_list_files__recursive($context[\'epmod_template\'], $files);
+				$field[\'options\'] = array();
+
+				foreach ($files as $file)
+				{
+					if ($file != \'index.php\')
+					{
+						$new_file = explode(\'.\', $file);
+						$field[\'options\'][] = $file;
+						$txt[\'ep_module_template_\' . $file] = $smcFunc[\'ucfirst\']($new_file[0]);
+					}
+				}
+
+				return $field;'),
 			'value' => 'default.php',
 		),
 		'module_header_display' => array(
@@ -2057,8 +2071,26 @@ function ep_fill_default_fields(&$fields)
 			'value' => 'enabled',
 		),
 		'module_icon' => array(
-			'type' => 'icon_select',
-			'options' => $context['epmod_icon_dir'],
+			'type' => 'select',
+			'preload' => create_function('&$field', '
+				global $context, $smcFunc, $txt;
+
+				$files = array();
+				ep_list_files__recursive($context[\'epmod_icon_dir\'], $files);
+				$field[\'options\'] = array();
+
+				foreach ($files as $file)
+				{
+					if ($file != \'index.php\')
+					{
+						$new_file = explode(\'.\', $file);
+						$field[\'options\'][] = $file;
+						$txt[\'ep_module_icon_\' . $file] = $smcFunc[\'ucfirst\']($new_file[0]);
+					}
+				}
+
+				return $field;'),
+			'iconpreview' => true,
 			'url' => $context['epmod_icon_url'],
 			'value' => '',
 		),
@@ -2072,7 +2104,12 @@ function ep_fill_default_fields(&$fields)
 			'value' => '_self',
 		),
 		'module_groups' => array(
-			'type' => 'list_groups',
+			'type' => 'callback',
+			'callback_func' => 'list_groups',
+			'preload' => create_function('&$field', '
+				$field[\'options\'] = ep_list_groups($field[\'value\']);
+
+				return $field;'),
 			'value' => '-3',
 		),
 	);

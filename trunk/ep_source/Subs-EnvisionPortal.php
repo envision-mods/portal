@@ -1125,11 +1125,10 @@ function ep_process_module($module_context, $data, $full_layout)
 	// Load user-defined module configurations.
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			name, emf.type, options, em.type AS module_type, value
+			name, em.type AS module_type, value
 		FROM {db_prefix}ep_module_positions AS emp
 			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
 			LEFT JOIN {db_prefix}ep_module_field_data AS emd ON (emd.id_module_position = emp.id_position)
-			LEFT JOIN {db_prefix}ep_module_fields AS emf ON (emf.id_field = emd.id_field)
 		WHERE emp.id_position = {int:id_position}',
 		array(
 			'id_position' => $data['id'],
@@ -1140,14 +1139,10 @@ function ep_process_module($module_context, $data, $full_layout)
 	{
 		$module_type = $row['module_type'];
 
-		if (!empty($row['type']))
+		if (!empty($row['name']))
 			$fields[$row['name']] = array(
-				'type' => $row['type'],
 				'value' => $row['value'],
 		);
-
-		if (!empty($row['options']))
-			$fields[$row['name']['options']] = $row['options'];
 	}
 
 	// Merge the default and custom configs together.

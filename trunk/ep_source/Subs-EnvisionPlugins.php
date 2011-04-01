@@ -98,7 +98,7 @@ function ep_call_hook($hook, $parameters = array())
 		if (is_callable($call))
 			$results[$function] = call_user_func_array($call, $parameters);
 		else
-			ep_remove_hook($call, $function);
+			ep_remove_hook($hook, $function);
 	}
 
 	return $results;
@@ -235,17 +235,17 @@ function ep_remove_hook($hook, $function)
 	// You can only remove it if it's available.
 	if (empty($modSettings['ep_hooks'][$hook]) || !in_array($function, $modSettings['ep_hooks'][$hook]))
 		return false;
+	else
+		$modSettings['ep_hooks'][$hook] = array_diff($modSettings['ep_hooks'][$hook], (array) $function);
 
-	$modSettings['ep_hooks'][$hook] = array_diff($modSettings['ep_hooks'][$hook], (array) $function);
+	$temp = unserialize($modSettings['ep_permanented_hooks']);
 
-	if (empty($modSettings['ep_permanented_hooks'][$hook]) || !in_array($function, $modSettings['ep_permanented_hooks'][$hook]))
+	if (empty($temp[$hook]) || !in_array($function, $temp[$hook]))
 		return false;
 
 	// Also remove it from the permanented hooks.
-	$modSettings['ep_permanented_hooks'][$hook] = array_diff($modSettings['ep_permanented_hooks'][$hook], (array) $function);
-	$hooks = $modSettings['ep_permanented_hooks'];
-	updateSettings(array('ep_permanented_hooks' => serialize($hooks)));
-	$modSettings['ep_permanented_hooks'] = $hooks;
+	$temp[$hook] = array_diff($temp[$hook], (array) $function);
+	updateSettings(array('ep_permanented_hooks' => serialize($temp)));
 
 	return true;
 }
