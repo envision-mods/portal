@@ -54,6 +54,11 @@ function template_modify_modules()
 				</dt>
 				<dd>';
 
+		// Want to put something infront of the box?
+		if (!empty($field['preinput']))
+			echo '
+					', $field['preinput'];
+
 		switch ($field['type'])
 		{
 			case 'text': case 'int':
@@ -71,63 +76,36 @@ function template_modify_modules()
 					<input type="checkbox" name="', $key, '" id="', $field['label'], '"', (!empty($field['value']) ? ' checked="checked"' : ''), ' value="1" class="input_check" />';
 				break;
 
-			case 'select': case 'file_select': case 'icon_select':
+			case 'select':
 				echo '
 					<select name="', $key, '" id="', $field['label'], '"';
 
-				if ($field['type'] == 'icon_select')
+				if (!empty($field['iconpreview']))
 					echo ' onchange="javascript:document.getElementById(\'', $field['label'], '_preview\').src = \'', $field['url'], '\' + this.options[this.selectedIndex].value;"';
 
 				echo '>';
 
-				foreach ($field['options'] as $option)
-					echo '
+				// Is this some code to generate the options?
+				if (!is_array($field['options']))
+					$field['options'] = eval($field['options']);
+				// Assuming we now have some!
+				if (is_array($field['options']))
+					foreach ($field['options'] as $option)
+						echo '
 						<option value="', $option, '"', ($option == $field['value'] ? ' selected="selected"' : ''), '>', $txt['ep_' . $key . '_' . $option], '</option>';
 
 				echo '
 					</select>';
 
-				if ($field['type'] == 'icon_select')
+				if (!empty($field['iconpreview']))
 					echo '
 					<img id="', $field['label'], '_preview" class="iconpreview" src="', $field['url'], $field['value'], '" />';
 				break;
 
-			case 'list_groups':
-				echo '
-					<fieldset id="', $field['label'], '_group_perms">
-						<legend>
-							<a href="#" onclick="document.getElementById(\'', $field['label'], '_group_perms\').style.display = \'none\';document.getElementById(\'', $field['label'], '_group_perms_groups_link\').style.display = \'block\'; return false;">', $txt['avatar_select_permission'], '</a>
-						</legend>';
-
-		$all_checked = true;
-
-		// List all the groups to configure permissions for.
-		foreach ($field['options'] as $group)
-		{
-			echo '
-							<div id="permissions_', $group['id'], '">
-								<label for="check_group', $group['id'], '">
-									<input type="checkbox" class="input_check" name="', $key, '[]" value="', $group['id'], '" id="check_group', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
-									<span', ($group['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $group['name'], '</span>
-								</label>
-							</div>';
-
-			if (!$group['checked'])
-				$all_checked = false;
-		}
-
-		echo '
-						<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'', $field['label'], '_groups[]\');" id="check_group_all"', $all_checked ? ' checked="checked"' : '', ' />
-						<label for="check_group_all">
-							<em>', $txt['check_all'], '</em>
-						</label>
-						<br />
-					</fieldset>
-					<a href="#" onclick="document.getElementById(\'', $field['label'], '_group_perms\').style.display = \'block\'; document.getElementById(\'', $field['label'], '_group_perms_groups_link\').style.display = \'none\'; return false;" id="', $field['label'], '_group_perms_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
-					<script type="text/javascript"><!-- // --><![CDATA[
-						document.getElementById("', $field['label'], '_group_perms").style.display = "none";
-						document.getElementById("', $field['label'], '_group_perms_groups_link").style.display = "";
-					// ]]></script>';
+			case 'callback':
+				if (isset($field['callback_func']) && function_exists('template_' . $field['callback_func']))
+					$callback_func = 'template_' . $field['callback_func'];
+					$callback_func($field);
 		}
 	}
 
@@ -1012,5 +990,46 @@ function template_edit_layout()
 			</form>
 		</div>';
 }
+
+function template_list_groups($field)
+{
+	global $txt;
+
+	echo '
+					<fieldset id="', $field['label'], '_group_perms">
+						<legend>
+							<a href="#" onclick="document.getElementById(\'', $field['label'], '_group_perms\').style.display = \'none\';document.getElementById(\'', $field['label'], '_group_perms_groups_link\').style.display = \'block\'; return false;">', $txt['avatar_select_permission'], '</a>
+						</legend>';
+
+		$all_checked = true;
+
+		// List all the groups to configure permissions for.
+		foreach ($field['options'] as $group)
+		{
+			echo '
+							<div id="permissions_', $group['id'], '">
+								<label for="check_group', $group['id'], '">
+									<input type="checkbox" class="input_check" name="', $group['name'], '[]" value="', $group['id'], '" id="check_group', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
+									<span', ($group['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $group['name'], '</span>
+								</label>
+							</div>';
+
+			if (!$group['checked'])
+				$all_checked = false;
+		}
+
+		echo '
+						<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'', $field['label'], '_groups[]\');" id="check_group_all"', $all_checked ? ' checked="checked"' : '', ' />
+						<label for="check_group_all">
+							<em>', $txt['check_all'], '</em>
+						</label>
+						<br />
+					</fieldset>
+					<a href="#" onclick="document.getElementById(\'', $field['label'], '_group_perms\').style.display = \'block\'; document.getElementById(\'', $field['label'], '_group_perms_groups_link\').style.display = \'none\'; return false;" id="', $field['label'], '_group_perms_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
+					<script type="text/javascript"><!-- // --><![CDATA[
+						document.getElementById("', $field['label'], '_group_perms").style.display = "none";
+						document.getElementById("', $field['label'], '_group_perms_groups_link").style.display = "";
+					// ]]></script>';
+	}
 
 ?>
