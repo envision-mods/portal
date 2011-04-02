@@ -59,20 +59,20 @@ function ep_init($init_action = '')
 
 	// Images. :D
 	$context['ep_icon_url'] = $boardurl . '/ep_extra/module_icons/';
-	$context['epmod_image_url'] = $boardurl . '/ep_extra/module_images/';
+	$context['ep_module_image_url'] = $boardurl . '/ep_extra/module_images/';
 	$context['epadmin_image_url'] = $boardurl . '/ep_extra/images/admin';
 
 	// Files and Modules
-	$context['epmod_files_url'] = $boardurl . '/ep_extra/module_files/';
-	$context['epmod_files_dir'] = $boarddir . '/ep_extra/module_files/';
-	$context['epmod_modules_dir'] = $boarddir . '/ep_extra/modules';
+	$context['ep_module_files_url'] = $boardurl . '/ep_extra/module_files/';
+	$context['ep_module_files_dir'] = $boarddir . '/ep_extra/module_files/';
+	$context['ep_module_modules_dir'] = $boarddir . '/ep_extra/modules';
 
 	// This is changeable from the Envision Admin -> Configuration -> Module Settings area, so we need to load up the correct filepath that is in there.
-	$context['epmod_icon_url'] = $boardurl . '/' . $modSettings['ep_icon_directory'] . '/';
-	$context['epmod_icon_dir'] = $boarddir . '/' . $modSettings['ep_icon_directory'] . '/';
+	$context['ep_module_icon_url'] = $boardurl . '/' . $modSettings['ep_icon_directory'] . '/';
+	$context['ep_module_icon_dir'] = $boarddir . '/' . $modSettings['ep_icon_directory'] . '/';
 
 	// Templates
-	$context['epmod_template'] = $boarddir . '/ep_extra/module_templates/';
+	$context['ep_module_template'] = $boarddir . '/ep_extra/module_templates/';
 
 	// Is Envision Portal disabled? Can you view it?
 	if (empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))

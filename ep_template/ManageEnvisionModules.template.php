@@ -24,20 +24,20 @@ function template_modify_modules()
 	echo '
 			<div class="title_bar">
 				<h3 class="titlebg">
-					', /*(!empty($context['mod_info'][$context['ep_modid']]['help']) ? '<a href="' . $scripturl . '?action=helpadmin;help=' . $context['mod_info'][$context['ep_modid']]['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" /></a>' : ''), */$txt['epmod_' . $context['ep_module_type']] . $txt['ep_modsettings'], '
+					', $txt['ep_module_' . $context['ep_module_type']] . $txt['ep_modsettings'], '
 				</h3>
 			</div>';
 
-	if (isset($txt['epmodinfo_' . $context['ep_module_type']]))
+	if (isset($txt['ep_module_info_' . $context['ep_module_type']]))
 		echo '
-			<p class="information">', $txt['epmodinfo_' . $context['ep_module_type']], '</p>';
+			<p class="information">', $txt['ep_module_info_' . $context['ep_module_type']], '</p>';
 
 	echo '
 			<span class="upperframe"><span></span></span>
 			<div class="roundframe">
 			<dl class="settings">';
 
-	// Now loop through all the parameters.
+	// Now loop through all the fields.
 	foreach ($context['ep_module'] as $key => $field)
 	{
 		echo '
@@ -91,8 +91,21 @@ function template_modify_modules()
 				// Assuming we now have some!
 				if (is_array($field['options']))
 					foreach ($field['options'] as $option)
-						echo '
-						<option value="', $option, '"', ($option == $field['value'] ? ' selected="selected"' : ''), '>', $txt['ep_' . $key . '_' . $option], '</option>';
+					{
+						if (is_array($option))
+						{
+							echo '
+						<optgroup label="', $option['name'], '">';
+							foreach ($option['boards'] as $board)
+								echo '
+							<option value="', $board['id'], '"', ($board['id'] == $field['value'] ? ' selected="selected"' : ''), '>', $board['name'], '</option>';
+							echo '
+						</optgroup>';
+						}
+						else
+							echo '
+						<option value="', $option, '"', ($option == $field['value'] ? ' selected="selected"' : ''), '>', $txt[$field['label'] . '_' . $option], '</option>';
+					}
 
 				echo '
 					</select>';
@@ -105,311 +118,13 @@ function template_modify_modules()
 			case 'callback':
 				if (isset($field['callback_func']) && function_exists('template_' . $field['callback_func']))
 					$callback_func = 'template_' . $field['callback_func'];
-					$callback_func($field);
+					$callback_func($field, $key);
 		}
-	}
 
-	$counter = 0;
-	$hiddentags = '';
-	foreach ($context['config_params'] as $config_id => $config_param)
-	{
-		$counter++;
-		$help = '<a id="setting_' . $config_param['name'] . '"></a></dt><dt>';
-
-		// Show the [?] button.
-		if (!empty($config_param['help']))
-			$help = '
-				<dt>
-					<a id="setting_' . $config_param['name'] . '" href="' . $scripturl . '?action=helpadmin;help=' . $config_param['help'] . '" onclick="return reqWin(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.gif" alt="' . $txt['help'] . '" border="0" /></a>
-					<span>';
-
-		echo $help, '
-						<label for="', $config_param['label_id'], '">', $txt[$config_param['label']], '</label>
-					</span>
-				</dt>
-				<dd>';
-
-			if ($config_param['type'] == 'check')
-				echo '
-					<input type="checkbox" name="', $config_param['name'], '" id="', $config_param['label_id'], '"', (!empty($config_param['value']) ? ' checked="checked"' : ''), ' value="1" class="input_check" />';
-
-			elseif ($config_param['type'] == 'db_select' && $config_param['db_select_custom'])
-			{
-				if (!isset($load_script))
-				{
-					$load_script = true;
-					echo '
-						<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/epAdmin.js"></script>';
-				}
-
-				echo '
-					<div id="db_select_option_list_', $config_id, '"">';
-
-				foreach ($config_param['db_select_options'] as $key => $select_value)
-					echo '
-							<div id="db_select_container_', $config_param['label_id'], '_', $key, '"><input type="radio" name="', $config_param['name'], '" id="', $config_param['label_id'], '_', $key, '" value="', $key, '"', ($key == $config_param['db_selected'] ? ' checked="checked"' : ''), ' class="input_check" /> <label for="', $config_param['label_id'], '_', $key, '" id="label_', $config_param['label_id'], '_', $key, '">', $select_value ,'</label> <span id="db_select_edit_', $config_param['label_id'], '_', $key, '" class="smalltext">(<a href="#" onclick="epEditDbSelect(', $config_id, ', \'', $config_param['label_id'], '_', $key, '\'); return false;" id="', $config_param['label_id'], '_', $key, '_db_custom_more">', $txt['ep_edit'], '</a>', $key != 1 ? ' - <a href="#" onclick="epDeleteDbSelect(' . $config_id . ', \'' . $config_param['label_id'] . '_' . $key . '\'); return false;" id="' . $config_param['label_id'] . '_' . $key . '_db_custom_delete">' . $txt['delete'] . '</a>' : '', ')</span></div>';
-
-				echo '
-					</div>
-						<input type="hidden" name="param_opts', $config_id, '" value="', $config_param['options'], '" />
-						<script type="text/javascript"><!-- // --><![CDATA[
-							function epEditDbSelect(config_id, key)
-							{
-								var parent = document.getElementById(\'db_select_edit_\' + key);
-								var child = document.getElementById(key + \'_db_custom_more\');
-								var newElement = document.createElement("input");
-								newElement.type = "text";
-								newElement.value = document.getElementById(\'label_\' + key).innerHTML;
-								newElement.name = "edit_" + key;
-								newElement.id = "edit_" + key;
-								newElement.className = "input_text";
-								newElement.setAttribute("size", 30);
-
-								parent.insertBefore(newElement, child);
-								newElement.focus();
-								newElement.select();
-
-								document.getElementById(\'label_\' + key).style.display = \'none\';
-								child.style.display = \'none\';
-
-								newElement = document.createElement("span");
-								newElement.innerHTML = " <a href=\"#\" onclick=\"epSubmitEditDbSelect(" + config_id + ", \'" + key + "\'); return false;\">', $txt['ep_submit'], '</a> - <a href=\"#\" onclick=\"epCancelEditDbSelect(" + config_id + ", \'" + key + "\'); return false;\">', $txt['ep_cancel'], '</a> - ";
-								newElement.id = "db_select_edit_buttons_" + key;
-
-								document.getElementById(\'db_select_edit_\' + key).insertBefore(newElement, document.getElementById(key + \'_db_custom_delete\'));
-
-								return true;
-							}
-
-							function epSubmitEditDbSelect(config_id, key)
-							{
-								var send_data = "data=" + escape(document.getElementById("edit_" + key).value.replace(/&#/g, "&#").php_to8bit()).replace(/\+/g, "%2B") + "&config_id=" + config_id + "&key=" + key;
-								var url = smf_prepareScriptUrl(smf_scripturl) + "action=envision;sa=dbSelect;xml";
-
-								sendXMLDocument(url, send_data);
-
-								var parent = document.getElementById(\'db_select_edit_\' + key);
-
-								document.getElementById(key + \'_db_custom_more\').style.display = \'\';
-								document.getElementById(\'label_\' + key).innerHTML = document.getElementById("edit_" + key).value;
-								document.getElementById(\'label_\' + key).style.display = \'\';
-								parent.removeChild(document.getElementById(\'db_select_edit_buttons_\' + key));
-								parent.removeChild(document.getElementById(\'edit_\' + key));
-
-								return true;
-							}
-
-							function epCancelEditDbSelect(config_id, key)
-							{
-								var parent = document.getElementById(\'db_select_edit_\' + key);
-
-								parent.removeChild(document.getElementById(\'db_select_edit_buttons_\' + key));
-								parent.removeChild(document.getElementById(\'edit_\' + key));
-								document.getElementById(key + \'_db_custom_more\').style.display = \'\';
-								document.getElementById(\'label_\' + key).style.display = \'\';
-
-								return true;
-							}
-
-							function epDeleteDbSelect(config_id, key)
-							{
-								var parent = document.getElementById(\'db_select_container_\' + key);
-
-								newElement = document.createElement("span");
-								newElement.innerHTML = document.getElementById(\'label_\' + key).innerHTML + " <span class=\"smalltext\">(', $txt['ep_deleted'], ' - <a href=\"#\" onclick=\"epRestoreDbSelect(" + config_id + ", \'" + key + "\'); return false;\">', $txt['ep_restore'], '</a>)</span>";
-								newElement.id = "db_select_deleted_" + key;
-
-								parent.appendChild(newElement);
-								oHidden = addHiddenElement("epModule", document.getElementById(\'label_\' + key).innerHTML, "epDeletedDbSelects_" + config_id);
-								oHidden.id = "epDeletedDbSelects_" + key;
-								oHidden.name = "epDeletedDbSelects_" + config_id + "[]";
-
-								document.getElementById(key).style.display = \'none\';
-								document.getElementById(\'label_\' + key).style.display = \'none\';
-								document.getElementById(\'db_select_edit_\' + key).style.display = \'none\';
-
-								return true;
-							}
-
-							function epRestoreDbSelect(config_id, key)
-							{
-								var parent = document.getElementById(\'db_select_container_\' + key);
-								var child = document.getElementById(\'db_select_deleted_\' + key);
-
-								parent.removeChild(child);
-								document.forms["epModule"].removeChild(document.getElementById("epDeletedDbSelects_" + key));
-
-								document.getElementById(key).style.display = \'\';
-								document.getElementById(\'label_\' + key).style.display = \'\';
-								document.getElementById(\'db_select_edit_\' + key).style.display = \'\';
-
-								return true;
-							}
-
-							function epInsertBefore(oParent, oChild, sType)
-							{
-								var parent = document.getElementById(oParent);
-								var child = document.getElementById(oChild);
-								var newElement = document.createElement("input");
-								newElement.type = sType;
-								newElement.value = "";
-								newElement.name = "', $config_param['name'], '_db_custom[]";
-								newElement.className = "input_text";
-								newElement.setAttribute("size", "' . $config_param['size'] . '");
-								newElement.setAttribute("style", "display: block");
-
-								parent.insertBefore(newElement, child);
-
-								return true;
-							}
-						// ]]></script>
-					<div id="', $config_param['name'], '_db_custom_container" class="smalltext">
-							<a href="#" onclick="epInsertBefore(\'', $config_param['name'], '_db_custom_container\', \'', $config_param['name'], '_db_custom_more\', \'text\'); return false;" id="', $config_param['name'], '_db_custom_more">(', $txt['ep_add_another'], ')</a>
-					</div>';
-			}
-			elseif ($config_param['type'] == 'int')
-				echo '
-					<input type="text" name="', $config_param['name'], '" id="', $config_param['label_id'], '" value="', $config_param['value'], '"', ($config_param['size'] ? ' size="' . $config_param['size'] . '" ' : ' '), 'class="input_text" />';
-			elseif ($config_param['type'] == 'large_text' || $config_param['type'] == 'html')
-				echo '
-					<textarea rows="', (!empty($config_param['size']) ? $config_param['size'] : 4), '" cols="60" name="', $config_param['name'], '" id="', $config_param['label_id'], '">', $config_param['value'], '</textarea>';
-			elseif ($config_param['type'] == 'select' || $config_param['type'] == 'list_boards' || ($config_param['type'] == 'db_select' && !$config_param['db_select_custom']))
-			{
-				echo '
-					<select name="', $config_param['name'], '" id="', $config_param['label_id'], '">';
-
-					// Show all boards within a Category for each Category.
-					if ($config_param['type'] == 'list_boards')
-					{
-						foreach ($config_param['select_options'] as $key => $option)
-						{
-							echo '
-										<optgroup label="', $option['category'], '">';
-
-							foreach ($option['board'] as $boardid => $board)
-								echo '
-												<option value="', $boardid, '"', ((strval($boardid) == $config_param['select_value'] || (trim($config_param['select_value']) == '' && empty($boardid))) ? ' selected="selected"' : ''), '>', $board, '</option>';
-
-							echo '
-										</optgroup>';
-						}
-					}
-					elseif ($config_param['type'] == 'db_select' && !$config_param['db_select_custom'])
-					{
-						if(!isset($load_script))
-						{
-							$load_script = true;
-							echo '
-										<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/epAdmin.js"></script>';
-						}
-
-						foreach ($config_param['db_select_options'] as $key => $select_value)
-							echo '
-											<option value="', $key, '"', ($key == $config_param['db_selected'] ? ' selected="selected"' : ''), '>', $select_value, '</option>';
-					}
-					elseif ($config_param['type'] == 'list_boards')
-					{
-						foreach ($config_param['select_options'] as $key => $option)
-						{
-							echo '
-										<option value="', $key, '"', ($key == $config_param['select_value'] || (trim($config_param['select_value']) == '' && empty($key)) ? ' selected="selected"' : ''), '>', $txt['epmod_' . $config_param['name'] . '_' . $option], '</option>';
-						}
-					}
-					else
-					{
-						foreach ($config_param['select_options'] as $key => $option)
-						{
-							if ($config_param['type'] == 'select')
-								$option = $txt['epmod_' . $config_param['name'] . '_' . $option];
-
-							echo '
-										<option value="', $key, '"', ($key == $config_param['select_value'] || (trim($config_param['select_value']) == '' && empty($key)) ? ' selected="selected"' : ''), '>', $option, '</option>';
-						}
-					}
-
-					echo '
-									</select>';
-
-				if ($config_param['type'] == 'select' || ($config_param['type'] == 'db_select' && !$config_param['db_select_custom']))
-					echo '
-									<input type="hidden" name="param_opts', $config_id, '" value="', $config_param['options'], '" />';
-			}
-
-			// Rich Edit text area.
-			elseif ($config_param['type'] == 'rich_edit')
-				template_control_richedit($config_param['post_box_name']);
-
-			// BBC list...
-			elseif ($config_param['type'] == 'list_bbc')
-			{
-				if(!isset($load_script))
-				{
-					$load_script = true;
-					echo '
-					<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/epAdmin.js"></script>';
-				}
-
-					echo '
-							<fieldset id="', $config_param['name'], '">
-								<legend>', $txt['bbcTagsToUse_select'], '</legend>
-									<ul class="reset">';
-
-					foreach ($config_param['bbc_columns'] as $bbcColumn)
-					{
-						foreach ($bbcColumn as $bbcTag)
-							echo '
-										<li class="list_bbc align_left">
-											<input type="checkbox" name="', $config_param['name'], '_enabledTags[]" id="tag_', $config_param['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', isset($config_param['bbc_sections'][$bbcTag['tag']]['disabled']) && !in_array($bbcTag['tag'], $config_param['bbc_sections'][$bbcTag['tag']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_param['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=helpadmin;help=tag_' . $bbcTag['tag'] . '" onclick="return reqWin(this.href);">?</a>)' : '', '
-										</li>';
-					}
-					echo '			</ul>
-					<input type="checkbox" id="select_all', $config_id, '" onclick="invertAll(this, this.form, \'', $config_param['name'], '_enabledTags\');"', $config_param['bbc_all_selected'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="select_all', $config_id, '"><em>', $txt['bbcTagsToUse_select_all'], '</em></label>
-							</fieldset>';
-			}
-
-			// List Groups or Checklist.
-			elseif ($config_param['type'] == 'list_groups' || $config_param['type'] == 'checklist')
-			{
-				$checkCount = 0;
-
-				$checkid = $config_param['type'] == 'list_groups' ? 'grp' : 'chk';
-				$checkname = $config_param['type'] == 'list_groups' ? 'group' : 'check';
-
-				if($config_param['check_order'] && !isset($load_script))
-				{
-					$load_script = true;
-					echo '
-					<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/epAdmin.js"></script>';
-				}
-
-				foreach($config_param['check_options'] as $check)
-				{
-					$checkCount++;
-		echo '
-							<div id="', $checkid, '_', $counter . '_' . $checkCount, '"><label for="', $checkname . 's_' . $counter . $check['id'], '"><input type="checkbox" name="', $checkname . 's' . $counter, '[]" value="', $check['id'], '" id="', $checkname . 's_' . $counter . $check['id'], '" ', ($check['checked'] ? 'checked="checked" ' : ''), 'class="input_check" /><span', ($config_param['type'] == 'list_groups' ? ($check['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : '') : ''), '>', $check['name'], '</span></label>', $config_param['check_order'] ? '<span style="padding-left: 10px;"><a href="javascript:void(0);" onClick="moveUp(this.parentNode.parentNode); orderChecks(\'' . $checkid . '_' . $counter . '_' . $checkCount . '\', \'order' . $checkid . '_' . $counter . '\');">' . $txt['checks_order_up'] . '</a> | <a href="javascript:void(0);" onClick="moveDown(this.parentNode.parentNode); orderChecks(\'' . $checkid . '_' . $counter . '_' . $checkCount . '\', \'order' . $checkid . '_' . $counter . '\');">' . $txt['checks_order_down'] . '</a></span>' : '', '</div>';
-				}
-	echo '
-								<em>', $txt['check_all'], '</em> <input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'', $checkname . 's' . $counter, '[]\');" /><br />
-								<br />
-								<input type="hidden" name="conval' . $checkid . '_' . $counter . '" value="' . $config_param['check_value'] . '" />', ($config_param['check_order'] ? '
-								<input type="hidden" id="order' . $checkid . '_' . $counter . '" name="order' . $checkid . '_' . $counter . '" value="' . $context[$checkname . '_order' . $config_param['id']] . '" />' : ''), '
-							</dd>';
-			}
-			// Just show a regular textbox.
-			else
-			{
-				echo '
-							<input type="text" name="', $config_param['name'], '" id="', $config_param['label_id'], '" value="', $config_param['value'], '"', ($config_param['size'] ? ' size="' . $config_param['size'] . '"' : ''), ' class="input_text" />';
-			}
-
-		// Holds all parameters param_name1, param_name2, param_name3, and so on.
-		echo '
-							<input type="hidden" name="param_name', $counter, '" value="', $config_param['name'], '" />
-							<input type="hidden" name="param_id', $counter, '" value="', $config_id, '" />
-							<input type="hidden" name="param_type', $counter, '" value="', $config_param['type'], '" />';
-
-		echo '
-			</dd>';
+		// Want to put something after the box?
+		if (!empty($field['postinput']))
+			echo '
+					', $field['postinput'];
 	}
 
 	echo '
@@ -449,8 +164,8 @@ function template_manage_modules()
 	echo '
 	<div class="floatleft w100">
 		<div class="floatright">
-			<form name="urLayouts" id="epmod_change_layout" action="', $scripturl, '?action=admin;area=epmodules;sa=epmanmodules;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
-				<select onchange="document.forms[\'epmod_change_layout\'].submit();" name="layout_picker" class="w100">';
+			<form name="urLayouts" id="ep_module_change_layout" action="', $scripturl, '?action=admin;area=epmodules;sa=epmanmodules;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
+				<select onchange="document.forms[\'ep_module_change_layout\'].submit();" name="layout_picker" class="w100">';
 
 		foreach ($_SESSION['layouts'] as $id_layout => $layout_name)
 			echo '
@@ -991,7 +706,7 @@ function template_edit_layout()
 		</div>';
 }
 
-function template_list_groups($field)
+function template_list_groups($field, $key)
 {
 	global $txt;
 
@@ -1031,5 +746,159 @@ function template_list_groups($field)
 						document.getElementById("', $field['label'], '_group_perms_groups_link").style.display = "";
 					// ]]></script>';
 	}
+
+function template_checklist($field, $key)
+{
+	global $txt;
+
+	$all_checked = true;
+
+	// List all the groups to configure permissions for.
+	foreach ($field['options'] as $group)
+	{
+		echo '
+							<div id="checklist_', $key, '_', $group['id'], '_div"', !empty($field['float']) ? ' class="floatleft list_bbc"' : '', '><label for="checklist_', $key, '_', $group['id'], '">
+								<input type="checkbox" class="input_check" name="', $key, '[]" value="', $group['id'], '" id="checklist_', $key, '_', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
+							', $group['name'], '</div>';
+
+		if (!$group['checked'])
+			$all_checked = false;
+	}
+
+	echo '
+						<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'', $key, '[]\');" id="checklist_', $key, '_all"', $all_checked ? ' checked="checked"' : '', ' />
+						<label for="checklist_', $key, '_all">
+							<em>', $txt['check_all'], '</em>
+						</label>';
+	}
+
+function template_db_select($field, $key)
+{
+	global $txt;
+
+				echo '
+					<div id="db_select_option_list_', $key, '"">';
+
+				foreach ($field['options'] as $select_key => $select_value)
+					echo '
+							<div id="db_select_container_', $field['label'], '_', $select_key, '"><input type="radio" name="', $key, '" id="', $field['label'], '_', $select_key, '" value="', $select_key, '"', ($select_key == $field['value'] ? ' checked="checked"' : ''), ' class="input_check" /> <label for="', $field['label'], '_', $select_key, '" id="label_', $field['label'], '_', $select_key, '">', $select_value ,'</label> <span id="db_select_edit_', $field['label'], '_', $select_key, '" class="smalltext">(<a href="#" onclick="epEditDbSelect(', $key, ', \'', $field['label'], '_', $select_key, '\'); return false;" id="', $field['label'], '_', $select_key, '_db_custom_more">', $txt['ep_edit'], '</a>', $select_key != 1 ? ' - <a href="#" onclick="epDeleteDbSelect(' . $key . ', \'' . $field['label'] . '_' . $select_key . '\'); return false;" id="' . $field['label'] . '_' . $select_key . '_db_custom_delete">' . $txt['delete'] . '</a>' : '', ')</span></div>';
+
+				echo '
+					</div>
+						<script type="text/javascript"><!-- // --><![CDATA[
+							function epEditDbSelect(key, label)
+							{
+								var parent = document.getElementById(\'db_select_edit_\' + label);
+								var child = document.getElementById(label + \'_db_custom_more\');
+								var newElement = document.createElement("input");
+								newElement.type = "text";
+								newElement.value = document.getElementById(\'label_\' + label).innerHTML;
+								newElement.name = "edit_" + key;
+								newElement.id = "edit_" + key;
+								newElement.className = "input_text";
+								newElement.setAttribute("size", 30);
+
+								parent.insertBefore(newElement, child);
+								newElement.focus();
+								newElement.select();
+
+								document.getElementById(\'label_\' + label).style.display = \'none\';
+								child.style.display = \'none\';
+
+								newElement = document.createElement("span");
+								newElement.innerHTML = " <a href=\"#\" onclick=\"epSubmitEditDbSelect(" + key + ", \'" + key + "\'); return false;\">', $txt['ep_submit'], '</a> - <a href=\"#\" onclick=\"epCancelEditDbSelect(\'" + key + "\', \'" + label + "\'); return false;\">', $txt['ep_cancel'], '</a> - ";
+								newElement.id = "db_select_edit_buttons_" + key;
+
+								document.getElementById(\'db_select_edit_\' + label).insertBefore(newElement, document.getElementById(key + \'_db_custom_delete\'));
+
+								return true;
+							}
+
+							function epSubmitEditDbSelect(key, label)
+							{
+								var send_data = "data=" + escape(document.getElementById("edit_" + key).value.replace(/&#/g, "&#").php_to8bit()).replace(/\+/g, "%2B") + "&key=" + key + "&key=" + key;
+								var url = smf_prepareScriptUrl(smf_scripturl) + "action=envision;sa=dbSelect;xml";
+
+								sendXMLDocument(url, send_data);
+
+								var parent = document.getElementById(\'db_select_edit_\' + key);
+
+								document.getElementById(key + \'_db_custom_more\').style.display = \'\';
+								document.getElementById(\'label_\' + key).innerHTML = document.getElementById("edit_" + key).value;
+								document.getElementById(\'label_\' + key).style.display = \'\';
+								parent.removeChild(document.getElementById(\'db_select_edit_buttons_\' + key));
+								parent.removeChild(document.getElementById(\'edit_\' + key));
+
+								return true;
+							}
+
+							function epCancelEditDbSelect(key, label)
+							{
+								var parent = document.getElementById(\'db_select_edit_\' + label);
+
+								parent.removeChild(document.getElementById(\'db_select_edit_buttons_\' + key));
+								parent.removeChild(document.getElementById(\'edit_\' + key));
+								document.getElementById(label + \'_db_custom_more\').style.display = \'\';
+								document.getElementById(\'label_\' + label).style.display = \'\';
+
+								return true;
+							}
+
+							function epDeleteDbSelect(key, label)
+							{
+								var parent = document.getElementById(\'db_select_container_\' + key);
+
+								newElement = document.createElement("span");
+								newElement.innerHTML = document.getElementById(\'label_\' + key).innerHTML + " <span class=\"smalltext\">(', $txt['ep_deleted'], ' - <a href=\"#\" onclick=\"epRestoreDbSelect(" + key + ", \'" + key + "\'); return false;\">', $txt['ep_restore'], '</a>)</span>";
+								newElement.id = "db_select_deleted_" + key;
+
+								parent.appendChild(newElement);
+								oHidden = addHiddenElement("epModule", document.getElementById(\'label_\' + key).innerHTML, "epDeletedDbSelects_" + key);
+								oHidden.id = "epDeletedDbSelects_" + key;
+								oHidden.name = "epDeletedDbSelects_" + key + "[]";
+
+								document.getElementById(key).style.display = \'none\';
+								document.getElementById(\'label_\' + key).style.display = \'none\';
+								document.getElementById(\'db_select_edit_\' + key).style.display = \'none\';
+
+								return true;
+							}
+
+							function epRestoreDbSelect(key, label)
+							{
+								var parent = document.getElementById(\'db_select_container_\' + key);
+								var child = document.getElementById(\'db_select_deleted_\' + key);
+
+								parent.removeChild(child);
+								document.forms["epModule"].removeChild(document.getElementById("epDeletedDbSelects_" + key));
+
+								document.getElementById(key).style.display = \'\';
+								document.getElementById(\'label_\' + key).style.display = \'\';
+								document.getElementById(\'db_select_edit_\' + key).style.display = \'\';
+
+								return true;
+							}
+
+							function epInsertBefore(oParent, oChild, sType)
+							{
+								var parent = document.getElementById(oParent);
+								var child = document.getElementById(oChild);
+								var newElement = document.createElement("input");
+								newElement.type = sType;
+								newElement.value = "";
+								newElement.name = "', $key, '_db_custom[]";
+								newElement.className = "input_text";
+								newElement.setAttribute("size", "' . $field['size'] . '");
+								newElement.setAttribute("style", "display: block");
+
+								parent.insertBefore(newElement, child);
+
+								return true;
+							}
+						// ]]></script>
+					<div id="', $key, '_db_custom_container" class="smalltext">
+							<a href="#" onclick="epInsertBefore(\'', $key, '_db_custom_container\', \'', $key, '_db_custom_more\', \'text\'); return false;" id="', $key, '_db_custom_more">(', $txt['ep_add_another'], ')</a>
+					</div>';
+}
 
 ?>

@@ -43,11 +43,8 @@ function loadGeneralSettingParameters3($subActions = array(), $defaultAction = '
 	// You need to be an admin to edit settings!
 	isAllowedTo('admin_forum');
 
-	// Language Files needed, load EnvisionModules 1st so that it can't overwrite any default Envision Strings.
-	loadLanguage('ep_languages/EnvisionModules+ep_languages/EnvisionHelp+ep_languages/ManageEnvisionModules+ManageSettings');
-
-	// Will need the utility functions from here.
-	require_once($sourcedir . '/ManageServer.php');
+	// Language Files needed, load EnvisionModules first so that it can't overwrite any default Envision Strings.
+	loadLanguage('ep_languages/EnvisionHelp+ep_languages/ManageEnvisionModules');
 
 	// load the template and the style sheet needed
 	loadTemplate('ep_template/ManageEnvisionModules', 'ep_css/envisionportal');
@@ -317,8 +314,8 @@ function ModifyModule()
 	foreach ($data as $key => &$field)
 	{
 		$field += array(
-			'help' => isset($helptxt['epmod_' . $module_type . '_' . $key]) ? 'epmod_' . $module_type . '_' . $key : 'ep_' . $key,
-			'label' => isset($txt['epmod_' . $module_type . '_' . $key]) ? 'epmod_' . $module_type . '_' . $key : 'ep_' . $key,
+			'help' => isset($helptxt['ep_module_' . $module_type . '_' . $key]) ? 'ep_module_' . $module_type . '_' . $key : 'ep_' . $key,
+			'label' => isset($txt['ep_module_' . $module_type . '_' . $key]) ? 'ep_module_' . $module_type . '_' . $key : 'ep_' . $key,
 		);
 
 		if (isset($field['options']) && is_string($field['options']) && strpos($field['options'], ';'))
@@ -326,28 +323,6 @@ function ModifyModule()
 
 		if (isset($field['preload']) && function_exists($field['preload']))
 			$field = array_replace_recursive($field, $field['preload']($field));
-
-		switch ($field['type'])
-		{
-			case 'list_groups':
-				$field['options'] = ep_list_groups($field['value']);
-				break;
-
-			case 'file_select': case 'icon_select':
-				$files = array();
-				ep_list_files__recursive($field['options'], $files);
-				$field['options'] = array();
-
-				foreach ($files as $file)
-				{
-					if ($file != 'index.php')
-					{
-						$new_file = explode('.', $file);
-						$field['options'][] = $file;
-						$txt['ep_' . $key . '_' . $file] = $smcFunc['ucfirst']($new_file[0]);
-					}
-				}
-		}
 	}
 
 	$context['ep_module'] = $data;
@@ -463,7 +438,7 @@ function ModifyModule2()
  * @return array all the fields retrieved from the database table; empty array if something went wrong.
  * @since 1.0
  */
-function ListDbSelects($db_select = array(), $param_id)
+function ep_db_select($db_select, $param_id = 0)
 {
 	global $smcFunc, $db_connection, $context;
 
@@ -501,11 +476,11 @@ function ListDbSelects($db_select = array(), $param_id)
 
 	$return = array();
 	while($row = $smcFunc['db_fetch_assoc']($request))
-		if (!isset($return[$param_id][$row[$db_select['select2']]]))
+		if (!isset($return[$param_id][$row[$db_select['select1']]]))
 		{
-			$return_val = (string) $smcFunc['htmlspecialchars'](un_htmlspecialchars($row[$db_select['select1']]));
+			$return_val = $smcFunc['htmlspecialchars']($row[$db_select['select2']]);
 			if (trim($return_val) != '')
-				$return[$param_id][$row[$db_select['select2']]] = $return_val;
+				$return[$param_id][$row[$db_select['select1']]] = $return_val;
 		}
 
 	$smcFunc['db_free_result']($request);
@@ -525,32 +500,65 @@ function ListDbSelects($db_select = array(), $param_id)
  * @return array a list of boards grouped by their categories.
  * @since 1.0
  */
-function ListBoards()
+function ep_list_boards()
 {
 	global $smcFunc;
 
 	$request = $smcFunc['db_query']('', '
-		SELECT b.id_board, b.name AS bName, c.id_cat, c.name AS cName
-		FROM {db_prefix}boards AS b, {db_prefix}categories AS c
-		WHERE b.id_cat = c.id_cat
-		ORDER BY c.cat_order, b.board_order',
-		array()
-	);
+		SELECT b.id_board, b.name AS bName, c.id_cat, c.name AS cName, c.cat_order, b.board_order
+		FROM {db_prefix}categories AS c
+			INNER JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)');
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		if (!isset($all_boards[$row['id_cat']]))
-			$all_boards[$row['id_cat']] = array(
-				'category' => $row['cName'],
-				'board' => array(),
+		if (!isset($all_boards[$row['cat_order']]))
+			$all_boards[$row['cat_order']] = array(
+				'id' => $row['id_cat'],
+				'name' => $row['cName'],
+				'boards' => array(),
 			);
 
-		$all_boards[$row['id_cat']]['board'][$row['id_board']] = $row['bName'];
+		$all_boards[$row['cat_order']]['boards'][$row['board_order']] = array(
+				'id' => $row['id_board'],
+				'name' => $row['bName'],
+			);
 	}
-	$smcFunc['db_free_result']($request);
 
 	// Return the array of categories and boards.
 	return $all_boards;
+}
+
+/**
+ * Gets a list of bb codes.
+ *
+ * @return array a list of bb codes.
+ * @since 1.0
+ */
+function ep_list_bbc($bbcChoice)
+{
+	global $context, $txt;
+
+	// What are the options, eh?
+	$bbcChoice = explode(';', $bbcChoice);
+	$temp = parse_bbc(false);
+	$bbcTags = array();
+	foreach ($temp as $tag)
+		$bbcTags[] = $tag['tag'];
+
+	$bbcTags = array_unique($bbcTags);
+
+	// Now put whatever BBC options we may have into context too!
+	$bbc_sections = array();
+	foreach ($bbcTags as $bbc)
+		if (empty($modSettings['bbc_disabled_' . $bbc]))
+			$bbc_sections[$bbc] = array(
+				'id' => $bbc,
+				'name' => $bbc,
+				'title' => isset($txt['bbc_title_' . $bbc]) ? $txt['bbc_title_' . $bbc] : $txt['bbcTagsToUse_select'],
+				'checked' => in_array($bbc, $bbcChoice),
+			);
+
+	return $bbc_sections;
 }
 
 /**
@@ -564,31 +572,34 @@ function ListBoards()
  * @return array all the items parsed for displaying the checklist; empty array if something went wrong.
  * @since 1.0
  */
-function ListChecks($checked = array(), $checkStrings = array(), $order = array(), $param_name, $param_id)
+function ep_list_checks($checked = array(), $checkStrings = array(), $order = array(), $param_name, $param_id)
 {
 	global $context, $txt;
 
 	if (empty($checked) || empty($checkStrings))
 		return array();
 
+	if (!is_array($checked))
+		$checked = explode(',', $checked);
+
 	$all_checks['checks'][$param_id] = array();
 
 	// Build the array
-	foreach($checkStrings as $key => $name)
+	foreach ($checkStrings as $key => $name)
 	{
 		// Ordering?
 		if (!empty($order))
 		{
 			$all_checks['checks'][$param_id][$order[$key]] = array(
 				'id' => $order[$key],
-				'name' => $txt['epmod_' . $param_name . '_' . $checkStrings[$order[$key]]],
+				'name' => $txt[$param_name . '_' . $checkStrings[$order[$key]]],
 				'checked' => in_array($order[$key], $checked) ? true : false,
 			);
 		}
 		else
 			$all_checks['checks'][$param_id][] = array(
 				'id' => $key,
-				'name' => $txt['epmod_' . $param_name . '_' . $name],
+				'name' => $txt[$param_name . '_' . $name],
 				'checked' => in_array($key, $checked) ? true : false,
 			);
 	}
@@ -608,12 +619,11 @@ function ListChecks($checked = array(), $checkStrings = array(), $order = array(
  * @param string $checked comma-seperated list of all id_groups to be checked (have a mark in the checkbox). Default is an empty array.
  * @param string $unallowed comma-seperated list of all id_groups that are skipped. Default is an empty array.
  * @param array $order integer list specifying the order of id_groups to be displayed. Default is an empty array.
- * @param string $param_name the name of the paameter being used.
- * @param int $param_id the parameter's ID.
+ * @param bool $permissions whether or not to filter out the inherited groups. Default is false.
  * @return array all the membergroups filtered according to the parameters; empty array if something went wrong.
  * @since 1.0
  */
-function ep_list_groups($checked, $unallowed = '', $order = array(), $param_id = 0)
+function ep_list_groups($checked, $unallowed = '', $order = array(), $permissions = false)
 {
 	global $context, $smcFunc, $txt;
 
@@ -664,9 +674,13 @@ function ep_list_groups($checked, $unallowed = '', $order = array(), $param_id =
 	$request = $smcFunc['db_query']('', '
 		SELECT group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
-		WHERE id_group > {int:is_zero}',
+		WHERE id_group > {int:is_zero}' . ($permissions ? '
+			AND id_parent = {int:not_inherited}' : '') . ($permissions && empty($modSettings['permission_enable_postgroups']) ? '
+			AND min_posts = {int:min_posts}' : ''),
 		array(
 			'is_zero' => 0,
+			'not_inherited' => -2,
+			'min_posts' => -1,
 		)
 	);
 	while ($row = $smcFunc['db_fetch_assoc']($request))
@@ -889,7 +903,7 @@ function UploadModule($reservedNames = array(), $installed_functions = array())
 		if (empty($pathinfo['filename']))
 			$pathinfo['filename'] = basename($_FILES['ep_modules']['name']);
 
-		$module_path = $context['epmod_modules_dir'] . '/' . $pathinfo['filename'];
+		$module_path = $context['ep_module_modules_dir'] . '/' . $pathinfo['filename'];
 
 		// Check if name already exists, or restricted, or doesn't have a name.
 		if (is_dir($module_path) || in_array($pathinfo['filename'], $reservedNames) || $pathinfo['filename'] == '')
@@ -993,12 +1007,12 @@ function InstallEnvisionModule()
 	$AvailableModules = array();
 	$name = $_GET['name'];
 
-	if ($dir = opendir($context['epmod_modules_dir']))
+	if ($dir = opendir($context['ep_module_modules_dir']))
 	{
 		$dirs = array();
 		while ($file = readdir($dir))
 		{
-			$retVal = ep_get_module_info('', '', $context['epmod_modules_dir'], $file, $name, true);
+			$retVal = ep_get_module_info('', '', $context['ep_module_modules_dir'], $file, $name, true);
 			if ($retVal === false)
 				continue;
 			else
@@ -1046,7 +1060,7 @@ function UninstallEnvisionModule()
 
 	// Can't seem to find it.
 	if (empty($name))
-		fatal_lang_error('epmod_uninstall_error', false);
+		fatal_lang_error('ep_module_uninstall_error', false);
 
 	uninstallModule($name);
 
@@ -1163,7 +1177,7 @@ function DeleteEnvisionModule()
 
 	// Last, but not least, remove the files.
 	require_once($sourcedir . '/Subs-Package.php');
-	deltree($context['epmod_modules_dir'] . '/' . $name);
+	deltree($context['ep_module_modules_dir'] . '/' . $name);
 
 	// A light heart and an easy step paves the way ;)
 	redirectexit('action=admin;area=epmodules;sa=epaddmodules');
@@ -2049,7 +2063,7 @@ function ep_fill_default_fields(&$fields)
 				global $context, $smcFunc, $txt;
 
 				$files = array();
-				ep_list_files__recursive($context[\'epmod_template\'], $files);
+				ep_list_files__recursive($context[\'ep_module_template\'], $files);
 				$field[\'options\'] = array();
 
 				foreach ($files as $file)
@@ -2076,7 +2090,7 @@ function ep_fill_default_fields(&$fields)
 				global $context, $smcFunc, $txt;
 
 				$files = array();
-				ep_list_files__recursive($context[\'epmod_icon_dir\'], $files);
+				ep_list_files__recursive($context[\'ep_module_icon_dir\'], $files);
 				$field[\'options\'] = array();
 
 				foreach ($files as $file)
@@ -2091,7 +2105,7 @@ function ep_fill_default_fields(&$fields)
 
 				return $field;'),
 			'iconpreview' => true,
-			'url' => $context['epmod_icon_url'],
+			'url' => $context['ep_module_icon_url'],
 			'value' => '',
 		),
 		'module_link' => array(

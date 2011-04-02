@@ -2,7 +2,7 @@
 // Version 1.0; EnvisionPortal
 
 /**
- * Template for displaying everything above the portal. In this case, the basic rendering of the layout is done here. Modules that go after MF are held in a buffer and saved for later.
+ * Template for displaying everything above the portal. In this case, the basic rendering of the layout is done here. Modules that go after SMF are held in a buffer and saved for later.
  *
  * @since 1.0
  */
