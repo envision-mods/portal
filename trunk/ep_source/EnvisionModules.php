@@ -75,7 +75,7 @@ function module_usercp()
 		// Some time vars, and a bullet image.
 		//!!! Now uses timeformat() instead of date() for localization
 		$time = timeformat(time(), '%a, ' . $time_fmt);
-		$b = '<img src="' . $context['epmod_image_url'] . 'bullet' . ($context['right_to_left'] ? '_rtl' : '') . '.gif" alt="" />&nbsp;';
+		$b = '<img src="' . $context['ep_module_image_url'] . 'bullet' . ($context['right_to_left'] ? '_rtl' : '') . '.gif" alt="" />&nbsp;';
 
 		echo '
 							<span class="ep_hello">', $txt['hello_member_ndt'], ', ', $user_info['name'], '</span><br />';
@@ -1727,7 +1727,7 @@ function module_sitemenu($params)
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/epSiteMenu.js"></script>';
 
 		echo '<div id="ep_sitemenu">
-			<div style="float: right;"><img src="', $context['epmod_image_url'], 'sitemenu/expandall.png" width="15" height="15" border="0" style="cursor: pointer;" alt="', $txt['ep_site_menu_alt_xall'], '" title="', $txt['ep_site_menu_title_xall'], '" onclick="siteMenu.expandAll();" />&nbsp;<img src="', $context['epmod_image_url'], 'sitemenu/collapseall.png" border="0" style="cursor: pointer;" width="15" height="15" alt="', $txt['ep_site_menu_alt_call'], '" title="', $txt['ep_site_menu_title_call'], '" onclick="siteMenu.collapseAll();" /></div>
+			<div style="float: right;"><img src="', $context['ep_module_image_url'], 'sitemenu/expandall.png" width="15" height="15" border="0" style="cursor: pointer;" alt="', $txt['ep_site_menu_alt_xall'], '" title="', $txt['ep_site_menu_title_xall'], '" onclick="siteMenu.expandAll();" />&nbsp;<img src="', $context['ep_module_image_url'], 'sitemenu/collapseall.png" border="0" style="cursor: pointer;" width="15" height="15" alt="', $txt['ep_site_menu_alt_call'], '" title="', $txt['ep_site_menu_title_call'], '" onclick="siteMenu.collapseAll();" /></div>
 			<div style="float: left;" id="ep_menu" class="epsitemenu">';
 
 		foreach ($context['menu_buttons'] as $act => $button)
@@ -1829,9 +1829,9 @@ function module_shoutbox($params)
 				<input name="ep_Reserved_Message" id="shout_input', $unique_id, '" maxlength="', $max_chars, '" type="text" value="" class="w100" tabindex="', $context['tabindex']++, '" />
 				<br class="clear" />
 				<input name="shout_submit" value="', $txt['shoutbox_shout'], '" class="button_submit" type="submit" tabindex="', $context['tabindex']++, '" />
-					<img src="', $context['epmod_image_url'], 'shoutbox/emoticon_smile.png" alt="" title="', $txt['shoutbox_emoticons'], '" class="hand" id="toggle_smileys_div', $unique_id, '" />
-					<img src="', $context['epmod_image_url'], 'shoutbox/font.png" alt="" title="', $txt['shoutbox_fonts'], '" class="hand" id="toggle_font_styles_div', $unique_id, '" />
-					<img src="', $context['epmod_image_url'], 'shoutbox/clock.png" alt="" title="', $txt['shoutbox_history'], '" class="hand" id="toggle_history_div', $unique_id, '" />
+					<img src="', $context['ep_module_image_url'], 'shoutbox/emoticon_smile.png" alt="" title="', $txt['shoutbox_emoticons'], '" class="hand" id="toggle_smileys_div', $unique_id, '" />
+					<img src="', $context['ep_module_image_url'], 'shoutbox/font.png" alt="" title="', $txt['shoutbox_fonts'], '" class="hand" id="toggle_font_styles_div', $unique_id, '" />
+					<img src="', $context['ep_module_image_url'], 'shoutbox/clock.png" alt="" title="', $txt['shoutbox_history'], '" class="hand" id="toggle_history_div', $unique_id, '" />
 					<div class="shout_smileys" id="shout_smileys', $unique_id, '">';
 
 			if (empty($context['smileys']))

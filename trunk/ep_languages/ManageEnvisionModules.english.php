@@ -5,8 +5,8 @@
 
 Note:  All Help Strings for modules are located in EnvisionHelp.[language].php and EnvisionHelp.[language]-utf8.php
 
-For the Module Title => $helptxt['epmod_(name value in ep_modules table)];
-For the Module Parameter => $helptxt['epmod_(name value in ep_modules table)_(parameter_name in ep_module_parameters table)];
+For the Module Title => $helptxt['ep_(name value in ep_modules table)];
+For the Module Parameter => $helptxt['ep_(name value in ep_modules table)_(parameter_name in ep_module_parameters table)];
 
 */
 
@@ -83,108 +83,108 @@ $txt['checks_order_down'] = 'Down';
 ----------------------------------
 
 	$txt indexes go like this:
-	$txt['epmod_(module name)]
-	$txt['epmod_(module name)_(parameter_name)]
+	$txt['ep_module_(module name)]
+	$txt['ep_module_(module name)_(parameter_name)]
 */
 
-$txt['epmod_announce'] = 'Announcement';
-$txt['epmod_announce_msg'] = 'Announcement Message';
-$txt['epmod_usercp'] = 'User Panel';
-$txt['epmod_stats'] = 'Statistics';
-$txt['epmod_stats_stat_choices'] = 'Stats Choice List';
-$txt['epmod_online'] = 'Who&#039;s Online';
-$txt['epmod_online_show_online'] = 'Show Online';
-$txt['epmod_online_online_pos'] = 'Online Position';
-$txt['epmod_online_online_groups'] = 'Online Groups';
-$txt['epmod_news'] = 'Site News';
-$txt['epmod_news_board'] = 'Select Board';
-$txt['epmod_news_limit'] = 'Limit<div class="smalltext">0 = default value</div>';
-$txt['epmod_recent'] = 'Recent Posts/Topics';
-$txt['epmod_recent_post_topic'] = 'Show Recent';
-$txt['epmod_recent_num_recent'] = 'Recent Quantity<div class="smalltext">0 = default value</div>';
-$txt['epmod_recent_show_avatars'] = 'Show Avatars';
-$txt['epmod_search'] = 'Search';
-$txt['epmod_calendar'] = 'Calendar';
-$txt['epmod_calendar_display'] = 'Display Options';
-$txt['epmod_calendar_animate'] = 'Animation Style';
-$txt['epmod_calendar_animate_none'] = 'Disabled';
-$txt['epmod_calendar_animate_horiz'] = 'Horizontal';
-$txt['epmod_calendar_display_month'] = 'Monthly Grid';
-$txt['epmod_calendar_display_info'] = 'Text-Based';
-$txt['epmod_calendar_show_months'] = 'Show all months';
-$txt['epmod_calendar_show_months_year'] = 'in this year';
-$txt['epmod_calendar_show_months_asdefined'] = 'as defined';
-$txt['epmod_calendar_previous'] = 'Previous Months';
-$txt['epmod_calendar_next'] = 'Next Months';
-$txt['epmod_calendar_show_options'] = 'Show Dates';
-$txt['epmod_calendar_show_options_events'] = 'Events';
-$txt['epmod_calendar_show_options_holidays'] = 'Holidays';
-$txt['epmod_calendar_show_options_birthdays'] = 'Birthdays';
-$txt['epmod_poll'] = 'Poll';
-$txt['epmod_poll_topic'] = 'Topic ID<div class="smalltext">0 = disabled</div>';
-$txt['epmod_top_posters'] = 'Top Posters';
-$txt['epmod_top_posters_show_avatar'] = 'Show Avatar';
-$txt['epmod_top_posters_show_postcount'] = 'Show Postcount';
-$txt['epmod_top_posters_num_posters'] = 'Number of Posters to show';
-$txt['epmod_staff'] = 'Forum Staff';
-$txt['epmod_staff_groups'] = 'Listed Groups';
-$txt['epmod_staff_list_type'] = 'List Style';
-$txt['epmod_staff_name_type'] = 'Staff Title';
-$txt['epmod_poll_options'] = 'Poll Options';
-$txt['epmod_theme_select'] = 'Theme Changer';
-$txt['epmod_new_members'] = 'Latest Members';
-$txt['epmod_new_members_limit'] = 'Number of members';
-$txt['epmod_new_members_list_type'] = 'List Style';
-$txt['epmod_sitemenu'] = 'Site Navigation';
-$txt['epmod_sitemenu_onesm'] = 'Enable Multiple Menu Expansions';
-$txt['epmod_shoutbox'] = 'Shoutbox';
-$txt['epmod_shoutbox_refresh_rate'] = 'Refresh Rate<div class="smalltext">In seconds, 0 = 500 milliseconds</div>';
-$txt['epmod_shoutbox_member_color'] = 'Display Membergroup Color<div class="smalltext">If unchecked, will revert to the master setting</div>';
-$txt['epmod_shoutbox_max_count'] = 'Maximum shout count<div class="smalltext">(0 = default value of 15)</div>';
-$txt['epmod_shoutbox_id'] = 'Shoutbox instance';
-$txt['epmod_shoutbox_bbc'] = 'Allowed BBC tags';
-$txt['epmod_shoutbox_max_chars'] = 'Maximum characters per shout<div class="smalltext">(0 = unlimited)</div>';
-$txt['epmod_shoutbox_text_size'] = 'Text Size';
-$txt['epmod_shoutbox_text_size_small'] = 'Small';
-$txt['epmod_shoutbox_text_size_medium'] = 'Medium';
-$txt['epmod_shoutbox_message'] = 'Notice';
-$txt['epmod_shoutbox_message_position'] = 'Notice Position';
-$txt['epmod_shoutbox_message_position_top'] = 'Before the shouts';
-$txt['epmod_shoutbox_message_position_after'] = 'After the shouts';
-$txt['epmod_shoutbox_message_position_bottom'] = 'On the bottom';
-$txt['epmod_shoutbox_message_groups'] = 'Groups that can view the notice';
-$txt['epmod_shoutbox_mod_own'] = 'Moderate Own Shouts';
-$txt['epmod_shoutbox_mod_groups'] = 'Moderate All Shouts';
-$txt['epmod_custom'] = 'Custom Module';
-$txt['epmod_custom_code'] = 'Code';
-$txt['epmod_custom_code_type'] = 'Code Type';
+$txt['ep_module_announce'] = 'Announcement';
+$txt['ep_module_announce_msg'] = 'Announcement Message';
+$txt['ep_module_usercp'] = 'User Panel';
+$txt['ep_module_stats'] = 'Statistics';
+$txt['ep_module_stats_stat_choices'] = 'Stats Choice List';
+$txt['ep_module_online'] = 'Who&#039;s Online';
+$txt['ep_module_online_show_online'] = 'Show Online';
+$txt['ep_module_online_pos'] = 'Online Position';
+$txt['ep_module_online_groups'] = 'Online Groups';
+$txt['ep_module_news'] = 'Site News';
+$txt['ep_module_news_board'] = 'Select Board';
+$txt['ep_module_news_limit'] = 'Limit<div class="smalltext">0 = default value</div>';
+$txt['ep_module_recent'] = 'Recent Posts/Topics';
+$txt['ep_module_recent_post_topic'] = 'Show Recent';
+$txt['ep_module_recent_num_recent'] = 'Recent Quantity<div class="smalltext">0 = default value</div>';
+$txt['ep_module_recent_show_avatars'] = 'Show Avatars';
+$txt['ep_module_search'] = 'Search';
+$txt['ep_module_calendar'] = 'Calendar';
+$txt['ep_module_calendar_display'] = 'Display Options';
+$txt['ep_module_calendar_animate'] = 'Animation Style';
+$txt['ep_module_calendar_animate_none'] = 'Disabled';
+$txt['ep_module_calendar_animate_horiz'] = 'Horizontal';
+$txt['ep_module_calendar_display_month'] = 'Monthly Grid';
+$txt['ep_module_calendar_display_info'] = 'Text-Based';
+$txt['ep_module_calendar_show_months'] = 'Show all months';
+$txt['ep_module_calendar_show_months_year'] = 'in this year';
+$txt['ep_module_calendar_show_months_asdefined'] = 'as defined';
+$txt['ep_module_calendar_previous'] = 'Previous Months';
+$txt['ep_module_calendar_next'] = 'Next Months';
+$txt['ep_module_calendar_show_options'] = 'Show Dates';
+$txt['ep_module_calendar_show_options_events'] = 'Events';
+$txt['ep_module_calendar_show_options_holidays'] = 'Holidays';
+$txt['ep_module_calendar_show_options_birthdays'] = 'Birthdays';
+$txt['ep_module_poll'] = 'Poll';
+$txt['ep_module_poll_topic'] = 'Topic ID<div class="smalltext">0 = disabled</div>';
+$txt['ep_module_top_posters'] = 'Top Posters';
+$txt['ep_module_top_posters_show_avatar'] = 'Show Avatar';
+$txt['ep_module_top_posters_show_postcount'] = 'Show Postcount';
+$txt['ep_module_top_posters_num_posters'] = 'Number of Posters to show';
+$txt['ep_module_staff'] = 'Forum Staff';
+$txt['ep_module_staff_groups'] = 'Listed Groups';
+$txt['ep_module_staff_list_type'] = 'List Style';
+$txt['ep_module_staff_name_type'] = 'Staff Title';
+$txt['ep_module_poll_options'] = 'Poll Options';
+$txt['ep_module_theme_select'] = 'Theme Changer';
+$txt['ep_module_new_members'] = 'Latest Members';
+$txt['ep_module_new_members_limit'] = 'Number of members';
+$txt['ep_module_new_members_list_type'] = 'List Style';
+$txt['ep_module_sitemenu'] = 'Site Navigation';
+$txt['ep_module_sitemenu_onesm'] = 'Enable Multiple Menu Expansions';
+$txt['ep_module_shoutbox'] = 'Shoutbox';
+$txt['ep_module_shoutbox_refresh_rate'] = 'Refresh Rate<div class="smalltext">In seconds, 0 = 500 milliseconds</div>';
+$txt['ep_module_shoutbox_member_color'] = 'Display Membergroup Color<div class="smalltext">If unchecked, will revert to the master setting</div>';
+$txt['ep_module_shoutbox_max_count'] = 'Maximum shout count<div class="smalltext">(0 = default value of 15)</div>';
+$txt['ep_module_shoutbox_id'] = 'Shoutbox instance';
+$txt['ep_module_shoutbox_bbc'] = 'Allowed BBC tags';
+$txt['ep_module_shoutbox_max_chars'] = 'Maximum characters per shout<div class="smalltext">(0 = unlimited)</div>';
+$txt['ep_module_shoutbox_text_size'] = 'Text Size';
+$txt['ep_module_shoutbox_text_size_small'] = 'Small';
+$txt['ep_module_shoutbox_text_size_medium'] = 'Medium';
+$txt['ep_module_shoutbox_message'] = 'Notice';
+$txt['ep_module_shoutbox_message_position'] = 'Notice Position';
+$txt['ep_module_shoutbox_message_position_top'] = 'Before the shouts';
+$txt['ep_module_shoutbox_message_position_after'] = 'After the shouts';
+$txt['ep_module_shoutbox_message_position_bottom'] = 'On the bottom';
+$txt['ep_module_shoutbox_message_groups'] = 'Groups that can view the notice';
+$txt['ep_module_shoutbox_mod_own'] = 'Moderate Own Shouts';
+$txt['ep_module_shoutbox_mod_groups'] = 'Moderate All Shouts';
+$txt['ep_module_custom'] = 'Custom Module';
+$txt['ep_module_custom_code'] = 'Code';
+$txt['ep_module_custom_code_type'] = 'Code Type';
 
 // Brief Module Information.  Shows a bit of info on the module just below the title.
 /*
 	$txt indexes go like this:
-	$txt['epmodinfo_(module name)]
+	$txt['ep_module_info_(module name)]
 */
 
-$txt['epmodinfo_new_members'] = 'Shows the most recently registered members on your forum.';
-$txt['epmodinfo_announce'] = 'Show an Announcement of any kind to all of your members and/or guests for any reason.';
-$txt['epmodinfo_usercp'] = 'Just your basic, everyday, User Control Panel (UCP).';
-$txt['epmodinfo_stats'] = 'Bunch of Statistics on your forum.';
-$txt['epmodinfo_online'] = 'Show Who&#039;s online at your forum.';
-$txt['epmodinfo_news'] = 'Grabs Topics from any board you specify in your forum and displays them as News.';
-$txt['epmodinfo_recent'] = 'Gets the most Recent Topics or Posts on your forum.';
-$txt['epmodinfo_search'] = 'Allows users to search conveniently from anywhere the module gets displayed at.';
-$txt['epmodinfo_calendar'] = 'A nifty little, and useful Calendar to keep track of Events, Birthdays, and/or Holidays.';
-$txt['epmodinfo_poll'] = 'Allows you to specify a Poll (with the topic id) to display for everyone to vote on.';
-$txt['epmodinfo_top_posters'] = 'Displays a list of Top Posters at your forum.';
-$txt['epmodinfo_staff'] = 'Lists Staff Members on your forum in an organized fashion.';
-$txt['epmodinfo_theme_select'] = 'Allows users to quickly and easily change their theme from anywhere this module gets displayed at.';
-$txt['epmodinfo_shoutbox'] = 'Gives your users the ability to engage in a live chat while browsing your forum.';
-$txt['epmodinfo_custom'] = 'Code that you can put into a module. There are three types to pick from: PHP, HTML, or BBC (Bulletin Board Code).';
+$txt['ep_module_info_new_members'] = 'Shows the most recently registered members on your forum.';
+$txt['ep_module_info_announce'] = 'Show an Announcement of any kind to all of your members and/or guests for any reason.';
+$txt['ep_module_info_usercp'] = 'Just your basic, everyday, User Control Panel (UCP).';
+$txt['ep_module_info_stats'] = 'Bunch of Statistics on your forum.';
+$txt['ep_module_info_online'] = 'Show Who&#039;s online at your forum.';
+$txt['ep_module_info_news'] = 'Grabs Topics from any board you specify in your forum and displays them as News.';
+$txt['ep_module_info_recent'] = 'Gets the most Recent Topics or Posts on your forum.';
+$txt['ep_module_info_search'] = 'Allows users to search conveniently from anywhere the module gets displayed at.';
+$txt['ep_module_info_calendar'] = 'A nifty little, and useful Calendar to keep track of Events, Birthdays, and/or Holidays.';
+$txt['ep_module_info_poll'] = 'Allows you to specify a Poll (with the topic id) to display for everyone to vote on.';
+$txt['ep_module_info_top_posters'] = 'Displays a list of Top Posters at your forum.';
+$txt['ep_module_info_staff'] = 'Lists Staff Members on your forum in an organized fashion.';
+$txt['ep_module_info_theme_select'] = 'Allows users to quickly and easily change their theme from anywhere this module gets displayed at.';
+$txt['ep_module_info_shoutbox'] = 'Gives your users the ability to engage in a live chat while browsing your forum.';
+$txt['ep_module_info_custom'] = 'Code that you can put into a module. There are three types to pick from: PHP, HTML, or BBC (Bulletin Board Code).';
 
 // Select Options
 /*
 	$txt indexes go like this:
-	$txt['epmod_(module name)_(parameter_name)_(each value in the parameter_value column after : and separated by a semicolon)]
+	$txt['ep_module_(module name)_(parameter_name)_(each value in the parameter_value column after : and separated by a semicolon)]
 
 	For Example, If the parameter_value contains the following:
 				1:option1;option2;option3
@@ -193,50 +193,50 @@ $txt['epmodinfo_custom'] = 'Code that you can put into a module. There are three
 */
 
 // Recent Topics/Posts module settings.
-$txt['epmod_recent_post_topic_posts'] = 'Posts';
-$txt['epmod_recent_post_topic_topics'] = 'Topics';
+$txt['ep_module_post_topic_posts'] = 'Posts';
+$txt['ep_module_post_topic_topics'] = 'Topics';
 
 // Forum Staff module settings.
-$txt['epmod_staff_name_type_0'] = 'Group Name';
-$txt['epmod_staff_name_type_1'] = 'Custom Title';
-$txt['epmod_staff_name_type_2'] = $txt['epmod_staff_name_type_1'] . ' or ' . $txt['epmod_staff_name_type_0'];
-$txt['epmod_staff_list_type_0'] = 'Names Only';
-$txt['epmod_staff_list_type_1'] = 'Avatars Only';
-$txt['epmod_staff_list_type_2'] = 'Names and Avatars';
+$txt['ep_module_staff_name_type_0'] = 'Group Name';
+$txt['ep_module_staff_name_type_1'] = 'Custom Title';
+$txt['ep_module_staff_name_type_2'] = $txt['ep_module_staff_name_type_1'] . ' or ' . $txt['ep_module_staff_name_type_0'];
+$txt['ep_module_staff_list_type_0'] = 'Names Only';
+$txt['ep_module_staff_list_type_1'] = 'Avatars Only';
+$txt['ep_module_staff_list_type_2'] = 'Names and Avatars';
 
 // Latest Members
-$txt['epmod_new_members_list_type_0'] = 'Names Only';
-$txt['epmod_new_members_list_type_1'] = 'Avatars Only';
-$txt['epmod_new_members_list_type_2'] = 'Names and Avatars';
+$txt['ep_module_new_members_list_type_0'] = 'Names Only';
+$txt['ep_module_new_members_list_type_1'] = 'Avatars Only';
+$txt['ep_module_new_members_list_type_2'] = 'Names and Avatars';
 
 // Poll Options
-$txt['epmod_poll_options_showPoll'] = 'Based on Topic Id';
-$txt['epmod_poll_options_topPoll'] = 'Most Rated Poll';
-$txt['epmod_poll_options_recentPoll'] = 'Most Recent Poll';
+$txt['ep_module_poll_options_showPoll'] = 'Based on Topic Id';
+$txt['ep_module_poll_options_topPoll'] = 'Most Rated Poll';
+$txt['ep_module_poll_options_recentPoll'] = 'Most Recent Poll';
 
 // Statistics Options (using the checklist parameter type)
-$txt['epmod_stats_stat_choices_members'] = 'Total Members';
-$txt['epmod_stats_stat_choices_posts'] = 'Total Posts';
-$txt['epmod_stats_stat_choices_topics'] = 'Total Topics';
-$txt['epmod_stats_stat_choices_categories'] = 'Total Categories';
-$txt['epmod_stats_stat_choices_boards'] = 'Total Boards';
-$txt['epmod_stats_stat_choices_ontoday'] = 'Most Online Today';
-$txt['epmod_stats_stat_choices_onever'] = 'Most Online Ever';
+$txt['ep_module_stats_stat_choices_members'] = 'Total Members';
+$txt['ep_module_stats_stat_choices_posts'] = 'Total Posts';
+$txt['ep_module_stats_stat_choices_topics'] = 'Total Topics';
+$txt['ep_module_stats_stat_choices_categories'] = 'Total Categories';
+$txt['ep_module_stats_stat_choices_boards'] = 'Total Boards';
+$txt['ep_module_stats_stat_choices_ontoday'] = 'Most Online Today';
+$txt['ep_module_stats_stat_choices_onever'] = 'Most Online Ever';
 
 // Who's Online Options
-$txt['epmod_online_show_online_users'] = 'Users';
-$txt['epmod_online_show_online_buddies'] = 'Buddies';
-$txt['epmod_online_show_online_guests'] = 'Guests';
-$txt['epmod_online_show_online_hidden'] = 'Hidden';
-$txt['epmod_online_show_online_spiders'] = 'Spiders';
+$txt['ep_module_online_show_online_users'] = 'Users';
+$txt['ep_module_online_show_online_buddies'] = 'Buddies';
+$txt['ep_module_online_show_online_guests'] = 'Guests';
+$txt['ep_module_online_show_online_hidden'] = 'Hidden';
+$txt['ep_module_online_show_online_spiders'] = 'Spiders';
 
-$txt['epmod_online_online_pos_top'] = 'Top';
-$txt['epmod_online_online_pos_bottom'] = 'Bottom';
+$txt['ep_module_online_pos_top'] = 'Top';
+$txt['ep_module_online_pos_bottom'] = 'Bottom';
 
 // Custom Code Options
-$txt['epmod_custom_code_type_0'] = 'PHP';
-$txt['epmod_custom_code_type_1'] = 'HTML';
-$txt['epmod_custom_code_type_2'] = 'BBC';
+$txt['ep_module_custom_code_type_0'] = 'PHP';
+$txt['ep_module_custom_code_type_1'] = 'HTML';
+$txt['ep_module_custom_code_type_2'] = 'BBC';
 
 // Add Modules Page
 $txt['ep_admin_modules_addmodules_desc'] = 'This page lists all uploaded modules and gives the option to upload a new module.';

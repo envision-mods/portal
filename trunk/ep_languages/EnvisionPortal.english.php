@@ -85,7 +85,7 @@ $txt['ep_admin_manage_menu'] = 'Manage Menu';
 
 // Errors
 $txt['ep_module_error'] = 'There is an error with this module!';
-$txt['epmod_uninstall_error'] = 'Unable to uninstall this module.';
+$txt['ep_module_uninstall_error'] = 'Unable to uninstall this module.';
 $txt['ep_unable_to_view_file'] = 'Sorry, but either Envision Portal is disabled, or you don\'t have permission to view/download this file.';
 
 // Envision Pages

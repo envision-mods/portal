@@ -118,9 +118,13 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 				'value' => 'action=stats',
 			),
 			'stat_choices' => array(
-				'type' => 'checklist',
+				'type' => 'callback',
+				'callback_func' => 'checklist',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_checks($field[\'value\'], array(\'members\', \'posts\', \'topics\', \'categories\', \'boards\', \'ontoday\', \'onever\'), array(), $field[\'label\'], 0);
+
+					return $field;'),
 				'value' => '0,1,2,5,6',
-				'options' => 'members;posts;topics;categories;boards;ontoday;onever:order',
 			),
 		),
 		'online' => array(
@@ -139,14 +143,22 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 				'options' => 'top;bottom',
 			),
 			'show_online' => array(
-				'type' => 'checklist',
+				'type' => 'callback',
+				'callback_func' => 'checklist',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_checks($field[\'value\'], array(\'users\', \'buddies\', \'guests\', \'hidden\', \'spiders\'), array(), $field[\'label\'], 0);
+
+					return $field;'),
 				'value' => '0,1,2',
-				'options' => 'users;buddies;guests;hidden;spiders:order',
 			),
 			'online_groups' => array(
-				'type' => 'list_groups',
+				'type' => 'callback',
+				'callback_func' => 'list_groups',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_groups($field[\'value\'], \'-1,0,3\');
+
+					return $field;'),
 				'value' => '-3',
-				'options' => '-1,0,3:',
 			),
 		),
 		'news' => array(
@@ -157,9 +169,13 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 				'value' => 'cog.png',
 			),
 			'board' => array(
-				'type' => 'list_boards',
-				'value' => '1',
-			),
+				'type' => 'select',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_boards();
+
+					return $field;'),
+					'value' => '1',
+				),
 			'limit' => array(
 				'type' => 'int',
 				'value' => '5',
@@ -226,9 +242,13 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 				'value' => '1',
 			),
 			'show_options' => array(
-				'type' => 'checklist',
+				'type' => 'callback',
+				'callback_func' => 'checklist',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_checks($field[\'value\'], array(\'events\', \'holidays\', \'birthdays\'), array(), $field[\'label\'], 0);
+
+					return $field;'),
 				'value' => '0,1,2',
-				'options' => 'events;holidays;birthdays:order',
 			),
 		),
 		'poll' => array(
@@ -314,9 +334,13 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 				'options' => '0;1;2',
 			),
 			'groups' => array(
-				'type' => 'list_groups',
+				'type' => 'callback',
+				'callback_func' => 'checklist',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_groups($field[\'value\'], \'-1,0\');
+
+					return $field;'),
 				'value' => '1,2',
-				'options' => '-1,0:order',
 			),
 		),
 		'sitemenu' => array(
@@ -339,9 +363,18 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 				'value' => 'comments.png',
 			),
 			'id' => array(
-				'type' => 'db_select',
+				'type' => 'callback',
+				'callback_func' => 'db_select',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_db_select(array(
+						\'select1\' => \'id_shoutbox\',
+						\'select2\' => \'name\',
+						\'table\' => \'{db_prefix}ep_shoutboxes\',
+					));
+
+					return $field;'),
+				'size' => '30',
 				'value' => '1',
-				'options' => 'id_shoutbox;{db_prefix}ep_shoutboxes;name:custom',
 			),
 			'refresh_rate' => array(
 				'type' => 'int',
@@ -374,23 +407,45 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 				'options' => 'top;after;bottom',
 			),
 			'message_groups' => array(
-				'type' => 'list_groups',
+				'type' => 'callback',
+				'callback_func' => 'checklist',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_groups($field[\'value\'], \'3\', array(), true);
+
+					return $field;'),
 				'value' => '-3',
-				'options' => '3',
+				'float' => true,
 			),
 			'mod_groups' => array(
-				'type' => 'list_groups',
+				'type' => 'callback',
+				'callback_func' => 'checklist',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_groups($field[\'value\'], \'-1,0,4\', array(), true);
+
+					return $field;'),
 				'value' => '1',
-				'options' => '-1,0,3',
+				'float' => true,
 			),
 			'mod_own' => array(
-				'type' => 'list_groups',
+				'type' => 'callback',
+				'callback_func' => 'checklist',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_groups($field[\'value\'], \'-1,3\', array(), true);
+
+					return $field;'),
 				'value' => '0,1,2',
 				'options' => '-1,3',
+				'float' => true,
 			),
 			'bbc' => array(
-				'type' => 'list_bbc',
+				'type' => 'callback',
+				'callback_func' => 'checklist',
+				'preload' => create_function('&$field', '
+					$field[\'options\'] = ep_list_bbc($field[\'value\']);
+
+					return $field;'),
 				'value' => 'b;i;u;s;pre;left;center;right;url;sup;sub;php;nobbc;me',
+				'float' => true,
 			),
 		),
 		'custom' => array(
@@ -413,8 +468,8 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 	);
 
 	// Let other modules hook in to the system.
-	ep_include_hook('load_module_files', $context['epmod_modules_dir']);
-	ep_include_language_hook('load_module_language_files', $context['epmod_modules_dir']);
+	ep_include_hook('load_module_files', $context['ep_module_modules_dir']);
+	ep_include_language_hook('load_module_language_files', $context['ep_module_modules_dir']);
 	ep_call_hook('load_module_fields', array(&$envisionModules));
 
 	return $envisionModules;
@@ -721,11 +776,11 @@ function listModules()
 	$added_mods = array();
 
 	// Let's loop throuugh each folder and get their module data. If anything goes wrong we shall skip it.
-	$files = scandir($context['epmod_modules_dir']);
+	$files = scandir($context['ep_module_modules_dir']);
 
 	foreach ($files as $file)
 	{
-		$retVal = ep_get_module_info('', '', $context['epmod_modules_dir'], $file, false);
+		$retVal = ep_get_module_info('', '', $context['ep_module_modules_dir'], $file, false);
 		if ($retVal === false)
 			continue;
 		else
@@ -798,7 +853,7 @@ function GetEnvisionInstalledModules($installed_mods = array())
 
 	foreach ($installed_mods as $installed)
 	{
-		$retVal = GetEnvisionModuleInfo($installed['files'], $installed['functions'], $context['epmod_modules_dir'], $installed['name'], $installed['name']);
+		$retVal = GetEnvisionModuleInfo($installed['files'], $installed['functions'], $context['ep_module_modules_dir'], $installed['name'], $installed['name']);
 		if ($retVal === false)
 			continue;
 
@@ -1158,21 +1213,21 @@ function ep_process_module($module_context, $data, $full_layout)
 	if ($full_layout === false)
 		return $data;
 
-	if (file_exists($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php'))
-		require_once($context['epmod_modules_dir'] . '/' . $data['type'] . '/main.php');
+	if (file_exists($context['ep_module_modules_dir'] . '/' . $data['type'] . '/main.php'))
+		require_once($context['ep_module_modules_dir'] . '/' . $data['type'] . '/main.php');
 
 	// Load the module template.
-	if (empty($data['template']) || !empty($data['template']) && !file_exists($context['epmod_template'] . $data['template'].'.php'))
+	if (empty($data['template']) || !empty($data['template']) && !file_exists($context['ep_module_template'] . $data['template'].'.php'))
 		$data['template'] = 'default';
 
-	require_once($context['epmod_template'] . $data['template'] . '.php');
+	require_once($context['ep_module_template'] . $data['template'] . '.php');
 
 	// Correct the title target...
 	if (!isset($fields['module_target']['value']))
 		$data['module_target'] = '_self';
 
 	if (!empty($fields['module_icon']['value']));
-		$data['module_icon'] = '<img src="' . $context['epmod_icon_url'] . $fields['module_icon']['value'] . '" alt="" title="' . $data['module_title'] . '" class="icon" style="margin-left: 0px;" />&nbsp;';
+		$data['module_icon'] = '<img src="' . $context['ep_module_icon_url'] . $fields['module_icon']['value'] . '" alt="" title="' . $data['module_title'] . '" class="icon" style="margin-left: 0px;" />&nbsp;';
 
 	if (isset($fields['module_link']))
 	{
