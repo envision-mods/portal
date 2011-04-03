@@ -38,7 +38,7 @@ if (!defined('SMF'))
  */
 function loadGeneralSettingParameters3($subActions = array(), $defaultAction = '')
 {
-	global $context, $txt, $sourcedir, $envisionModules, $restrictedNames;
+	global $context, $txt, $settings, $envisionModules, $restrictedNames;
 
 	// You need to be an admin to edit settings!
 	isAllowedTo('admin_forum');
@@ -59,6 +59,9 @@ function loadGeneralSettingParameters3($subActions = array(), $defaultAction = '
 		$context['sub_template'] = 'manage_modules';
 
 	$context['sub_action'] = $_REQUEST['sa'];
+
+	$context['html_headers'] .= '
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>';
 }
 
 /**
@@ -163,18 +166,10 @@ function ManageEnvisionModules()
 			'module_title' => $module_context[$row['type']]['module_title']['value'],
 		);
 
-	/*if (!isset($context['ep_columns']))
-	{
-		unset($_SESSION['selected_layout']);
-		unset($_SESSION['layouts']);
-		redirectexit('action=admin;area=epmodules;sa=epmanmodules');
-	}*/
-
 	$context['html_headers'] .= '
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_man_mods.js"></script>
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
 	<script type="text/javascript">
 		var sessVar = "' . $context['session_var'] . '";
 		var sessId = "' . $context['session_id'] . '";
@@ -375,6 +370,9 @@ function ModifyModule2()
 		if ($field['type'] == 'check' && !isset($_POST[$key]))
 			$_POST[$key] = 0;
 
+		if (!empty($field['order']))
+			$_POST[$key] = implode(',', $_POST[$key . 'order']) . ';' . $_POST[$key];
+
 		if ($field['value'] == $_POST[$key])
 			unset($_POST[$key]);
 	}
@@ -564,7 +562,7 @@ function ep_list_bbc($bbcChoice)
 /**
  * Parses a checklist.
  *
- * @param array $checked integer list of all items to be checked (have a mark in the checkbox). Default is an empty array.
+ * @param string $checked comma seperated list of values for the checklist. If a semicolon is found, the numbers before it coorrespond to the order.
  * @param array $checkStrings a list of items for the checklist. These items are the familiar $txt indexes used in language files. Default is an empty array.
  * @param array $order integer list specifying the order of items for the checklist. Default is an empty array.
  * @param string $param_name the name of the paameter being used.
@@ -579,8 +577,15 @@ function ep_list_checks($checked = array(), $checkStrings = array(), $order = ar
 	if (empty($checked) || empty($checkStrings))
 		return array();
 
-	if (!is_array($checked))
-		$checked = explode(',', $checked);
+	if (is_string($checked) && strpos($checked, ';'))
+	{
+		$checked = explode(';', $checked);
+		$order = explode(',', $checked[0]);
+		$checked = explode(',', $checked[1]);
+	}
+
+	if (is_string($checked) && strpos($checked, ','))
+	$checked = explode(',', $checked);
 
 	$all_checks['checks'][$param_id] = array();
 

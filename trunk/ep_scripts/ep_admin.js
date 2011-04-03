@@ -115,22 +115,6 @@ function removeActions()
 	return true;
 }
 
-function orderChecks(objId, order)
-{
-	var element = document.getElementById(objId);
-	var elements = element.parentNode.getElementsByTagName(element.nodeName);
-	var daOrder = '';
-	for(x=0;x<elements.length;x++)
-	{
-		var daComma = x == elements.length - 1 ? "" : ",";
-		var child = elements[x].firstChild.firstChild;
-		var daValue = child.getAttribute('value');
-		daOrder += daValue + daComma;
-	}
-	if(daOrder != '')
-		document.getElementById(order).value = daOrder;
-}
-
 function moveDown(element)
 {
 	var elements = element.parentNode.getElementsByTagName(element.nodeName);

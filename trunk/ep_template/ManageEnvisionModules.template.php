@@ -724,7 +724,7 @@ function template_list_groups($field, $key)
 			echo '
 							<div id="permissions_', $group['id'], '">
 								<label for="check_group', $group['id'], '">
-									<input type="checkbox" class="input_check" name="', $group['name'], '[]" value="', $group['id'], '" id="check_group', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
+									<input type="checkbox" class="input_check" name="', $key, '[]" value="', $group['id'], '" id="check_group', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
 									<span', ($group['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $group['name'], '</span>
 								</label>
 							</div>';
@@ -759,7 +759,18 @@ function template_checklist($field, $key)
 		echo '
 							<div id="checklist_', $key, '_', $group['id'], '_div"', !empty($field['float']) ? ' class="floatleft list_bbc"' : '', '><label for="checklist_', $key, '_', $group['id'], '">
 								<input type="checkbox" class="input_check" name="', $key, '[]" value="', $group['id'], '" id="checklist_', $key, '_', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', ' />
-							', $group['name'], '</div>';
+							', $group['name'], '</label>';
+
+		if (!empty($field['order']))
+			echo '
+								<span style="padding-left: 10px;">
+									<a href="javascript:void(0);" onclick="moveUp(this.parentNode.parentNode);">' . $txt['checks_order_up'] . '</a> |
+									<a href="javascript:void(0);" onclick="moveDown(this.parentNode.parentNode);">' . $txt['checks_order_down'] . '</a>
+								</span>
+								<input type="hidden" name="', $key, 'order[]" value="', $group['id'], '" />';
+
+		echo '
+							</div>';
 
 		if (!$group['checked'])
 			$all_checked = false;

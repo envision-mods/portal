@@ -125,6 +125,7 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 
 					return $field;'),
 				'value' => '0,1,2,5,6',
+				'order' => true,
 			),
 		),
 		'online' => array(
@@ -150,6 +151,7 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 
 					return $field;'),
 				'value' => '0,1,2',
+				'order' => true,
 			),
 			'online_groups' => array(
 				'type' => 'callback',
@@ -249,6 +251,7 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 
 					return $field;'),
 				'value' => '0,1,2',
+				'order' => true,
 			),
 		),
 		'poll' => array(
@@ -323,6 +326,9 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 			'module_title' => array(
 				'value' => $txt['ep_module_staff'],
 			),
+			'module_icon' => array(
+				'value' => 'rainbow.png',
+			),
 			'list_type' => array(
 				'type' => 'select',
 				'value' => '1',
@@ -341,11 +347,15 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 
 					return $field;'),
 				'value' => '1,2',
+				'order' => true,
 			),
 		),
 		'sitemenu' => array(
 			'module_title' => array(
 				'value' => $txt['ep_module_sitemenu'],
+			),
+			'module_icon' => array(
+				'value' => 'rainbow.png',
 			),
 			'module_icon' => array(
 				'value' => 'star.png',

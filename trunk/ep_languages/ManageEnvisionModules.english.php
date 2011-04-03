@@ -73,7 +73,7 @@ $txt['restricted_unexists'] = 'Sorry, seems that either the file is restricted, 
 $txt['file_timeout'] = 'File timed-out while uploading, please try again!';
 $txt['file_bad_extension'] = 'Unable to upload that type of file.  Please try a different filetype.';
 
-// List groups handling...
+// Checklist order handling...
 $txt['checks_order_up'] = 'Up';
 $txt['checks_order_down'] = 'Down';
 
@@ -94,8 +94,8 @@ $txt['ep_module_stats'] = 'Statistics';
 $txt['ep_module_stats_stat_choices'] = 'Stats Choice List';
 $txt['ep_module_online'] = 'Who&#039;s Online';
 $txt['ep_module_online_show_online'] = 'Show Online';
-$txt['ep_module_online_pos'] = 'Online Position';
-$txt['ep_module_online_groups'] = 'Online Groups';
+$txt['ep_module_online_online_pos'] = 'Online Position';
+$txt['ep_module_online_online_groups'] = 'Online Groups';
 $txt['ep_module_news'] = 'Site News';
 $txt['ep_module_news_board'] = 'Select Board';
 $txt['ep_module_news_limit'] = 'Limit<div class="smalltext">0 = default value</div>';
@@ -230,8 +230,8 @@ $txt['ep_module_online_show_online_guests'] = 'Guests';
 $txt['ep_module_online_show_online_hidden'] = 'Hidden';
 $txt['ep_module_online_show_online_spiders'] = 'Spiders';
 
-$txt['ep_module_online_pos_top'] = 'Top';
-$txt['ep_module_online_pos_bottom'] = 'Bottom';
+$txt['ep_module_online_online_pos_top'] = 'Top';
+$txt['ep_module_online_online_pos_bottom'] = 'Bottom';
 
 // Custom Code Options
 $txt['ep_module_custom_code_type_0'] = 'PHP';
