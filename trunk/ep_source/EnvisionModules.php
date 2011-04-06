@@ -149,29 +149,19 @@ function module_stats($params)
 	// Grab the params, if they exist.
 	if (is_array($params))
 	{
-		if (!isset($params['stat_choices']['checked']) || empty($params['stat_choices']))
+		if (empty($params['stat_choices']))
 		{
 			module_error();
 			return;
 		}
 		else
-			$stat_choices = explode(',', $params['stat_choices']['checked']);
-
-		// in_array workaround (array_combine > PHP 5)
-		$stat_choices = array_combine($stat_choices, $stat_choices);
-
-		// Nothing to show, return.
-		if (isset($stat_choices['-2']))
-		{
-			module_error('empty');
-			return;
-		}
+			$stat_choices = explode(',', $params['stat_choices']);
 
 		$totals = array();
 
 		if (isset($stat_choices[3]))
 		{
-			// How many cats? Er...categories. Not cats...xD
+			// How many cats? Er... categories. Not cats...xD
 			$request = $smcFunc['db_query']('', '
 				SELECT COUNT(id_cat)
 				FROM {db_prefix}categories');
@@ -199,7 +189,7 @@ function module_stats($params)
 
 		// Start the output.
 		echo '
-				<ul class="ep_list">';
+				<ul class="reset">';
 
 		foreach($stat_choices as $type)
 		{
@@ -265,29 +255,6 @@ function module_announce($params)
 		module_error();
 }
 
-/*
-
-// Just an example with the file_input param type.
-function module_announce($params)
-{
-	// file_input parameter test.
-	if (is_array($params))
-	{
-		if(count($params['msg']) <= 0)
-		{
-			echo 'No files defined yet.  Please upload some files via your Admin Panel!';
-			return;
-		}
-		foreach($params['msg'] as $key => $file)
-			if ($file['has_thumb'] && $file['is_image'])
-				echo '<a href="', $file['href'], ';image" target="_blank"><img src="', $file['thumb_href'], '" border="0" /></a><br />';
-	}
-	else
-		module_error();
-}
-*/
-
-
 function module_news($params)
 {
 	global $context, $txt, $settings, $modSettings;
@@ -342,12 +309,15 @@ function module_recent($params)
 	// Grab the params, if they exist.
 	if (is_array($params))
 	{
-		$function = !empty($params['post_topic']) ? 'ep_recentTopics' : 'ep_recentPosts';
+		$function = 'ep_recent_' . $params['post_topic'];
 		$num_recent = empty($params['num_recent']) ? 8 : $params['num_recent'];
 		$show_avatars = (bool) empty($params['show_avatars']) ? false : true;
 
 		// Access the function.
-		$input = $function($num_recent);
+		if (is_callable($function))
+			$input = $function($num_recent);
+		else
+			module_error();
 
 		// The count var.
 		$count = 0;
@@ -530,26 +500,33 @@ function module_online($params)
 	if (is_array($params))
 	{
 		$online_groups = array();
-		$show_online = array();
-		$show_online = !isset($params['show_online']['checked']) || empty($params['show_online']) || $params['show_online']['checked'] < 0 ? NULL : explode(',', $params['show_online']['checked']);
+		$show_online = explode(';', $params['show_online']);
 		$online_pos = empty($params['online_pos']) ? 'top' : $params['online_pos'];
 		$online_groups = !isset($params['online_groups']) ? array('-3') : explode(',', $params['online_groups']);
 
-		// Yes, much faster than using in_array.
-		$online_groups = array_combine($online_groups, $online_groups);
+		// This is only so isset() can be used instead of in_array() from within the loop below. If anyone has a better idea please share.
+		$online_groups = array_flip($online_groups);
 
 		// Get all info.
 		$online = ep_whosOnline();
 		$online_info = '';
 
+		if (!in_array(-3, $online_groups))
+			foreach ($online['online_groups'] as $group)
+				if (!isset($online_groups[$group['id']]))
+					unset($online['online_groups'][$group['id']]);
+
 		// Ok, lets build the list of online things to show.
+		if (!empty($show_online[1]))
+			$show_online = explode(',', $show_online[1]);
+		else
+			$show_online = array();
+
 		if (!empty($show_online))
 		{
-			$online_info .= '<ul class="ep_list ep_paddingleft">';
+			$online_info .= '<ul class="reset">';
 			foreach ($show_online as $option => $type)
 			{
-				$type = (int) $type;
-
 				// Guests don't have any buddies.
 				if (($type == 1 && !$user_info['is_guest']) || $type != 1)
 					$online_info .= '<li>&bull;&nbsp;';
@@ -581,113 +558,38 @@ function module_online($params)
 		}
 
 		if (!empty($show_online) && $online_pos == 'top' && !empty($online_info))
-			echo $online_info;
+			echo $online_info . '<hr />';
 
-		// Grab the online groups, if we have any.
-		if (!isset($online_groups['-2']) && !empty($online['online_groups']))
+		// Ready to begin the output of groups.
+		echo '
+					<div class="ep_control_flow">
+						<ul class="ep_list ep_paddingleft">';
+
+		// Loading up all users
+		foreach ($online['online_groups'] as $group)
 		{
-			// Need to order the array of online groups based on the $online_groups array.
-			if (!isset($online_groups['-3']))
-			{
-				foreach ($online_groups as $groupid)
-				{
-					$id_group = (int) $groupid;
-
-					if (!empty($online['online_groups'][$id_group]))
-					{
-						if (!isset($beginul))
-						{
-							if (!empty($show_online) && $online_pos == 'top' && !empty($online_info))
-								echo '
-									<hr />';
-
-							// Ready to begin the output of groups.
-							echo '
-									<div class="ep_control_flow">
-										<ul class="ep_list ep_paddingleft">';
-							$beginul = true;
-						}
-
-						echo '
-												<li><strong>' . $online['online_groups'][$id_group]['name'] . '</strong>:
-													<ul class="ep_list_indent">';
-
-						// Get all users for this group
-						foreach ($online['users'] as $user)
-						{
-							if ($user['group'] == $id_group)
-								echo '
-										<li>', $user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'] , '</li>';
-						}
-
-						echo '
-													</ul>
-												</li>';
-					}
-				}
-			}
-			else
-			{
-				// Is -3 and need to load all groups and all users online.  A bit tricky, but we need to do this SUPER FAST no matter how any groups/users online!!
-
-				// Loading up all users
-				foreach ($online['online_groups'] as $group)
-				{
-					if (!isset($start_group))
-					{
-						$start_group = true;
-
-						if (!isset($beginul))
-						{
-							if (!empty($show_online) && $online_pos == 'top' && !empty($online_info))
-								echo '<hr />';
-
-							// Ready to begin the output of groups.
-							echo '
-								<div class="ep_control_flow">
-									<ul class="ep_list ep_paddingleft">';
-							$beginul = true;
-						}
-					}
-
-						echo '
+			echo '
 												<li><strong>' . $group['name'] . '</strong>:
 													<ul class="ep_list_indent">';
 
-						foreach ($online['users'] as $user)
-							if ($user['group'] == $group['id'])
-								echo '
+			foreach ($online['users'] as $user)
+				if ($user['group'] == $group['id'])
+					echo '
 														<li>', $user['hidden'] ? '<em>' . $user['link'] . '</em>' : $user['link'] , '</li>';
-								echo '
+			echo '
 													</ul></li>';
 
-				}
-				// No longer needed.
-				unset($start_group);
-			}
+		}
+		// No longer needed.
+		unset($start_group);
 
-			// Close it up.
-			if (!empty($beginul))
-			{
-				echo '
+		echo '
 							</ul>
 						</div>';
-				unset($beginul);
-				$endul = true;
-			}
 
-			if (!empty($show_online) && !empty($online_info) && $online_pos == 'bottom')
-			{
-				if (!empty($online['online_groups']) && !isset($online_groups['-2']) && !empty($endul))
-				{
-					echo '
-							<hr />';
-					unset($endul);
-				}
-			}
-		}
 		if ($online_pos == 'bottom' && !empty($online_info))
-			echo $online_info;
+			echo '
+						<hr />' . $online_info;
 	}
 
 	// Throw an error.

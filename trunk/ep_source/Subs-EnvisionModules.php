@@ -46,7 +46,7 @@ if (!defined('SMF'))
 		- !!!
 	void ep_recentTopics()
 		- !!!
-	void ep_queryPosts()
+	void ep_query_posts()
 		- !!!
 	void ep_topPoll()
 		- !!!
@@ -771,7 +771,7 @@ function ep_boardNews($board, $limit)
 	return $return;
 }
 
-function ep_recentPosts($num_recent = 8, $exclude_boards = null, $include_boards = null)
+function ep_recent_posts($num_recent = 8, $exclude_boards = null, $include_boards = null)
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
 	global $modSettings, $smcFunc;
@@ -806,10 +806,10 @@ function ep_recentPosts($num_recent = 8, $exclude_boards = null, $include_boards
 	);
 
 	// Pass to this simpleton of a function...
-	return ep_queryPosts($query_where, $query_where_params, $num_recent, 'm.id_msg DESC', true);
+	return ep_query_posts($query_where, $query_where_params, $num_recent, 'm.id_msg DESC', true);
 }
 
-function ep_recentTopics($num_recent = 8, $exclude_boards = null, $include_boards = null)
+function ep_recent_topics($num_recent = 8, $exclude_boards = null, $include_boards = null)
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
 	global $modSettings, $smcFunc;
@@ -931,7 +931,7 @@ function ep_recentTopics($num_recent = 8, $exclude_boards = null, $include_board
 	return $posts;
 }
 
-function ep_queryPosts($query_where, $query_where_params = array(), $query_limit = '', $query_order = 'm.id_msg DESC', $limit_body = false)
+function ep_query_posts($query_where, $query_where_params = array(), $query_limit = '', $query_order = 'm.id_msg DESC', $limit_body = false)
 {
 	global $context, $settings, $scripturl, $txt, $db_prefix, $user_info;
 	global $modSettings, $smcFunc;
@@ -991,10 +991,12 @@ function ep_queryPosts($query_where, $query_where_params = array(), $query_limit
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#new',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . $row['subject'] . '</a>',
-			'new' => !empty($row['is_read']),
+			'is_new' => empty($row['is_read']),
 			'new_from' => $row['new_from'],
 		);
 	}
+
+	return $posts;
 }
 
 function ep_topPoll()
@@ -1254,7 +1256,6 @@ function ep_whosOnline()
 	);
 	$return = getMembersOnlineStats($membersOnlineOptions);
 
-	// Add some redundancy for backwards compatibility reasons.
 	return $return + array(
 		'users' => $return['users_online'],
 		'guests' => $return['num_guests'],
@@ -1263,11 +1264,6 @@ function ep_whosOnline()
 		'num_users' => $return['num_users_online'],
 		'total_users' => $return['num_users_online'] + $return['num_guests'] + $return['num_spiders'],
 	);
-
-	// Showing membergroups?
-	if (!empty($settings['show_group_key']) && !empty($return['membergroups']))
-		echo '<br />
-			[' . implode(']&nbsp;&nbsp;[', $return['membergroups']) . ']';
 }
 
 // Changes the theme data for the user when a theme from the theme module is selected.

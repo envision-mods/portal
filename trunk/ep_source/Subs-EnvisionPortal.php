@@ -1256,7 +1256,7 @@ function ep_process_module($module_context, $data, $full_layout)
 
 		foreach ($fields2 as $key => $field)
 			if (isset($field['type']))
-				$data['fields'][$key] = loadParameter(array(), $field['type'], $field['value']);
+				$data['fields'][$key] = $field['value'];//loadParameter(array(), $field['type'], $field['value']);
 	}
 
 	$data['function'] = 'module_' . $data['type'];
