@@ -717,6 +717,15 @@ function envisionBuffer($buffer)
 {
 	global $portal_ver, $context;
 
+	/*
+	Fix the category links acrross the board, even in mods and themes
+		that use their own. In ordeer for this to work, the category
+		item should be immediately after $scripturl like how SMF does
+		it. Thus, index.php#c1 gets converted, while $sess_id#c1 does not.
+		*/
+	if (!WIRELESS)
+		$buffer = preg_replace('/index.php#c([\d]+)/', 'index.php?action=forum#c$1', $buffer);
+
 	// Add our copyright. Please have a thought for the developers and keep it in place.
 	$search_array = array(
 		', Simple Machines LLC</a>',
@@ -1636,6 +1645,32 @@ function envision_integrate_load_theme()
 
 	// Kick off time!
 	ep_init();
+}
+
+function envision_integrate_core_features(&$core_features)
+{
+	$ep_core_feature = array(
+		'url' => 'action=admin;area=epmodules',
+	);
+
+	$new_core_features = array();
+	foreach ($core_features as $area => $info)
+	{
+		$new_core_features[$area] = $info;
+		if ($area == 'cp')
+			$new_core_features['ep'] = $ep_core_feature;
+	}
+	$core_features = $new_core_features;
+
+}
+
+function envision_integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
+{
+	loadLanguage('ep_languages/EnvisionPermissions');
+
+	$permissionList['membergroup'] += array(
+		'ep_view' => array(false, 'ep_', 'ep_'),
+	);
 }
 
 ?>
