@@ -130,11 +130,6 @@ function ep_init($init_action = '')
 				'name' => $txt['forum'],
 				'url' => $scripturl . '?action=forum',
 			);
-
-		// Fix the linktree if a category was requested.
-		foreach ($context['linktree'] as $key => $tree)
-			if (strpos($tree['url'], '#c') !== false && strpos($tree['url'], 'action=forum#c') === false)
-				$context['linktree'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
 	}
 
 	// Default Exception actions.

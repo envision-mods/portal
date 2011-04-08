@@ -703,6 +703,8 @@ function DatabasePopulation()
 	add_integration_function('integrate_admin_areas', 'add_ep_admin_areas');
 	add_integration_function('integrate_buffer', 'envisionBuffer');
 	add_integration_function('integrate_whos_online', 'envision_whos_online');
+	add_integration_function('integrate_core_features', 'envision_integrate_core_features');
+	add_integration_function('integrate_load_permissions', 'envision_integrate_load_permissions');
 }
 
 ?>

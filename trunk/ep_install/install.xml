@@ -57,40 +57,6 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/ManageSettings.php">
-		<operation>
-			<search position="after"><![CDATA[		// k = karma.]]></search>
-			<add><![CDATA[		// ep = Envision Portal
-		'ep' => array(
-			'url' => 'action=admin;area=epmodules',
-		),
-]]></add>
-		</operation>
-	</file>
-
-	<file name="$sourcedir/Recent.php">
-		<operation>
-			<search position="replace"><![CDATA[
-				'url' => $scripturl . '#c' . (int) $_REQUEST['c'],]]></search>
-			<add><![CDATA[
-				'url' => $scripturl . '?action=forum#c' . (int) $_REQUEST['c'],]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[
-				'href' => $scripturl . '#c' . $row['id_cat'],
-				'link' => '<a href="' . $scripturl . '#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>']]></search>
-			<add><![CDATA[
-				'href' => $scripturl . '?action=forum#c' . $row['id_cat'],
-				'link' => '<a href="' . $scripturl . '?action=forum#c' . $row['id_cat'] . '">' . $row['cname'] . '</a>']]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[
-			'url' => $scripturl . '#c' . (int) $_REQUEST['c'][0],]]></search>
-			<add><![CDATA[
-			'url' => $scripturl . '?action=forum#c' . (int) $_REQUEST['c'][0],]]></add>
-		</operation>
-	</file>
-
 	<file name="$sourcedir/Subs.php">
 		<operation>
 			<search position="replace"><![CDATA[	global $context, $modSettings, $user_info, $txt, $scripturl;]]></search>
@@ -142,15 +108,6 @@
 		</operation>
 	</file>
 
-	<file name="$sourcedir/Subs-BoardIndex.php">
-		<operation>
-			<search position="replace"><![CDATA[
-					'href' => $scripturl . '#c' . $row_board['id_cat'],]]></search>
-			<add><![CDATA[
-					'href' => $scripturl . '?action=forum#c' . $row_board['id_cat'],]]></add>
-		</operation>
-	</file>
-
 	<file name="$sourcedir/Who.php">
 		<operation>
 			<search position="after"><![CDATA[// Sort out... the column sorting.]]></search>
@@ -163,39 +120,6 @@
 
 	]]></add>
 		</operation>
-	</file>
-
-	<file name="$boarddir/SSI.php">
-		<operation>
-			<search position="before"><![CDATA[require_once($sourcedir . '/Security.php');]]></search>
-			<add><![CDATA[
-require_once($sourcedir . '/ep_source/EnvisionPortal.php');
-require_once($sourcedir . '/ep_source/Subs-EnvisionPortal.php');]]></add>
-		</operation>
-	</file>
-
-	<file name="$sourcedir/ManagePermissions.php">
-		<operation>
-			<search position="before"><![CDATA[loadLanguage('ManagePermissions+ManageMembers]]></search>
-			<add><![CDATA[+ep_languages/EnvisionPermissions]]></add>
-		</operation>
-		<operation>
-			<search position="after"><![CDATA[// All permission groups that will be shown in the left column on classic view.]]></search>
-			<add><![CDATA[$ep_ = array(
-		'membergroup' => array(
-			'ep_view' => array(false, 'ep_', 'ep_'),
-		),
-	);
-
-	$permissionList['membergroup'] = array_merge($ep_['membergroup'], $permissionList['membergroup']);
-	]]></add>
-		</operation>
-		<operation>
-			<search position="before"><![CDATA['profile_identity_own',]]></search> <!-- Restricted group -->
-			<add><![CDATA[
-		'ep_view',]]></add>
-		</operation>
-
 	</file>
 
 	<file name="$themedir/scripts/script.js">
