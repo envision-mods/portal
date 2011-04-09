@@ -26,7 +26,7 @@ $txt['ep_admin_modules_manage_col_disabled'] = 'Disabled Modules';
 $txt['ep_admin_modules_manage_col_section'] = 'Section';
 $txt['ep_is_smf_section'] = 'SMF';
 $txt['ep_admin_modules_manage_modify'] = 'Modify';
-$txt['ep_admin_modules_manage_uninstall'] = '<span class="smalltext">Uninstall</span>';
+$txt['ep_admin_modules_manage_uninstall'] = 'Uninstall';
 $txt['epmodule_uninstall_success'] = 'The module was successfully uninstalled!';
 $txt['error_string'] = 'Error';
 $txt['module_positions_saved'] = 'The module positions have been saved.';
@@ -36,11 +36,6 @@ $txt['click_to_close'] = 'Click to close this message.';
 		Modify Modules
 ***************************/
 // General Strings
-/*
-// Playing with an idea to split Options up when modifying modules into separate pages.  Not sure I like it.  Will get back to it...
-$txt['ep_modify_section_general'] = 'General Settings';
-$txt['ep_modify_section_custom'] = 'Custom Settings';
-*/
 $txt['ep_modify_mod'] = 'Envision Portal - Modify Modules';
 $txt['ep_module_not_installed'] = 'Sorry, unable to retrieve the modules id value, please make sure this module is installed.';
 $txt['ep_modsettings'] = '&nbsp;Settings';
@@ -49,7 +44,7 @@ $txt['ep_module_icon'] = 'Module&#039;s Icon';
 $txt['ep_module_link'] = 'Module&#039;s Title Link';
 $txt['ep_module_target'] = 'Module&#039;s target';
 $txt['ep_module_target__self'] = 'Same window';
-$txt['ep_module_target__parent'] = 'Paremt';
+$txt['ep_module_target__parent'] = 'Parent';
 $txt['ep_module_target__blank'] = 'New window';
 $txt['no_icon'] = '(no icon)';
 $txt['ep_module_template'] = 'Module&#039;s Template';
