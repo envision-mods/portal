@@ -24,7 +24,7 @@ if ((SMF == 'SSI') && !$user_info['is_admin'])
 	die('Admin privileges required.');
 
 // An array of all table names, minus the prefixes, to uninstall.
-//$ep_tables_i_can_haz_ceiling__katzy = array('groups', 'layouts', 'layout_positions', 'module_positions', 'modules', 'module_clones', 'module_parameters', 'module_files', 'envision_pages', 'envision_menu', 'shoutboxes', 'shouts');
+//$ep_tables = array('groups', 'layouts', 'layout_positions', 'module_positions', 'modules', 'module_clones', 'module_parameters', 'module_files', 'envision_pages', 'envision_menu', 'shoutboxes', 'shouts');
 
 // storing all settings to be removed.
 $ep_settings = array(
