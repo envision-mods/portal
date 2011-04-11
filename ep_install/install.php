@@ -135,7 +135,12 @@ function DatabasePopulation()
 					'name' => 'status',
 					'type' => 'enum(\'active\',\'inactive\')',
 					'default' => 'active',
-				)
+				),
+				array(
+					'name' => 'is_smf',
+					'type' => 'tinyint',
+					'size' => 1,
+				),
 			),
 			'indexes' => array(
 				array(
@@ -283,114 +288,6 @@ function DatabasePopulation()
 			)
 		),
 		array(
-			'name' => 'module_fields',
-			'columns' => array(
-				array(
-					'name' => 'id_field',
-					'type' => 'int',
-					'size' => 10,
-					'unsigned' => true,
-					'auto' => true,
-				),
-				array(
-					'name' => 'name',
-					'type' => 'varchar',
-					'size' => 40,
-				),
-				array(
-					'name' => 'type',
-					'type' => 'varchar',
-					'size' => 40,
-				),
-				array(
-					'name' => 'options',
-					'type' => 'text',
-				),
-				array(
-					'name' => 'required',
-					'type' => 'enum(\'yes\',\'no\')',
-					'default' => 'no',
-				),
-			),
-			'indexes' => array(
-				array(
-					'type' => 'primary',
-					'columns' => array('id_field')
-				),
-			),
-			'default' => array(
-				'columns' => array(
-					'name' => 'string',
-					'type' => 'string',
-				),
-				'values' => array(
-					// All modules
-					array('module_title', 'text'),
-					array('module_template', 'file_select'),
-					array('module_header_display', 'select'),
-					array('module_icon', 'icon_select'),
-					array('module_link', 'text'),
-					array('module_target', 'select'),
-					array('module_groups', 'list_groups'),
-					// Announcement
-					array('msg', 'large_text'),
-					// Stats
-					array('stat_choices', 'checklist'),
-					// Online
-					array('online_pos', 'select'),
-					array('show_online', 'checklist'),
-					array('online_groups', 'list_groups'),
-					// News
-					array('board', 'list_boards'),
-					array('limit', 'int'),
-					// Recent Topics/Posts
-					array('post_topic', 'select'),
-					array('show_avatars', 'check'),
-					array('num_recent', 'int'),
-					// Calendar
-					array('display', 'select'),
-					array('animate', 'select'),
-					array('show_months', 'select'),
-					array('previous', 'int'),
-					array('next', 'int'),
-					array('show_options', 'checklist'),
-					// Poll
-					array('options', 'select'),
-					array('topic', 'int'),
-					// Top Posters
-					array('show_avatar', 'check'),
-					array('show_postcount', 'check'),
-					array('num_posters', 'int'),
-					// Latest Members
-					array('limit', 'int'),
-					array('list_type', 'select'),
-					// Forum Staff
-					array('list_type', 'select'),
-					array('name_type', 'select'),
-					array('groups', 'list_groups'),
-					// Site Navigation
-					array('onesm', 'check'),
-					// Shoutbox
-					array('id', 'db_select'),
-					array('refresh_rate', 'int'),
-					array('max_count', 'int'),
-					array('max_chars', 'int'),
-					array('text_size', 'select'),
-					array('member_color', 'check'),
-					array('message', 'text'),
-					array('message_position', 'select'),
-					array('message_groups', 'list_groups'),
-					array('mod_groups', 'list_groups'),
-					array('mod_own', 'list_groups'),
-					array('bbc', 'list_bbc'),
-					// Custom PHP/BBC/HTML
-					array('code_type', 'select'),
-					array('code', 'rich_edit'),
-				),
-				'keys' => array('id_field')
-			),
-		),
-		array(
 			'name' => 'module_field_data',
 			'columns' => array(
 				array(
@@ -414,6 +311,66 @@ function DatabasePopulation()
 				array(
 					'type' => 'primary',
 					'columns' => array('id_field', 'id_module_position')
+				),
+			),
+		array(
+			'name' => 'member_data',
+			'columns' => array(
+				array(
+					'name' => 'id_member',
+					'type' => 'mediumint',
+					'size' => 8,
+					'unsigned' => true,
+				),
+				array(
+					'name' => 'variable',
+					'type' => 'varchar',
+					'size' => 80,
+				),
+				array(
+					'name' => 'value',
+					'type' => 'text',
+				),
+			),
+			'indexes' => array(
+				array(
+					'type' => 'primary',
+					'columns' => array('id_member', 'variable')
+				),
+			),
+		array(
+			'name' => 'log_actions',
+			'columns' => array(
+				array(
+					'name' => 'id_member',
+					'type' => 'mediumint',
+					'size' => 8,
+					'unsigned' => true,
+				),
+				array(
+					'name' => 'action',
+					'type' => 'varchar',
+					'size' => 255,
+				),
+				array(
+					'name' => 'description',
+					'type' => 'varchar',
+					'size' => 255,
+				),
+				array(
+					'name' => 'time',
+					'type' => 'int',
+					'size' => 10,
+					'unsigned' => true,
+				),
+			),
+			'indexes' => array(
+				array(
+					'type' => 'primary',
+					'columns' => array('id_member'),
+				),
+				array(
+					'columns' => array('action'),
 				),
 			),
 		),
@@ -705,6 +662,7 @@ function DatabasePopulation()
 	add_integration_function('integrate_whos_online', 'envision_whos_online');
 	add_integration_function('integrate_core_features', 'envision_integrate_core_features');
 	add_integration_function('integrate_load_permissions', 'envision_integrate_load_permissions');
+	add_integration_function('integrate_profile_areas', 'envision_integrate_profile_areas');
 }
 
 ?>

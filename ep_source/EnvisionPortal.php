@@ -36,7 +36,7 @@ function ep_init($init_action = '')
 
 	// Software Version.
 	// !!! Revise this on each commit!
-	$portal_ver = '1.0 DEV r36';
+	$portal_ver = '1.0 DEV r43';
 
 	// Unallowed Envision names.
 	$envision_names = array('announce', 'usercp', 'stats', 'online', 'news', 'topics', 'posts', 'search', 'calendar', 'poll', 'top_posters', 'theme_select', 'new_members', 'staff', 'sitemenu', 'shoutbox', 'custom');
@@ -62,9 +62,7 @@ function ep_init($init_action = '')
 	$context['ep_module_image_url'] = $boardurl . '/ep_extra/module_images/';
 	$context['epadmin_image_url'] = $boardurl . '/ep_extra/images/admin';
 
-	// Files and Modules
-	$context['ep_module_files_url'] = $boardurl . '/ep_extra/module_files/';
-	$context['ep_module_files_dir'] = $boarddir . '/ep_extra/module_files/';
+	// Modules
 	$context['ep_module_modules_dir'] = $boarddir . '/ep_extra/modules';
 
 	// This is changeable from the Envision Admin -> Configuration -> Module Settings area, so we need to load up the correct filepath that is in there.
@@ -78,7 +76,7 @@ function ep_init($init_action = '')
 	if (empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))
 		return;
 
-	// Load the EnvisionModules Language File for all you Module Customizers out there :)
+	// Load the EnvisionModules language file for all you module customizers out there :)
 	if (!loadLanguage('ep_languages/EnvisionModules'))
 		loadLanguage('ep_languages/EnvisionModules');
 
