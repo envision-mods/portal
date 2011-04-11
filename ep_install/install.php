@@ -313,6 +313,7 @@ function DatabasePopulation()
 					'columns' => array('id_field', 'id_module_position')
 				),
 			),
+		),
 		array(
 			'name' => 'member_data',
 			'columns' => array(
@@ -338,6 +339,7 @@ function DatabasePopulation()
 					'columns' => array('id_member', 'variable')
 				),
 			),
+		),
 		array(
 			'name' => 'log_actions',
 			'columns' => array(
