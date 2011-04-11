@@ -1598,6 +1598,9 @@ function envision_integrate_pre_load()
 	// Is Envision Portal enabled in the Core Features?
 	$modSettings['ep_portal_mode'] = isset($modSettings['admin_features']) ? in_array('ep', explode(',', $modSettings['admin_features'])) : false;
 
+	// Unserialize our permanent hooks here.
+	$modSettings['ep_permanented_hooks'] = unserialize($modSettings['ep_permanented_hooks']);
+
 	require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
 	require_once($sourcedir . '/ep_source/EnvisionModules.php');
@@ -1666,11 +1669,64 @@ function envision_integrate_core_features(&$core_features)
 
 function envision_integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
 {
-	loadLanguage('ep_languages/EnvisionPermissions');
+	global $context;
 
-	$permissionList['membergroup'] += array(
-		'ep_view' => array(false, 'ep_', 'ep_'),
+	loadLanguage('ep_languages/Permissions');
+
+	// If this is a guest limit the available permissions.
+	if (isset($context['group']['id']) && $context['group']['id'] == -1)
+		$permissionList['membergroup'] += array(
+			'ep_view' => array(false, 'ep_', 'ep_'),
+		);
+	else
+		$permissionList['membergroup'] += array(
+			'ep_view' => array(false, 'ep_', 'ep_'),
+			'ep_create_layouts' => array(false, 'ep_', 'ep_'),
+			'ep_modify_layouts' => array(true, 'ep_', 'ep_'),
+			'ep_delete_layouts' => array(true, 'ep_', 'ep_'),
+		);
+}
+
+function envision_integrate_profile_areas(&$profile_areas)
+{
+	global $txt, $sourcedir;
+
+	loadLanguage('ep_languages/Profile');
+
+	$profile_areas += array(
+		'ep' => array(
+			'title' => $txt['ep_'],
+			'areas' => array(
+				'overview' => array(
+					'label' => $txt['summary'],
+					'file' => 'ep_source/Profile.php',
+					'function' => 'overview',
+					'permission' => array(
+						'own' => 'profile_view_own',
+						'any' => 'profile_view_any',
+					),
+				),
+				'layouts' => array(
+					'label' => $txt['ep_my_layouts'],
+					'file' => 'ep_source/Profile.php',
+					'function' => 'layouts',
+					'subsections' => array(
+						'manage' => array($txt['ep_manage_layouts'], array('ep_modify_layouts_own', 'ep_modify_layouts_any', 'ep_delete_layouts_own', 'ep_delete_layouts_any')),
+						'add' => array($txt['ep_add_layout'], array('ep_create_layouts')),
+					),
+					'permission' => array(
+						'own' => 'profile_view_own',
+						'any' => 'profile_view_any',
+					),
+				),
+			),
+		),
 	);
+
+	// Time to fish for hookers? Yeah, yeah, correct me. I don't care. :P
+	ep_include_hook('load_profile_files');
+	ep_include_language_hook('load_profile_language_files', $sourcedir . '/ep_plugin_language');
+	ep_call_hook('load_profile_areas', array(&$profile_areas));
 }
 
 ?>

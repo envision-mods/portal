@@ -81,9 +81,9 @@ function ep_call_hook($hook, $parameters = array())
 	global $modSettings;
 
 	if (empty($modSettings['ep_hooks']))
-		$functions = unserialize($modSettings['ep_permanented_hooks']);
+		$functions = $modSettings['ep_permanented_hooks'];
 	else
-		$functions = $modSettings['ep_hooks'] + unserialize($modSettings['ep_permanented_hooks']);
+		$functions = $modSettings['ep_hooks'] + $modSettings['ep_permanented_hooks'];
 
 	if (empty($functions[$hook]))
 		return array();
@@ -105,7 +105,7 @@ function ep_call_hook($hook, $parameters = array())
 }
 
 /**
- * {@sse ep_call_hook}
+ * {@see ep_call_hook}
  *
  * The file-inclusion hooks should be called with this.
  *
@@ -120,15 +120,26 @@ function ep_include_hook($hook, $base)
 	global $modSettings;
 
 	if (empty($modSettings['ep_hooks']))
-		$files = unserialize($modSettings['ep_permanented_hooks']);
+		$files = $modSettings['ep_permanented_hooks'];
 	else
-		$files = $modSettings['ep_hooks'] + unserialize($modSettings['ep_permanented_hooks']);
+		$files = $modSettings['ep_hooks'] + $modSettings['ep_permanented_hooks'];
 
 	if (empty($files[$hook]))
 		return false;
 
+	// Plugin directories
+	$plugin_dirs = array(
+		'$template' => $themedir . '/ep_plugin_template',
+		'$source' => $sourcedir . '/ep_plugin_source',
+		'$extra' => $boarddir . '/ep_plugin_extra'
+	);
+
 	// Loop through each file and remove the odd strand if present...
 	foreach ($files[$hook] as $file)
+	{
+		if (empty($base))
+			$base = strtr($file, $plugin_dirs);
+
 		if (file_exists($base . '/' . $file))
 			require_once($base . '/' . $file);
 		else
@@ -136,12 +147,13 @@ function ep_include_hook($hook, $base)
 			ep_remove_hook($hook, $file);
 			return false;
 		}
+	}
 
 	return true;
 }
 
 /**
- * {@sse ep_call_hook}
+ * {@see ep_call_hook}
  *
  * The file-inclusion hooks should be called with this.
  *
@@ -158,9 +170,9 @@ function ep_include_language_hook($hook, $base, $lang = '', $try = 1)
 	global $modSettings, $language, $user_info;
 
 	if (empty($modSettings['ep_hooks']))
-		$files = unserialize($modSettings['ep_permanented_hooks']);
+		$files = $modSettings['ep_permanented_hooks'];
 	else
-		$files = $modSettings['ep_hooks'] + unserialize($modSettings['ep_permanented_hooks']);
+		$files = $modSettings['ep_hooks'] + $modSettings['ep_permanented_hooks'];
 
 	if (empty($files[$hook]))
 		return false;
@@ -238,13 +250,11 @@ function ep_remove_hook($hook, $function)
 	else
 		$modSettings['ep_hooks'][$hook] = array_diff($modSettings['ep_hooks'][$hook], (array) $function);
 
-	$temp = unserialize($modSettings['ep_permanented_hooks']);
-
-	if (empty($temp[$hook]) || !in_array($function, $temp[$hook]))
+	if (empty($temp[$hook]) || !in_array($function, $modSettings['ep_permanented_hooks'][$hook]))
 		return false;
 
 	// Also remove it from the permanented hooks.
-	$temp[$hook] = array_diff($temp[$hook], (array) $function);
+	$temp[$hook] = array_diff($modSettings['ep_permanented_hooks'][$hook], (array) $function);
 	updateSettings(array('ep_permanented_hooks' => serialize($temp)));
 
 	return true;

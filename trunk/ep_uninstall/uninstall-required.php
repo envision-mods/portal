@@ -33,5 +33,6 @@ if ((SMF == 'SSI') && !$user_info['is_admin'])
 	remove_integration_function('integrate_whos_online', 'envision_whos_online');
 	remove_integration_function('integrate_core_features', 'envision_integrate_core_features');
 	remove_integration_function('integrate_load_permissions', 'envision_integrate_load_permissions');
+	remove_integration_function('integrate_profile_areas', 'envision_integrate_profile_areas');
 
 ?>
