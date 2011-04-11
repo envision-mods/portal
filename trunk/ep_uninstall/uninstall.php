@@ -43,8 +43,8 @@ $ep_settings = array(
 db_extend('packages');
 
 // Remove the tables.
-foreach ($ep_tables as $table)
-	$smcFunc['db_drop_table']('{db_prefix}ep_' . $table);
+/* foreach ($ep_tables as $table)
+	$smcFunc['db_drop_table']('{db_prefix}ep_' . $table); */
 
 // Purge the permissions
 $request = $smcFunc['db_query']('', '
