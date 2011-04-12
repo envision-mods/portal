@@ -417,7 +417,7 @@ function template_basic_layout()
 					</span>
 				</dt>
 				<dd>
-					<select id="actions_list" name="layouts" multiple class="layout_list', (isset($context['layout_error']['no_actions']) ? ' layout_error' : ''), '">';
+					<select id="actions_list" name="layouts" class="layout_style" size="10" multiple class="layout_list', (isset($context['layout_error']['no_actions']) ? ' layout_error' : ''), '">';
 
 	foreach ($context['current_actions'] as $cur_action)
 		echo '
@@ -445,7 +445,7 @@ function template_add_layout()
 			var exceptions = nonallowed_actions.split("|");
 		// ]]></script>
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
-		<form name="epFlayouts" id="epLayouts" ', isset($context['ep_file_input']) ? 'enctype="multipart/form-data" ' : '', 'action="', $scripturl, '?action=admin;area=epmodules;sa=epaddlayout2;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
+		<form action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>
 		<div class="cat_bar">
 			<h3 class="catbg">
 				', $txt['add_layout'], '
@@ -502,8 +502,9 @@ function template_add_layout()
 							<input type="submit" name="save" id="save" value="', $txt['save'], '" class="button_submit" />
 						</div>
 					</div>
-				<span class="lowerframe"><span></span></span>
-				</form>';
+					<span class="lowerframe"><span></span></span>
+				</form>
+	</div>';
 }
 
 /**
