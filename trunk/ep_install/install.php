@@ -46,6 +46,11 @@ function DatabasePopulation()
 					'size' => 8,
 					'unsigned' => true,
 				),
+				array(
+					'name' => 'name',
+					'type' => 'varchar',
+					'size' => 40,
+				),
 			),
 			'indexes' => array(
 				array(

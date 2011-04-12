@@ -27,9 +27,9 @@
 	width: 100%;
 }
 
-.ep_heavyleftpadding
+.ep_leftpadding
 {
-	padding-left: 15px;
+	padding-left: 5px;
 }
 
 .ep_padding
@@ -591,7 +591,7 @@ div.epsitemenu div a.sm:hover
 {
 	clear: both;
 }
-/*Styles Specific to Manage Envision Modules Template*/ 
+/*Styles Specific to Manage Envision Modules Template*/
 #margin2
 {
 	margin-top: -2px;
@@ -622,7 +622,7 @@ div.epsitemenu div a.sm:hover
 }
 .mod_user_action
 {
-	float: left; 
+	float: left;
 	margin-left: 5px;
 }
 .r-align
@@ -643,7 +643,7 @@ div.epsitemenu div a.sm:hover
 }
 .imgbox
 {
-	width: 12px; 
+	width: 12px;
 	height: 11px;
 }
 /*No wrapping*/
