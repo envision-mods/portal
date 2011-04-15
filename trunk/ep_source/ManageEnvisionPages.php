@@ -408,7 +408,7 @@ function SavePage()
 			);
 
 
-			// Needed for ListGroups()
+			// Needed for ep_list_groups()
 			require_once($sourcedir . '/ep_source/ManageEnvisionModules.php');
 
 			// Needed for the editor.
@@ -418,7 +418,7 @@ function SavePage()
 				'page_name' => $name,
 				'type' => $type,
 				'title' => $title,
-				'permissions' => ListGroups(!empty($_POST['permissions']) ? $_POST['permissions'] : array()),
+				'permissions' => ep_list_groups(!empty($_POST['permissions']) ? $_POST['permissions'] : array()),
 				'status' => $status,
 				'id' => $id,
 			);
@@ -440,7 +440,7 @@ function prepareContext()
 {
 	global $context, $smcFunc, $txt, $sourcedir;
 
-	// Needed for ListGroups()
+	// Needed for ep_list_groups()
 	require_once($sourcedir . '/ep_source/ManageEnvisionModules.php');
 
 	// Needed for the editor.
@@ -490,7 +490,7 @@ function prepareContext()
 			'page_name' => $row['page_name'],
 			'type' => $row['type'],
 			'title' => $row['title'],
-			'permissions' => ListGroups(explode(',', $row['permissions'])),
+			'permissions' => ep_list_groups(explode(',', $row['permissions'])),
 			'status' => $row['status'],
 			'id' => $_GET['pid'],
 		);
@@ -506,7 +506,7 @@ function prepareContext()
 			'page_name' => '',
 			'type' => 2,
 			'title' => '',
-			'permissions' => ListGroups(array('-3')),
+			'permissions' => ep_list_groups(array('-3')),
 			'status' => 1,
 			'id' => 0,
 		);

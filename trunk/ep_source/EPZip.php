@@ -36,6 +36,8 @@ class EPZip
 	{
 		$this->zipModule = extension_loaded('zlib');
 		if($this->zipModule)
+			$this->zipModule = class_exists('ZipArchive');
+		if($this->zipModule)
 			$this->zipArchive = new ZipArchive();
 	}
 	private function Open($file_name)
@@ -72,8 +74,9 @@ class EPZip
 			// We've got ourselves a directory. Simple stuff.
 			if($name[strlen($name) - 1] == DIRECTORY_SEPARATOR)
 			{
+				// Something went wrong creating the directory.
 				if(!mkdir($name))
-					return false; // Something went wrong creating the directory.
+					return false;
 			}
 			else
 			{

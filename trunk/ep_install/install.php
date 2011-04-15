@@ -383,6 +383,10 @@ function DatabasePopulation()
 					'columns' => array('id_member'),
 				),
 				array(
+					'type' => 'key',
+					'columns' => array('id_action'),
+				),
+				array(
 					'columns' => array('action'),
 				),
 			),
