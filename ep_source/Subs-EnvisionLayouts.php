@@ -377,7 +377,7 @@ function addLayout($layout_name, $id_member, $layout_actions, $insert_positions)
  * @return bool true on success; false otherwise.
  * @since 1.0
  */
-function editLayout($selected_layout, $layout_name, $id_member, $layout_actions, $layout_positions, $smf_pos, $remove_positions = array)
+function editLayout($selected_layout, $layout_name, $id_member, $layout_actions, $layout_positions, $smf_pos, $remove_positions = array())
 {
 	global $smcFunc;
 
@@ -483,7 +483,7 @@ function editLayout($selected_layout, $layout_name, $id_member, $layout_actions,
 				$layout_positions['y_pos'][$id_layout_position],
 				$layout_positions['colspan'][$id_layout_position],
 				$layout_positions['status'][$id_layout_position],
-				$layout_positions['is_smf'][$id_layout_position]),
+				$layout_positions['is_smf'][$id_layout_position],
 			);
 
 			$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_positions',  $columns, $data, $keys);

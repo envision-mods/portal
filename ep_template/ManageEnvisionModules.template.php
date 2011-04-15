@@ -576,7 +576,7 @@ function template_edit_layout()
 							<th class="last_th" scope="col"><input id="all_checks" type="checkbox" class="input_check" onclick="invertChecks(this, this.form, \'check_\');" /></th>
 						</tr>
 					</thead>
-					<tbody id="edit_layout_tbody">';
+					<tbody id="edit_layout_tbody" class="centertext">';
 
 	$rows = array();
 	$xRow = 0;
