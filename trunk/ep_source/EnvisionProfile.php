@@ -200,7 +200,7 @@ function Display()
  */
 function AddEnvisionLayout()
 {
-	global $context, $txt, $smcFunc, $scripturl;
+	global $context, $txt, $smcFunc, $scripturl, $settings;
 
 	isAllowedTo('ep_create_layouts');
 	$context['page_title'] = $txt['add_layout_title'];
