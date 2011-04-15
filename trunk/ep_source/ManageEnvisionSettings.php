@@ -40,9 +40,7 @@ function loadGeneralSettingParameters($subActions = array(), $defaultAction = ''
 	// You need to be an admin to edit settings!
 	isAllowedTo('admin_forum');
 
-	loadLanguage('ep_languages/EnvisionHelp');
-	loadLanguage('ep_languages/ManageSettings');
-	loadLanguage('ep_languages/ManageEnvisionSettings');
+	loadLanguage('ep_languages/EnvisionHelp+ManageSettings+ep_languages/ManageEnvisionSettings');
 	loadTemplate('ep_template/ManageEnvisionSettings');
 
 	// Will need the utility functions from here.
@@ -68,6 +66,7 @@ function Configuration()
 		'epinfo' => 'EnvisionPortalInfo',
 		'epgeneral' => 'ModifyEnvisionGeneral',
 		'epmodulesettings' => 'ModifyEnvisionModuleSettings',
+		'logs' => 'EnvisionLogs',
 	);
 
 	loadGeneralSettingParameters($subActions, 'epinfo');
@@ -307,6 +306,155 @@ function ModifyEnvisionModuleSettings($return_config = false)
 	$context['settings_title'] = $txt['ep_admin_config_modulesettings'];
 
 	prepareDBSettingContext($config_vars);
+}
+
+function EnvisionLogs()
+{
+	global $context, $txt, $modSettings, $scripturl, $sourcedir, $smcFunc;
+
+	loadLanguage('Modlog');
+
+	// The number of entries to show per page of log file.
+	$context['items_per_page'] = 30;
+
+	// Amount of hours that must pass before allowed to delete file.
+	$context['hoursdisable'] = 24;
+
+	// Handle deletion...
+	if (isset($_POST['removeall']) && $context['can_delete'])
+	{
+		checkSession();
+
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}ep_log_actions
+			WHERE time < {int:twenty_four_hours_wait}',
+			array(
+				'twenty_four_hours_wait' => time() - $context['hoursdisable'] * 3600,
+			)
+		);
+	}
+	elseif (!empty($_POST['remove']) && isset($_POST['delete']) && $context['can_delete'])
+	{
+		checkSession();
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}ep_log_actions
+			WHERE id_action IN ({array_string:delete_actions})
+				AND time < {int:twenty_four_hours_wait}',
+			array(
+				'twenty_four_hours_wait' => time() - $context['hoursdisable'] * 3600,
+				'delete_actions' => array_unique($_POST['delete']),
+			)
+		);
+	}
+
+	// Our options for our list.
+	$listOptions = array(
+		'id' => 'ep_list_logs',
+		'items_per_page' => $context['items_per_page'],
+		'base_href' => $scripturl . '?action=admin;area=epconfig;sa=logs',
+		'default_sort_col' => 'time',
+		'default_sort_dir' => 'desc',
+		'get_items' => array(
+			'file' => $sourcedir . '/ep_source/Subs-EnvisionPortal.php',
+			'function' => 'list_getLogs',
+		),
+		'get_count' => array(
+			'file' => $sourcedir . '/ep_source/Subs-EnvisionPortal.php',
+			'function' => 'list_getNumLogs',
+		),
+		'no_items_label' => $txt['ep_no_logs'],
+		'columns' => array(
+			'action' => array(
+				'header' => array(
+					'value' => $txt['modlog_action'],
+					'class' => 'lefttext first_th',
+				),
+				'data' => array(
+					'db' => 'action_text',
+					'class' => 'smalltext',
+				),
+				'sort' => array(
+					'default' => 'ela.action',
+					'reverse' => 'ela.action DESC',
+				),
+			),
+			'time' => array(
+				'header' => array(
+					'value' => $txt['modlog_date'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'db' => 'time',
+					'class' => 'smalltext',
+				),
+				'sort' => array(
+					'default' => 'ela.time DESC',
+					'reverse' => 'ela.time',
+				),
+			),
+			'moderator' => array(
+				'header' => array(
+					'value' => $txt['modlog_member'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'db' => 'moderator_link',
+					'class' => 'smalltext',
+				),
+				'sort' => array(
+					'default' => 'mem.real_name',
+					'reverse' => 'mem.real_name DESC',
+				),
+			),
+			'position' => array(
+				'header' => array(
+					'value' => $txt['modlog_position'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'db_htmlsafe' => 'position',
+					'class' => 'smalltext',
+				),
+				'sort' => array(
+					'default' => 'mg.group_name',
+					'reverse' => 'mg.group_name DESC',
+				),
+			),
+			'delete' => array(
+				'header' => array(
+					'value' => '<input type="checkbox" name="all" class="input_check" onclick="invertAll(this, this.form);" />',
+				),
+				'data' => array(
+					'function' => create_function('$entry', '
+						return \'<input type="checkbox" class="input_check" name="delete[]" value="\' . $entry[\'id\'] . \'"\' . ($entry[\'editable\'] ? \'\' : \' disabled="disabled"\') . \' />\';
+					'),
+					'style' => 'text-align: center;',
+				),
+			),
+		),
+		'form' => array(
+			'href' => $scripturl . '?action=admin;area=epconfig;sa=logs',
+			'include_sort' => true,
+			'include_start' => true,
+			'hidden_fields' => array(
+				$context['session_var'] => $context['session_id'],
+			),
+		),
+		'additional_rows' => array(
+			array(
+				'position' => 'below_table_data',
+				'value' => '
+						<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" class="button_submit" />
+						<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" class="button_submit" />',
+			),
+		),
+	);
+
+	require_once($sourcedir . '/Subs-List.php');
+	createList($listOptions);
+
+	$context['sub_template'] = 'show_list';
+	$context['default_list'] = 'ep_list_logs';
 }
 
 ?>

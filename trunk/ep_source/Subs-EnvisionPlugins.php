@@ -15,57 +15,6 @@ if (!defined('SMF'))
 	die('Hacking attempt...');
 
 /**
- *	Loads all plugin files
- *
- *	@since 1.0.0
-*/
-function ep_plugin_load_files($hook = '')
-{
-	global $sourcedir, $themedir, $boarddir, $modSettings;
-
-	/* Empty hook, or not set? Return silly goose! */
-	if (empty($hook) || empty($modSettings['ep_plugin_include_' . $hook]))
-		return;
-
-	/* Plugin directories */
-	$plugin_dirs = array(
-		$themedir . '/ep_plugin_template',
-		$sourcedir . '/ep_plugin_source',
-		$boarddir . '/ep_plugin_extra'
-	);
-
-	/* File list */
-	$filelist = explode(',', $modSettings['ep_plugin_include_' . $hook]);
-
-	/* Loop through, making sure files exist before including them! */
-	foreach ($filelist as $file)
-	{
-		foreach ($plugin_dirs as $dir)
-		{
-			if (file_exists($dir . '/' . $file))
-				require_once($dir . '/' . $file);
-		}
-	}
-}
-
-/**
- *	Loads language files for each plugin
- *
- *	@since 1.0.0
-*/
-function ep_plugin_load_langfiles($hook = '')
-{
-	global $modSettings;
-
-	if (empty($hook) || empty($modSettings['ep_plugin_include_lang_' . $hook]))
-		return;
-
-	$filelist = explode(',', $modSettings['ep_plugin_include_lang_' . $hook]);
-	foreach ($filelist as $file)
-		loadLanguage($file);
-}
-
-/**
  * Calls a given integration hook at the related point in the code.
  *
  * Each of the hooks is an array of functions within $modSettings['hooks'], to be called at relevant points in the code. Do note that the file-inclusion hooks may not be called with this.
@@ -87,6 +36,8 @@ function ep_call_hook($hook, $parameters = array())
 
 	if (empty($functions[$hook]))
 		return array();
+
+	$results = array();
 
 	// Loop through each function.
 	foreach ($functions[$hook] as $function)
@@ -115,9 +66,9 @@ function ep_call_hook($hook, $parameters = array())
  * @param array $base the base path of the file.
  * @return bool true if the specified file was found and included; false otherwise.
  */
-function ep_include_hook($hook, $base)
+function ep_include_hook($hook, $base = '')
 {
-	global $modSettings;
+	global $modSettings, $themedir, $sourcedir, $boarddir;
 
 	if (empty($modSettings['ep_hooks']))
 		$files = $modSettings['ep_permanented_hooks'];
@@ -245,19 +196,22 @@ function ep_remove_hook($hook, $function)
 	global $modSettings;
 
 	// You can only remove it if it's available.
-	if (empty($modSettings['ep_hooks'][$hook]) || !in_array($function, $modSettings['ep_hooks'][$hook]))
-		return false;
-	else
+	if (!empty($modSettings['ep_hooks'][$hook]) && in_array($function, $modSettings['ep_hooks'][$hook]))
+	{
 		$modSettings['ep_hooks'][$hook] = array_diff($modSettings['ep_hooks'][$hook], (array) $function);
 
-	if (empty($temp[$hook]) || !in_array($function, $modSettings['ep_permanented_hooks'][$hook]))
-		return false;
+		return true;
+	}
 
-	// Also remove it from the permanented hooks.
-	$temp[$hook] = array_diff($modSettings['ep_permanented_hooks'][$hook], (array) $function);
-	updateSettings(array('ep_permanented_hooks' => serialize($temp)));
+	if (!empty($modSettings['ep_permanented_hooks'][$hook]) && in_array($function, $modSettings['ep_permanented_hooks'][$hook]))
+	{
+		$modSettings['ep_permanented_hooks'][$hook] = array_diff($modSettings['ep_permanented_hooks'][$hook], (array) $function);
+		updateSettings(array('ep_permanented_hooks' => serialize($modSettings['ep_permanented_hooks'])));
 
-	return true;
+		return true;
+	}
+
+	return false;
 }
 
 ?>

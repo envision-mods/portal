@@ -80,4 +80,10 @@ $txt['ep_disable_custommod_icons'] = 'Do not install custom module icons';
 $txt['ep_enable_custommod_icons'] = 'Do not uninstall custom module icons';
 $txt['ep_icon_directory'] = 'Modules icon directory';
 
+// Logs
+$txt['ep_no_logs'] = 'Nothing has been logged yet.';
+$txt['ep_log_add_layout'] = 'Added the layout "%1$s"';
+$txt['ep_log_edit_layout'] = 'Edited the layout "%1$s"';
+$txt['ep_log_delete_layout'] = 'Deleted the layout "%1$s"';
+
 ?>

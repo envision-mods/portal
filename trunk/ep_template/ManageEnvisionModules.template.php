@@ -164,10 +164,10 @@ function template_manage_modules()
 	echo '
 	<div class="floatleft w100">
 		<div class="floatright">
-			<form name="urLayouts" id="ep_module_change_layout" action="', $scripturl, '?action=admin;area=epmodules;sa=epmanmodules;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
-				<select onchange="document.forms[\'ep_module_change_layout\'].submit();" name="layout_picker" class="w100">';
+			<form action="', $context['in_url'], '" method="post" accept-charset="', $context['character_set'], '">
+				<select onchange="this.form.submit();" name="in" class="w100">';
 
-		foreach ($_SESSION['layouts'] as $id_layout => $layout_name)
+		foreach ($context['layout_list'] as $id_layout => $layout_name)
 			echo '
 					<option value="', $id_layout, '"', ($_SESSION['selected_layout']['id_layout'] == $id_layout ? ' selected="selected"' : ''), '>', $layout_name, '</option>';
 
@@ -191,7 +191,7 @@ function template_manage_modules()
 						<div class="roundframe blockframe" id="disabled_module_container">';
 
 	if (!empty($context['ep_all_modules']))
-		foreach($context['ep_all_modules'] as $module)
+		foreach ($context['ep_all_modules'] as $module)
 			echo '
 							<div class="DragBox plainbox draggable_module disabled_module_container centertext" id="envisionmod_' . $module['type'] . '">
 								<p>
@@ -218,7 +218,7 @@ function template_manage_modules()
 		foreach ($row_data as $column_id => $column_data)
 		{
 				echo '
-							<td class="tablecol_', $column_id, '"', $column_data['html'], '>
+							<td class="tablecol_', $column_id, '" colspan="', $column_data['colspan'], '">
 
 								<div id="module_container_', $column_data['id_layout_position'], '" class="enabled w100">
 									<div class="cat_bar block_header">
@@ -459,15 +459,14 @@ function template_add_layout()
 						{
 							echo '
 			<div class="errorbox">
-				<strong>', $txt['layout_error_header'], '</strong>
-				<ul>';
+				<strong>', $txt['layout_error_header'], '</strong>';
 
 							foreach ($context['layout_error']['messages'] as $error)
 								echo '
-					<li class="error">', $error, '</li>';
+					<div class="error">', $error, '</div>';
 
 							echo '
-				</ul>
+				</dl>
 			</div>';
 						}
 
@@ -528,7 +527,7 @@ function template_edit_layout()
 			var delAllRowsError = ', JavaScriptEscape($txt['ep_cant_delete_all']), ';
 		// ]]></script>
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
-		<form name="epFlayouts" id="epLayouts"  action="', $scripturl, '?action=admin;area=epmodules;sa=epeditlayout2;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="beforeLayoutEditSubmit()">
+		<form name="epFlayouts" id="epLayouts"  action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="beforeLayoutEditSubmit()">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $txt['edit_layout'], '
@@ -537,20 +536,18 @@ function template_edit_layout()
 			<span class="upperframe"><span></span></span>
 			<div class="roundframe">';
 
-	// If there were errors when editing the Layout, show them.
+	// If there were errors when editing the layout, show them.
 	if (!empty($context['layout_error']['messages']))
 	{
 		echo '
 				<div class="errorbox">
-					<strong>', $txt['edit_layout_error_header'], '</strong>
-					<ul>';
+					<strong>', $txt['edit_layout_error_header'], '</strong>';
 
 		foreach ($context['layout_error']['messages'] as $error)
 			echo '
-						<li class="error">', $error, '</li>';
+					<div class="error">', $error, '</div>';
 
 		echo '
-					</ul>
 				</div>';
 	}
 
@@ -620,8 +617,8 @@ function template_edit_layout()
 									<a href="javascript:void(0);" onclick="javascript:moveDown(this.parentNode.parentNode.parentNode);" onfocus="if(this.blur)this.blur();">
 										<img src="', $context['epadmin_image_url'], '/ep_down.gif" class="imgbox" />
 									</a>
+									<span class="ep_edit_column">', $txt['ep_column'], ' ', $pCol + 1, '</span>
 								</div>
-								<span class="ep_edit_column">', $txt['ep_column'], ' ', $pCol + 1, '</span>
 							</td>
 							<td>
 								<input type="text" name="colspans[', $section['id_layout_position'], ']" size="5" value="', (isset($_POST['colspans'][$section['id_layout_position']]) ? $_POST['colspans'][$section['id_layout_position']] : $section['colspan']), '" class="', (in_array($section['id_layout_position'], $context['colspans_error_ids']) ? 'layout_error ' : ''), 'input_text" />
@@ -683,13 +680,13 @@ function template_edit_layout()
 							<input type="button" class="button_submit" value="', $txt['ep_edit_remove_selected'], '" onclick="javascript:deleteSelected(', JavaScriptEscape($txt['confirm_remove_selected']), ');" />
 						</p>
 					</div>
-
+					<br class="clear" />
 					<div>
 						<hr class="hrcolor" />
 						<div id="lay_right" class="righttext">', ($context['show_smf'] ? '
 							<input type="hidden" id="smf_section" name="smf_id_layout_position" value="' . $smf_section . '" />' : ''), '
-							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-							<input type="hidden" id="layout_picker" name="layout_picker" value="', $_POST['layout_picker'], '" />
+							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', (!empty($_POST['layout_picker']) ? '
+							<input type="hidden" id="layout_picker" name="layout_picker" value="' . $_POST['layout_picker'] . '" />' : ''), '
 							<input type="hidden" id="remove_positions" name="remove_positions" value="" />
 							<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />';
 
@@ -746,7 +743,7 @@ function template_list_groups($field, $key)
 						document.getElementById("', $field['label'], '_group_perms").style.display = "none";
 						document.getElementById("', $field['label'], '_group_perms_groups_link").style.display = "";
 					// ]]></script>';
-	}
+}
 
 function template_checklist($field, $key)
 {
