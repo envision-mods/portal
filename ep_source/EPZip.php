@@ -71,8 +71,10 @@ class EPZip
 				return false;
 			// We've got ourselves a directory. Simple stuff.
 			if($name[strlen($name) - 1] == DIRECTORY_SEPARATOR)
+			{
 				if(!mkdir($name))
 					return false; // Something went wrong creating the directory.
+			}
 			else
 			{
 				// Create the file and write the content to it.
