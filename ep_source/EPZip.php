@@ -1,6 +1,6 @@
 <?php 
 /**************************************************************************************
-* EPZip.php                                                                         *
+* EPZip.php                                                                           *
 /**************************************************************************************
 * EnvisionPortal                                                                      *
 * Community Portal Application for SMF                                                *
@@ -27,18 +27,22 @@ if (!defined('SMF'))
 			- Closes a zip archive.
 			- Returns true on success and false on failure.
 */
-class EPZip{
+class EPZip
+{
 	public $zipModule = false; // Tells whether or not we can use zlib functions.
 	private $zipArchive; // ZipArchive() handle.
 	private $zipOpen; // zip_open() handle.
-	public function EPZip(){
+	public function EPZip()
+	{
 		$this->zipModule = extension_loaded('zlib');
 		if($this->zipModule)
 			$this->zipArchive = new ZipArchive();
 	}
-	private function Open($file_name){
+	private function Open($file_name)
+	{
 		// This means zlib is loaded and working.
-		if($this->zipModule){
+		if($this->zipModule)
+		{
 			$this->zipArchive->open($file_name);
 			return $this->zipArchive;
 		}
@@ -49,22 +53,29 @@ class EPZip{
 			return false;
 		return true;
 	}
-	private function Extract($dir_name){
+	private function Extract($dir_name)
+	{
 		// ZipArchive really is a blessing as opposed to the other...
 		if($this->zipModule)
 			return $this->zipArchive->extractTo($dir_name);
 		
 		// Such a nuisance...
-		while($zip = zip_read($this->zipFile)){
+		while($zip = zip_read($this->zipFile))
+		{
 			$name = zip_entry_name($zip);
 			$dir = dirname($name);
+			// If we couldn't open, or the file already exists, something's wrong.
 			if(!zip_entry_open($this->zipFile, $zip))
 				return false;
 			if(file_exists($name))
 				return false;
+			// We've got ourselves a directory. Simple stuff.
 			if($name[strlen($name) - 1] == DIRECTORY_SEPARATOR)
-				mkdir($name);
-			else{
+				if(!mkdir($name))
+					return false; // Something went wrong creating the directory.
+			else
+			{
+				// Create the file and write the content to it.
 				$handle = fopen($name, 'w');
 				if(!$handle)
 					return false;
@@ -77,7 +88,9 @@ class EPZip{
 		}
 		return true;
 	}
-	private function Close(){
+	private function Close()
+	{
+		// Nothing interesting here. Just close up shop.
 		if($this->zipModule)
 			return $this->zipArchive->close();
 		zip_close($this->zipFile);
