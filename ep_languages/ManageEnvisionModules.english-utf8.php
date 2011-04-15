@@ -11,7 +11,6 @@ For the Module Parameter => $helptxt['ep_(name value in ep_modules table)_(param
 */
 
 // Just the basics.
-$txt['ep_admin_modules'] = 'Envision Portal Modules';
 $txt['ep_admin_title_manage_modules'] = 'Envision Portal - Manage Modules';
 $txt['ep_admin_title_add_modules'] = 'Envision Portal - Add Modules';
 $txt['ep_admin_modules_desc'] = 'This page allows you to add modules, edit currently installed modules, and change the layout of the main page.';

@@ -82,6 +82,7 @@ $txt['ep_admin_manage_pages'] = 'Manage Pages';
 $txt['ep_admin_menu'] = 'Envision Menu';
 $txt['ep_admin_add_button'] = 'Add Button';
 $txt['ep_admin_manage_menu'] = 'Manage Menu';
+$txt['ep_admin_log'] = 'Logs';
 
 // Errors
 $txt['ep_module_error'] = 'There is an error with this module!';

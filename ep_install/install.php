@@ -349,6 +349,13 @@ function DatabasePopulation()
 			'name' => 'log_actions',
 			'columns' => array(
 				array(
+					'name' => 'id_action',
+					'type' => 'int',
+					'size' => 10,
+					'unsigned' => true,
+					'auto' => true,
+				),
+				array(
 					'name' => 'id_member',
 					'type' => 'mediumint',
 					'size' => 8,
@@ -360,15 +367,14 @@ function DatabasePopulation()
 					'size' => 255,
 				),
 				array(
-					'name' => 'description',
-					'type' => 'varchar',
-					'size' => 255,
-				),
-				array(
 					'name' => 'time',
 					'type' => 'int',
 					'size' => 10,
 					'unsigned' => true,
+				),
+				array(
+					'name' => 'extra',
+					'type' => 'text',
 				),
 			),
 			'indexes' => array(
