@@ -19,8 +19,8 @@
 		<require-dir name="ep_images" destination="$imagesdir" />
 
 		<!-- Until SMF fixes their bug where the images directory for the
-		     Core Features is hard-coded into the template and the image
-		     parameter is not processed, we need to do this. Sigh. -->
+			 Core Features is hard-coded into the template and the image
+			 parameter is not processed, we need to do this. Sigh. -->
 		<require-file name="ep_images/feature_ep.png" destination="$imagesdir/admin" />
 		<!-- Also, we need this file to go by itself on the root directory of SMF -->
 		<require-file name="ep_ajax.php" destination="$boarddir" />
