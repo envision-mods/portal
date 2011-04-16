@@ -306,7 +306,7 @@ function SavePage()
 		$name = isset($_REQUEST['page_name']) ? $_REQUEST['page_name'] : '';
 		$type = isset($_REQUEST['type']) ? $_REQUEST['type'] : '';
 		$title = isset($_REQUEST['title']) ? $_REQUEST['title'] : '';
-		$groups = isset($_REQUEST['permissions']) ? implode(', ', $_REQUEST['permissions']) : '';
+		$groups = isset($_REQUEST['permissions']) ? implode(',', $_REQUEST['permissions']) : '';
 		$status = isset($_REQUEST['status']) ? $_REQUEST['status'] : '';
 		$body = isset($_REQUEST['body']) ? $_REQUEST['body'] : '';
 		$header = isset($_REQUEST['ep_header']) ? $_REQUEST['ep_header'] : '';
@@ -348,7 +348,7 @@ function SavePage()
 				// Ok, looks like we're modifying, so let's edit the existing page!
 				$smcFunc['db_query']('','
 					UPDATE {db_prefix}ep_envision_pages
-					SET page_name = {string:name}, type = {int:type}, title = {string:title}, permissions = {string:groups}, status = {int:status}, body = {string:body}
+					SET page_name = {string:name}, type = {int:type}, title = {string:title}, permissions = {string:groups}, status = {int:status}, header = {string:header}, body = {string:body}
 					WHERE id_page = {int:id}',
 					array(
 						'id' => (int) $id,
@@ -357,8 +357,8 @@ function SavePage()
 						'title' => $title,
 						'groups' => $groups,
 						'status' => (int) $status,
-						'body' => $body,
 						'header' => $header,
+						'body' => $body,
 					)
 				);
 			}
@@ -368,10 +368,10 @@ function SavePage()
 				$smcFunc['db_insert']('insert',
 					'{db_prefix}ep_envision_pages',
 					array(
-						'page_name' => 'string-255', 'type' => 'int', 'title' => 'string-255', 'permissions' => 'string-255', 'status' => 'int', 'body' => 'string', 'header' => 'string'
+						'page_name' => 'string-255', 'type' => 'int', 'title' => 'string-255', 'permissions' => 'string-255', 'status' => 'int', 'header' => 'string', 'body' => 'string'
 					),
 					array(
-						$name, (int) $type, $title, $groups, (int) $status, $body, $header
+						$name, (int) $type, $title, $groups, (int) $status, $header, $body
 					),
 					array('id_page')
 				);
@@ -490,7 +490,7 @@ function prepareContext()
 			'page_name' => $row['page_name'],
 			'type' => $row['type'],
 			'title' => $row['title'],
-			'permissions' => ep_list_groups(explode(',', $row['permissions'])),
+			'permissions' => ep_list_groups($row['permissions']),
 			'status' => $row['status'],
 			'id' => $_GET['pid'],
 		);
@@ -506,7 +506,7 @@ function prepareContext()
 			'page_name' => '',
 			'type' => 2,
 			'title' => '',
-			'permissions' => ep_list_groups(array('-3')),
+			'permissions' => ep_list_groups('-3'),
 			'status' => 1,
 			'id' => 0,
 		);

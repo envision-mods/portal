@@ -418,6 +418,10 @@ function DatabasePopulation()
 					'size' => 255,
 				),
 				array(
+					'name' => 'header',
+					'type' => 'longtext',
+				),
+				array(
 					'name' => 'body',
 					'type' => 'longtext',
 				),

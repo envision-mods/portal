@@ -36,7 +36,7 @@ function ep_init($init_action = '')
 
 	// Software Version.
 	// !!! Revise this on each commit!
-	$portal_ver = '1.0 DEV r57';
+	$portal_ver = '1.0 DEV r58';
 
 	// Unallowed Envision names.
 	$envision_names = array('announce', 'usercp', 'stats', 'online', 'news', 'topics', 'posts', 'search', 'calendar', 'poll', 'top_posters', 'theme_select', 'new_members', 'staff', 'sitemenu', 'shoutbox', 'custom');

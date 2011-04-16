@@ -1294,15 +1294,15 @@ function load_envision_menu($menu_buttons)
 		)
 	);
 
-	if (!empty($smcFunc['db_error']))
+	if ($smcFunc['db_num_rows']($request) == 0)
 		return $menu_buttons;
-
+		
 	$new_menu_buttons = array();
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		$permissions = explode(',', $row['permissions']);
-
+		
 		$ep_temp_menu = array(
 			'title' => $row['name'],
 			'href' => ($row['target'] == 'forum' ? $scripturl : '') . $row['link'],
@@ -1546,7 +1546,8 @@ function envision_integrate_pre_load()
 	$modSettings['ep_portal_mode'] = isset($modSettings['admin_features']) ? in_array('ep', explode(',', $modSettings['admin_features'])) : false;
 
 	// Unserialize our permanent hooks here.
-	$modSettings['ep_permanented_hooks'] = unserialize($modSettings['ep_permanented_hooks']);
+	if(!empty($modSettings['ep_permanented_hooks']))
+		$modSettings['ep_permanented_hooks'] = unserialize($modSettings['ep_permanented_hooks']);
 
 	require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');

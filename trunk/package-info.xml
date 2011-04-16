@@ -22,7 +22,8 @@
 		     Core Features is hard-coded into the template and the image
 		     parameter is not processed, we need to do this. Sigh. -->
 		<require-file name="ep_images/feature_ep.png" destination="$imagesdir/admin" />
-
+		<!-- Also, we need this file to go by itself on the root directory of SMF -->
+		<require-file name="ep_ajax.php" destination="$boarddir" />
 		<!-- Envision Plugins -->
 		<require-dir name="ep_plugins_source" destination="$sourcedir" />
 		<require-dir name="ep_plugins_template" destination="$themedir" />
@@ -44,7 +45,7 @@
 		<remove-dir name="$themedir/scripts/ep_scripts" />
 		<remove-dir name="$boarddir/ep_extra" />
 		<remove-file name="$imagesdir/admin/feature_ep.png" />
-
+		<remove-file name="$boarddir/ep_ajax.php" />
 		<!-- Envision Plugins -->
 		<remove-dir name="$sourcedir/ep_plugins_source" />
 		<remove-dir name="$themedir/ep_plugins_template" />
