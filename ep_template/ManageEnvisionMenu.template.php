@@ -142,7 +142,7 @@ function template_main()
 								<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'permissions[]\');" id="check_group_all"', $all_checked ? ' checked="checked"' : '', ' />
 								<label for="check_group_all"><em>', $txt['check_all'], '</em></label><br />
 							</fieldset>
-							<a href="javascript:void(0);" onclick="document.getElementById(\'group_perms\').style.display = \'block\'; document.getElementById(\'group_perms_groups_link\').style.display = \'none\'; return false;" id="group_perms_groups_link" class="display_none">[ ', $txt['avatar_select_permission'], ' ]</a>
+							<a href="javascript:void(0);" onclick="document.getElementById(\'group_perms\').style.display = \'block\'; document.getElementById(\'group_perms_groups_link\').style.display = \'none\'; return false;" id="group_perms_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
 							<script type="text/javascript"><!-- // --><![CDATA[
 								document.getElementById("group_perms").style.display = "none";
 								document.getElementById("group_perms_groups_link").style.display = "";
