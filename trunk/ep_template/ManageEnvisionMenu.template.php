@@ -152,8 +152,8 @@ function template_main()
 							<strong>', $txt['ep_envision_menu_button_status'], ':</strong>
 						</dt>
 						<dd>
-							<input type="radio" class="input_check" name="status" value="active"', $context['button_data']['status'] == 'active' ? ' checked="checked"' : '', ' />', $txt['ep_envision_menu_button_active'], ' <br />
-							<input type="radio" class="input_check" name="status" value="inactive"', $context['button_data']['status'] == 'inactive' ? ' checked="checked"' : '', ' />', $txt['ep_envision_menu_button_inactive'], '
+							<input type="radio" class="input_check" name="status" value="1"', $context['button_data']['status'] == '1' ? ' checked="checked"' : '', ' />', $txt['ep_envision_menu_button_active'], ' <br />
+							<input type="radio" class="input_check" name="status" value="0"', $context['button_data']['status'] == '0' ? ' checked="checked"' : '', ' />', $txt['ep_envision_menu_button_inactive'], '
 						</dd>
 					</dl>
 					<input name="bid" value="', $context['button_data']['id'], '" type="hidden" />

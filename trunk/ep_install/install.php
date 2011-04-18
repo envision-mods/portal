@@ -496,8 +496,9 @@ function DatabasePopulation()
 				),
 				array(
 					'name' => 'status',
-					'type' => 'enum(\'active\',\'inactive\')',
-					'default' => 'active',
+					'type' => 'tinyint',
+					'size' => 2,
+					'unsigned' => true,
 				),
 				array(
 					'name' => 'permissions',
