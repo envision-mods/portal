@@ -1304,7 +1304,7 @@ function load_envision_menu($menu_buttons)
 		$permissions = explode(',', $row['permissions']);
 		
 		if((!array_intersect($user_info['groups'], $permissions) || $row['status'] != '1') && !allowedTo('admin_forum'))
-		 continue;
+			continue;
 		 
 		$ep_temp_menu = array(
 			'title' => $row['name'],

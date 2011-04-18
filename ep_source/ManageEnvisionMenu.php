@@ -442,7 +442,7 @@ function PrepareContext()
 	{
 		$context['button_data'] = array(
 			'name' => '',
-			'link' => '',
+			'link' => '1',
 			'target' => '_self',
 			'type' => 'forum',
 			'position' => 'before',
