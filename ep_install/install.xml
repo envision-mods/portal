@@ -83,11 +83,12 @@
 	$current_action = (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view')) ? 'forum' : 'home';]]></add>
 		</operation>
 		<operation>
-			<search position="after"><![CDATA[// Now we put the buttons in the context so the theme can use them.]]></search>
-			<add><![CDATA[if (!empty($modSettings['ep_portal_mode']))
-			$buttons = load_envision_menu($buttons);
-
-		]]></add>
+			<search position="before"><![CDATA[	call_integration_hook('integrate_menu_buttons', array(&$menu_buttons));
+]]></search>
+			<add><![CDATA[
+	if (!empty($modSettings['ep_portal_mode']))
+		$menu_buttons = load_envision_menu($menu_buttons);
+]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[

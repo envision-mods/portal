@@ -1303,10 +1303,12 @@ function load_envision_menu($menu_buttons)
 	{
 		$permissions = explode(',', $row['permissions']);
 		
+		if((!array_intersect($user_info['groups'], $permissions) || $row['status'] != '1') && !allowedTo('admin_forum'))
+		 continue;
+		 
 		$ep_temp_menu = array(
 			'title' => $row['name'],
 			'href' => ($row['target'] == 'forum' ? $scripturl : '') . $row['link'],
-			'show' => (array_intersect($user_info['groups'], $permissions)) && ($row['status'] == 'active' || (allowedTo('admin_forum') && $row['status'] == 'inactive')),
 			'target' => $row['target'],
 			'active_button' => false,
 		);

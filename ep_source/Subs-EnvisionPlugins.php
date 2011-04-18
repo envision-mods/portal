@@ -30,7 +30,7 @@ function ep_call_hook($hook, $parameters = array())
 	global $modSettings;
 
 	if (empty($modSettings['ep_hooks']))
-		$functions = $modSettings['ep_permanented_hooks'];
+		$functions = empty($modSettings['ep_permanented_hooks']) ? '' : $modSettings['ep_permanented_hooks'];
 	else
 		$functions = $modSettings['ep_hooks'] + $modSettings['ep_permanented_hooks'];
 
