@@ -442,11 +442,11 @@ function PrepareContext()
 	{
 		$context['button_data'] = array(
 			'name' => '',
-			'link' => '1',
+			'link' => '',
 			'target' => '_self',
 			'type' => 'forum',
 			'position' => 'before',
-			'status' => 'active',
+			'status' => '1',
 			'permissions' => ep_list_groups('-3'),
 			'parent' => 'home',
 			'id' => 0,
