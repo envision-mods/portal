@@ -27,6 +27,52 @@ DatabasePopulation();
 // Try to chmod ep_ajax.php to 644. This might not work.
 @chmod((dirname(__FILE__) . '/ep_ajax.php'), 0644);
 
+//!!! SMF Doesn't believe in the update setting for create table, so we'll use our own instead.
+function ep_db_create_table($name, $columns, $indexes, $parameters)
+{
+	global $smcFunc;
+	
+	// Make sure the name has the proper...what's that thing called? (SMF's way makes an unsafe assumption imo)
+	$table_name = ((substr($name, 0, 1) == '`') ? $name : ('`' . $name));
+	$table_name = ((substr($name, -1) == '`') ? $name : ($name . '`'));
+	
+	if($smcFunc['db_num_rows'] == 0)
+		return $smcFunc['db_create_table']($name, $columns, $indexes, $parameters, 'update');
+	
+	$query = $smcFunc['db_query']('', '
+		SHOW COLUMNS
+		FROM {raw:table_name}',
+		array(
+			'table_name' => '',
+		)
+	);
+	
+	while($row = $smcFunc['db_fetch_assoc']($query))
+	{
+		foreach($columns as $key => $column)
+		{
+			if($row['Field'] == $column['name'])
+			{
+				$type = (isset($column['size']) ? ($column['type'] . '(' . $column['size'] . ')') : $column['type']);
+				if($row['Type'] != $type)
+					$smcFunc['db_change_column']($table_name, $column['name'], $column);
+				unset($columns[$key]);
+				break;
+			}
+		}
+	}
+	
+	$smcFunc['db_free_result']($query);
+	
+	if(!empty($columns))
+	{
+		foreach($columns as $column)
+			if(!empty($column))
+				$smcFunc['db_add_column']($table_name, $column);
+	}
+	return true;
+}
+
 //!!! Installs Envision Portal Tables for SMF 2.0.x with default values!
 function DatabasePopulation()
 {
@@ -613,7 +659,7 @@ function DatabasePopulation()
 
 	foreach ($ep_tables as $table)
 	{
-		$smcFunc['db_create_table']('{db_prefix}ep_' . $table['name'], $table['columns'], $table['indexes'], array(), 'update');
+		ep_db_create_table('{db_prefix}ep_' . $table['name'], $table['columns'], $table['indexes'], array(), 'update');
 
 		if (isset($table['default']))
 			$smcFunc['db_insert']('ignore', '{db_prefix}ep_' . $table['name'], $table['default']['columns'], $table['default']['values'], $table['default']['keys']);
