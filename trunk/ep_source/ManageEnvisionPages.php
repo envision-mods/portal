@@ -337,7 +337,7 @@ function SavePage()
 		if ($check != 0 && empty($id))
 			$post_errors['page_name'] = 'ep_envision_pages_mysql';
 
-		if (!empty($id) && $row['id_page'] != $id)
+		elseif ($check != 0 && !empty($id) && $row['id_page'] != $id)
 			$post_errors['page_name'] = 'ep_envision_pages_mysql';
 
 		if (empty($post_errors))

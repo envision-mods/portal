@@ -36,7 +36,7 @@ if (isset($_GET['check']))
 
 		if ($check != 0 && empty($_GET['id']))
 			$ret = $_GET['pn'] . $txt['ep_pages_ajax_navailable'];
-		elseif (!empty($_GET['id']) && $row['id_page'] != $id)
+		elseif ($check != 0 && !empty($_GET['id']) && $row['id_page'] != $_GET['id'])
 			$ret = $_GET['pn'] . $txt['ep_pages_ajax_navailable'];
 		else
 			$ret = $_GET['pn'] . $txt['ep_pages_ajax_available'];
