@@ -24,6 +24,9 @@ if ((SMF == 'SSI') && !$user_info['is_admin'])
 
 DatabasePopulation();
 
+// Try to chmod ep_ajax.php to 644. This might not work.
+@chmod((dirname(__FILE__) . '/ep_ajax.php'), 0644);
+
 //!!! Installs Envision Portal Tables for SMF 2.0.x with default values!
 function DatabasePopulation()
 {
