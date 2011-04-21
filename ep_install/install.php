@@ -37,6 +37,10 @@ function ep_db_create_table($name, $columns, $indexes, $parameters)
 	$table_name = ((substr($name, 0, 1) == '`') ? $name : ('`' . $name));
 	$table_name = ((substr($name, -1) == '`') ? $table_name : ($table_name . '`'));
 	
+	// If the table doesn't exist, create it. We're basically done here after that.
+	if(!in_array(str_replace('{db_prefix}', $db_prefix, $name), $smcFunc['db_list_tables']()))
+		return $smcFunc['db_create_table']($name, $columns, $indexes, $parameters, 'update');
+		
 	$query = $smcFunc['db_query']('', '
 		SHOW COLUMNS
 		FROM {raw:table_name}',
@@ -44,9 +48,6 @@ function ep_db_create_table($name, $columns, $indexes, $parameters)
 			'table_name' => $table_name,
 		)
 	);
-	
-	if($smcFunc['db_num_rows']($query) == 0)
-		return $smcFunc['db_create_table']($name, $columns, $indexes, $parameters, 'update');
 	
 	while($row = $smcFunc['db_fetch_assoc']($query))
 	{
