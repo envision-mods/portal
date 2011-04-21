@@ -30,22 +30,23 @@ DatabasePopulation();
 //!!! SMF Doesn't believe in the update setting for create table, so we'll use our own instead.
 function ep_db_create_table($name, $columns, $indexes, $parameters)
 {
-	global $smcFunc;
+	global $smcFunc, $db_prefix, $tp;
 	
 	// Make sure the name has the proper...what's that thing called? (SMF's way makes an unsafe assumption imo)
+	$name = str_replace('{db_prefix}', $db_prefix, $name);
 	$table_name = ((substr($name, 0, 1) == '`') ? $name : ('`' . $name));
-	$table_name = ((substr($name, -1) == '`') ? $name : ($name . '`'));
-	
-	if($smcFunc['db_num_rows'] == 0)
-		return $smcFunc['db_create_table']($name, $columns, $indexes, $parameters, 'update');
+	$table_name = ((substr($name, -1) == '`') ? $table_name : ($table_name . '`'));
 	
 	$query = $smcFunc['db_query']('', '
 		SHOW COLUMNS
 		FROM {raw:table_name}',
 		array(
-			'table_name' => '',
+			'table_name' => $table_name,
 		)
 	);
+	
+	if($smcFunc['db_num_rows']($query) == 0)
+		return $smcFunc['db_create_table']($name, $columns, $indexes, $parameters, 'update');
 	
 	while($row = $smcFunc['db_fetch_assoc']($query))
 	{
