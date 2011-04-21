@@ -64,5 +64,6 @@ $txt['ep_envision_menu_empty_link'] = 'The link was left empty.';
 $txt['ep_envision_menu_depend_desc'] = 'You must move or remove all child and/or grandchild buttons of this button before modifying it.';
 $txt['ep_envision_menu_before_child_title'] = 'Make this a child button';
 $txt['ep_envision_menu_before_child_desc'] = 'Use Child Of to make buttons the child of another!';
+$txt['ep_envision_menu_mysql'] = 'The button name you chose is already in use!';
 
 ?>

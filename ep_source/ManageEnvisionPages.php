@@ -324,20 +324,19 @@ function SavePage()
 		$query = $smcFunc['db_query']('', '
 			SELECT id_page
 			FROM {db_prefix}ep_envision_pages
-			WHERE page_name = {string:name}',
+			WHERE page_name = {string:name}
+			AND id_page != {int:id}',
 			array(
-				'name' => $name
+				'name' => $name,
+				'id' => $id,
 			)
 		);
 
 		$check = $smcFunc['db_num_rows']($query);
 
-		$row = $smcFunc['db_fetch_assoc']($query);
+		$smcFunc['db_free_result']($query);
 
-		if ($check != 0 && empty($id))
-			$post_errors['page_name'] = 'ep_envision_pages_mysql';
-
-		elseif ($check != 0 && !empty($id) && $row['id_page'] != $id)
+		if ($check > 0 || empty($id))
 			$post_errors['page_name'] = 'ep_envision_pages_mysql';
 
 		if (empty($post_errors))

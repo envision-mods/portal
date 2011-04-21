@@ -315,20 +315,19 @@ function SaveButton()
 		$query = $smcFunc['db_query']('', '
 			SELECT id_button
 			FROM {db_prefix}ep_envision_menu
-			WHERE name = {string:name}',
+			WHERE name = {string:name}
+			AND id_button != {int:id}',
 			array(
-				'name' => $name
+				'name' => $name,
+				'id' => $id,
 			)
 		);
 
 		$check = $smcFunc['db_num_rows']($query);
 
-		$row = $smcFunc['db_fetch_assoc']($query);
+		$smcFunc['db_free_result']($query);
 
-		if ($check != 0 && empty($id))
-			$post_errors['name'] = 'ep_envision_menu_mysql';
-
-		if (!empty($id) && $row['id_button'] != $id)
+		if ($check > 0 || empty($id))
 			$post_errors['name'] = 'ep_envision_menu_mysql';
 
 		if (empty($post_errors))

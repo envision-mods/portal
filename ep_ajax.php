@@ -24,24 +24,19 @@ if (isset($_GET['check']))
 		$query = $smcFunc['db_query']('', '
 			SELECT id_page
 			FROM {db_prefix}ep_envision_pages
-			WHERE page_name = {string:name}',
+			WHERE page_name = {string:name}
+			AND id_page != {int:id}',
 			array(
-				'name' => $_GET['pn']
+				'name' => $_GET['pn'],
+				'id' => $_GET['id'],
 			)
 		);
 
 		$check = $smcFunc['db_num_rows']($query);
 
-		$row = $smcFunc['db_fetch_assoc']($query);
+		$smcFunc['db_free_result']($query);
 
-		if ($check != 0 && empty($_GET['id']))
-			$ret = $_GET['pn'] . $txt['ep_pages_ajax_navailable'];
-		elseif ($check != 0 && !empty($_GET['id']) && $row['id_page'] != $_GET['id'])
-			$ret = $_GET['pn'] . $txt['ep_pages_ajax_navailable'];
-		else
-			$ret = $_GET['pn'] . $txt['ep_pages_ajax_available'];
-
-		echo $ret;
+		echo $_GET['pn'] . (($check > 0 || empty($_GET['id'])) ? $txt['ep_pages_ajax_navailable'] : $txt['ep_pages_ajax_available']);
 	}
 }
 elseif (isset($_GET['button']))
@@ -55,24 +50,19 @@ elseif (isset($_GET['button']))
 		$query = $smcFunc['db_query']('', '
 			SELECT id_button
 			FROM {db_prefix}ep_envision_menu
-			WHERE name = {string:name}',
+			WHERE name = {string:name}
+			AND id_button != {int:id}',
 			array(
-				'name' => $_GET['bn']
+				'name' => $_GET['bn'],
+				'id' => $_GET['id'],
 			)
 		);
 
 		$check = $smcFunc['db_num_rows']($query);
-
-		$row = $smcFunc['db_fetch_assoc']($query);
-
-		if ($check != 0 && empty($_GET['id']))
-			$ret = $_GET['bn'] . $txt['ep_pages_ajax_navailable'];
-		elseif (!empty($_GET['id']) && $row['id_button'] != $id)
-			$ret = $_GET['bn'] . $txt['ep_pages_ajax_navailable'];
-		else
-			$ret = $_GET['bn'] . $txt['ep_pages_ajax_available'];
-
-		echo $ret;
+		
+		$smcFunc['db_free_result']($query);
+		
+		echo $_GET['bn'] . (($check > 0 || empty($_GET['id'])) ? $txt['ep_pages_ajax_navailable'] : $txt['ep_pages_ajax_available']);
 	}
 }
 else
