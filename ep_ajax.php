@@ -36,7 +36,7 @@ if (isset($_GET['check']))
 
 		$smcFunc['db_free_result']($query);
 
-		echo $_GET['pn'] . (($check > 0 || empty($_GET['id'])) ? $txt['ep_pages_ajax_navailable'] : $txt['ep_pages_ajax_available']);
+		echo $_GET['pn'] . ($check > 0 ? $txt['ep_pages_ajax_navailable'] : $txt['ep_pages_ajax_available']);
 	}
 }
 elseif (isset($_GET['button']))
@@ -62,7 +62,7 @@ elseif (isset($_GET['button']))
 		
 		$smcFunc['db_free_result']($query);
 		
-		echo $_GET['bn'] . (($check > 0 || empty($_GET['id'])) ? $txt['ep_pages_ajax_navailable'] : $txt['ep_pages_ajax_available']);
+		echo $_GET['bn'] . ($check > 0 ? $txt['ep_pages_ajax_navailable'] : $txt['ep_pages_ajax_available']);
 	}
 }
 else
