@@ -336,7 +336,7 @@ function SavePage()
 
 		$smcFunc['db_free_result']($query);
 
-		if ($check > 0 || empty($id))
+		if ($check > 0)
 			$post_errors['page_name'] = 'ep_envision_pages_mysql';
 
 		if (empty($post_errors))
