@@ -204,9 +204,9 @@ function EnvisionPortalInfo()
 					),
 				),
 				array(
-					'title' => $txt['ep_credits_fam_fam'],
+					'title' => $txt['ep_credits_fugue'],
 					'members' => array(
-						$txt['ep_credits_fam_fam_message'],
+						$txt['ep_credits_fugue_message'],
 					),
 				),
 			),
