@@ -612,10 +612,10 @@ function template_edit_layout()
 							<td id="tdcolumn_', $xRow, '_', $pCol, '_', $section['id_layout_position'], '">
 								<div class="floatleft">
 									<a href="javascript:void(0);" onclick="javascript:moveUp(this.parentNode.parentNode.parentNode);" onfocus="if(this.blur)this.blur();">
-										<img src="' . $context['epadmin_image_url'] . '/ep_up.gif" class="imgbox" />
+										<img src="' . $context['epadmin_image_url'] . '/ep_up.png" class="imgbox" />
 									</a>
 									<a href="javascript:void(0);" onclick="javascript:moveDown(this.parentNode.parentNode.parentNode);" onfocus="if(this.blur)this.blur();">
-										<img src="', $context['epadmin_image_url'], '/ep_down.gif" class="imgbox" />
+										<img src="', $context['epadmin_image_url'], '/ep_down.png" class="imgbox" />
 									</a>
 									<span class="ep_edit_column">', $txt['ep_column'], ' ', $pCol + 1, '</span>
 								</div>

@@ -75,7 +75,7 @@ function module_usercp()
 		// Some time vars, and a bullet image.
 		//!!! Now uses timeformat() instead of date() for localization
 		$time = timeformat(time(), '%a, ' . $time_fmt);
-		$b = '<img src="' . $context['ep_module_image_url'] . 'bullet' . ($context['right_to_left'] ? '_rtl' : '') . '.gif" alt="" />&nbsp;';
+		$b = '<img src="' . $context['ep_module_image_url'] . 'bullet' . ($context['right_to_left'] ? '_rtl' : '') . '.png" alt="" />&nbsp;';
 
 		echo '
 							<span class="ep_hello">', $txt['hello_member_ndt'], ', ', $user_info['name'], '</span><br />';
