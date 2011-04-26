@@ -416,14 +416,14 @@ div.epsitemenu div span.subs
 	margin-top: -6px;
 	padding: 5px 25px;
 	color: white;
-	background: url(../../../envisionportal/module_images/sitemenu/expanded.gif) no-repeat 10px center;
+	background: url(../../../envisionportal/module_images/sitemenu/expanded.png) no-repeat 10px center;
 	cursor: default;
 	border-bottom: 1px solid #ddd;
 }
 
 div.epsitemenu div.epsm_collapsed span.subs
 {
-	background-image: url(../../../envisionportal/module_images/sitemenu/collapsed.gif);
+	background-image: url(../../../envisionportal/module_images/sitemenu/collapsed.png);
 }
 
 div.epsitemenu div a
@@ -464,7 +464,7 @@ div.epsitemenu div span.no_subs
 
 div.epsitemenu div a.sm:hover
 {
-	background : #869bd8 url(../../../envisionportal/module_images/sitemenu/linkarrow.gif) no-repeat right center;
+	background : #869bd8 url(../../../envisionportal/module_images/sitemenu/linkarrow.png) no-repeat right center;
 	color: #fff;
 	text-decoration: none;
 }

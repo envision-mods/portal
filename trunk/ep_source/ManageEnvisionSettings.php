@@ -200,7 +200,7 @@ function EnvisionPortalInfo()
 				array(
 					'title' => $txt['ep_credits_special'],
 					'members' => array(
-						'All of the Envision Portal Friends'
+						$txt['ep_credits_all_friends'],
 					),
 				),
 				array(

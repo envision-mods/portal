@@ -44,6 +44,7 @@ $txt['ep_credits_special'] = 'Special Thanks';
 $txt['ep_credits_fugue'] = 'Icons';
 $txt['ep_credits_fugue_message'] = 'Yusuke Kamiyamane for his <a href="http://p.yusukekamiyamane.com/" target="_blank">Fugue Icons</a>.';
 $txt['ep_credits_anyone'] = '<em>And for anyone we may have missed, thank you!</em>';
+$txt['ep_credits_all_friends'] = 'All of the Envision Portal Friends';
 $txt['ep_credits_contribute'] = 'Do you like Envision Portal? <a href="http://envisionportal.net/index.php?action=contribute">Contribute to the project!</a>';
 
 /***********************************
