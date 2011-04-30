@@ -1554,6 +1554,8 @@ function envision_integrate_pre_load()
 	// Unserialize our permanent hooks here.
 	if (!empty($modSettings['ep_permanented_hooks']))
 		$modSettings['ep_permanented_hooks'] = unserialize($modSettings['ep_permanented_hooks']);
+	else
+		$modSettings['ep_permanented_hooks'] = array();
 
 	require_once($sourcedir . '/ep_source/EnvisionPortal.php');
 	require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
