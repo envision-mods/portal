@@ -44,7 +44,7 @@ function loadGeneralSettingParameters3($subActions = array(), $defaultAction = '
 	isAllowedTo('admin_forum');
 
 	// Language Files needed, load EnvisionModules first so that it can't overwrite any default Envision Strings.
-	loadLanguage('ep_languages/EnvisionHelp', 'ep_languages/ManageEnvisionModules');
+	loadLanguage('ep_languages/EnvisionHelp+ep_languages/ManageEnvisionModules');
 
 	// load the template and the style sheet needed
 	loadTemplate('ep_template/ManageEnvisionModules', 'ep_css/envisionportal');
