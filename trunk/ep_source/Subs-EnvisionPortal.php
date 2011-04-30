@@ -658,7 +658,7 @@ function envisionBuffer($buffer)
 	global $portal_ver, $context;
 
 	/*
-	Fix the category links acrross the board, even in mods and themes
+	Fix the category links across the board, even in mods and themes
 		that use their own. In ordeer for this to work, the category
 		item should be immediately after $scripturl like how SMF does
 		it. Thus, index.php#c1 gets converted, while $sess_id#c1 does not.
@@ -1342,7 +1342,9 @@ function add_ep_menu_buttons($menu_buttons)
 {
 	global $txt, $context, $scripturl, $modSettings;
 
-	// Adding the Forum button to the main menu.
+	if (empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))
+		return $menu_buttons;
+
 	$envisionportal = array(
 		'title' => (!empty($txt['forum']) ? $txt['forum'] : 'Forum'),
 		'href' => $scripturl . '?action=forum',
@@ -1404,9 +1406,11 @@ function add_ep_menu_buttons($menu_buttons)
 
 function add_ep_admin_areas($admin_areas)
 {
-	global $txt;
+	global $txt, $modSettings;
 
-	// Building the Envision Portal admin areas
+	if (empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))
+		return $admin_areas;
+
 	$envisionportal = array(
 		'title' => $txt['ep_'],
 		'areas' => array(
@@ -1548,7 +1552,7 @@ function envision_integrate_pre_load()
 	$modSettings['ep_portal_mode'] = isset($modSettings['admin_features']) ? in_array('ep', explode(',', $modSettings['admin_features'])) : false;
 
 	// Unserialize our permanent hooks here.
-	if(!empty($modSettings['ep_permanented_hooks']))
+	if (!empty($modSettings['ep_permanented_hooks']))
 		$modSettings['ep_permanented_hooks'] = unserialize($modSettings['ep_permanented_hooks']);
 
 	require_once($sourcedir . '/ep_source/EnvisionPortal.php');
@@ -1602,6 +1606,11 @@ function envision_integrate_load_theme()
 
 function envision_integrate_core_features(&$core_features)
 {
+	global $modSettings;
+
+	if (empty($modSettings['ep_portal_mode']))
+		loadLanguage('ep_languages/EnvisionPortal');
+
 	$ep_core_feature = array(
 		'url' => 'action=admin;area=epmodules',
 	);
