@@ -392,7 +392,7 @@ function editLayout($selected_layout, $layout_name, $id_member, $layout_actions,
 		)
 	);
 
-	list ($id_layout) = $smcFunc['db_fetch_roe']($request);
+	list ($id_layout) = $smcFunc['db_fetch_row']($request);
 
 	if (empty($id_layout))
 		return false;
@@ -408,7 +408,7 @@ function editLayout($selected_layout, $layout_name, $id_member, $layout_actions,
 		)
 	);
 
-	list ($old_smf_pos) = $smcFunc['db_fetch_roe']($request);
+	list ($old_smf_pos) = $smcFunc['db_fetch_row']($request);
 
 	// Update the name
 	$smcFunc['db_query']('', '
