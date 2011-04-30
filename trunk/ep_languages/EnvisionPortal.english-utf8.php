@@ -7,7 +7,7 @@ $txt['ep_'] = 'Envision Portal';
 $txt['ep_core_modules'] = 'Collapse or expand this module';
 $txt['ep_who_forum'] = 'Viewing the forum index of <a href="' . $scripturl . '?action=forum">' . $context['forum_name'] . '</a>&#46;';
 $txt['ep_who_portal'] = 'Viewing the portal index of <a href="' . $scripturl . '">' . $context['forum_name'] . '</a>&#46;';
-$txt['ep_who_page'] = 'Viewing the page &quot;<a href="' ., $scripturl . '?page=%1$s">%2$s</a>&quot;&#46;';
+$txt['ep_who_page'] = 'Viewing the page &quot;<a href="' . $scripturl . '?page=%1$s">%2$s</a>&quot;&#46;';
 
 // Module-Specific Strings
 $txt['ep_module_usercp'] = 'User Panel';

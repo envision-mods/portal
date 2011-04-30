@@ -1296,16 +1296,16 @@ function load_envision_menu($menu_buttons)
 
 	if ($smcFunc['db_num_rows']($request) == 0)
 		return $menu_buttons;
-		
+
 	$new_menu_buttons = array();
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
 		$permissions = explode(',', $row['permissions']);
-		
+
 		if((!array_intersect($user_info['groups'], $permissions) || $row['status'] != '1') && !allowedTo('admin_forum'))
 			continue;
-		 
+
 		$ep_temp_menu = array(
 			'title' => $row['name'],
 			'href' => ($row['target'] == 'forum' ? $scripturl : '') . $row['link'],
@@ -1340,7 +1340,7 @@ function load_envision_menu($menu_buttons)
 
 function add_ep_menu_buttons($menu_buttons)
 {
-	global $txt, $context, $scripturl;
+	global $txt, $context, $scripturl, $modSettings;
 
 	// Adding the Forum button to the main menu.
 	$envisionportal = array(
