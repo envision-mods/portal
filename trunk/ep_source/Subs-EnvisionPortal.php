@@ -1006,12 +1006,50 @@ function loadLayout($url, $return = false)
 	{
 		$match = (!empty($_REQUEST['board']) ? '[board]=' . $_REQUEST['board'] : (!empty($_REQUEST['topic']) ? '[topic]=' . (int) $_REQUEST['topic'] : (!empty($_REQUEST['page']) ? '[page]=' . $_REQUEST['page'] : $url)));
 		$general_match = (!empty($_REQUEST['board']) ? '[board]' : (!empty($_REQUEST['topic']) ? '[topic]' : (!empty($_REQUEST['page']) ? '[page]' : (!empty($_REQUEST['action']) ? '[all_actions]' : ''))));
+		$mmatch = $match;
+		$mgeneral_match = $general_match;
 
 		$request = $smcFunc['db_query']('', '
 			SELECT
 				el.id_layout
 			FROM {db_prefix}ep_layouts AS el
-				LEFT JOIN {db_prefix}ep_layout_actions AS ela ON (ela.action = {string:current_action})
+				INNER JOIN {db_prefix}ep_layout_actions AS ela ON (ela.id_layout = el.id_layout AND ela.action = {string:current_action})
+			WHERE el.id_member = {int:current_member}',
+			array(
+				'current_action' => $mmatch,
+				'current_member' => $user_info['id'],
+			)
+		);
+
+		$num2 = $smcFunc['db_num_rows']($request);
+		$smcFunc['db_free_result']($request);
+
+		if (empty($num2))
+			$mmatch = $mgeneral_match;
+
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				el.id_member
+			FROM {db_prefix}ep_layouts AS el
+				INNER JOIN {db_prefix}ep_layout_actions AS ela ON (ela.id_layout = el.id_layout AND ela.action = {string:current_action})
+			WHERE el.id_member = {int:current_member}',
+			array(
+				'current_action' => $mmatch,
+				'current_member' => $user_info['id'],
+			)
+		);
+
+		list ($current_member) = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		if (empty($current_member))
+			$current_member = 0;
+
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				el.id_layout
+			FROM {db_prefix}ep_layouts AS el
+				INNER JOIN {db_prefix}ep_layout_actions AS ela ON (ela.id_layout = el.id_layout AND ela.action = {string:current_action})
 			WHERE el.id_member = {int:zero}',
 			array(
 				'current_action' => $match,
@@ -1041,10 +1079,10 @@ function loadLayout($url, $return = false)
 				LEFT JOIN {db_prefix}ep_layout_positions AS elp ON (elp.id_layout = el.id_layout)
 				LEFT JOIN {db_prefix}ep_module_positions AS emp ON (emp.id_layout_position = elp.id_layout_position)
 				LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
-			WHERE el.id_member = {int:zero}',
+			WHERE el.id_member = {int:current_member}',
 			array(
-				'zero' => 0,
-				'current_action' => $match,
+				'current_member' => $current_member,
+				'current_action' => empty($current_member) ? $match : $mmatch,
 			)
 		);
 
@@ -1061,7 +1099,7 @@ function loadLayout($url, $return = false)
 
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 	{
-		$smf_col = empty($row['id_module']) && !is_null($row['id_position']);
+		$smf_col = !empty($row['is_smf']);
 
 		if (!is_int($url) && !$smf_col && $row['status'] == 'inactive')
 			continue;
@@ -1071,7 +1109,7 @@ function loadLayout($url, $return = false)
 
 		if (!isset($ep_modules[$row['x_pos']][$row['y_pos']]) && !empty($row['id_layout_position']))
 			$ep_modules[$row['x_pos']][$row['y_pos']] = array(
-				'is_smf' => $row['is_smf'],
+				'is_smf' => $smf_col,
 				'id_layout_position' => $row['id_layout_position'],
 				'html' => ($row['colspan'] >= 2 ? ' colspan="' . $row['colspan'] . '"' : '') . ($context['ep_home'] && in_array($row['y_pos'], array(0, 2)) || !$context['ep_home'] && $row['y_pos'] <= 1 && !$smf_col ? ' style="width: 200px;"' : ''),
 				'extra' => $row,

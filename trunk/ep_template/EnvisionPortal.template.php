@@ -23,18 +23,18 @@ function template_portal_above()
 			<tr class="tablerow', $row_id, '" valign="top">';
 
 			foreach ($row_data as $column_id => $column_data)
-				if (!empty($column_data['modules']))
-				{
-					echo '
+			{
+				echo '
 				<td class="tablecol_', $column_id, '"', $column_data['html'], '>';
 
-						if ($column_data['is_smf'])
-						{
-							ob_start();
-							$buffer = true;
-						}
-						else
-							template_module_column($ep_module_display_style, $column_data['modules']);
+				if ($column_data['is_smf'])
+				{
+					ob_start();
+					$buffer = true;
+				}
+
+				if (!empty($column_data['modules']))
+					template_module_column($ep_module_display_style, $column_data['modules']);
 
 					echo '
 				</td>';
