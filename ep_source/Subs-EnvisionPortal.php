@@ -1613,6 +1613,9 @@ function envision_integrate_core_features(&$core_features)
 
 	$ep_core_feature = array(
 		'url' => 'action=admin;area=epmodules',
+		'save_callback' => create_function('$value', '
+			clean_cache();
+		'),
 	);
 
 	$new_core_features = array();
