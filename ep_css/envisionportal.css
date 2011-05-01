@@ -384,19 +384,16 @@ div.epsitemenu
 	font-family: Arial, sans-serif;
 	font-size: 12px;
 	padding-bottom: 5px;
-	background: url(../../../envisionportal/module_images/sitemenu/bottom.gif) no-repeat  left bottom;
 	color: #fff;
 }
 
 div.epsitemenu div
 {
-	background: url(../../../envisionportal/module_images/sitemenu/title.gif) repeat-x;
 	overflow: hidden;
 }
 
 div.epsitemenu div:first-child
 {
-	background: url(../../../envisionportal/module_images/sitemenu/toptitle.gif) no-repeat;
 }
 
 div.epsitemenu div.epsm_collapsed
