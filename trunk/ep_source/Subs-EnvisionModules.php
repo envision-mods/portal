@@ -218,8 +218,8 @@ function ep_shoutbox($request, $get_value)
 		if (!empty($can_mod))
 			$smcFunc['db_query']('', '
 				DELETE FROM {db_prefix}ep_shouts WHERE id_shout = {int:id_shout}',
-			array(
-				'id_shout' => str_replace('deleteshout_', '', $data[0]['id_shout']),
+				array(
+					'id_shout' => str_replace('deleteshout_', '', $data[0]['id_shout']),
 				)
 			);
 	}

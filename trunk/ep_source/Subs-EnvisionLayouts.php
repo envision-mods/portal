@@ -251,22 +251,63 @@ function ep_get_predefined_layouts($style)
  */
 function exportLayout($id_layout)
 {
-	global $smcFunc, $user_info;
+	global $context, $user_info;
 
 	checkSession();
 
-	$layout_data = loadLayout($id_layout, true);
+	if (empty($id_layout) && !is_int($id_layout))
+		return false;
+
+	$layout_data = loadLayout((int) $id_layout, true);
+	$xml_children = array();
 
 	ep_call_hook('export_layout', array(&$id_layout, &$layout_data));
 
-	foreach (array('layouts', 'layout_positions', 'layout_actions') as $table_name)
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}ep_' . $table_name . '
-			WHERE id_layout = {int:id_layout}',
-			array(
-				'id_layout' => $id_layout,
-			)
+	foreach ($layout_data as $row_id => $row_data)
+	{
+		$xml_children[$row_id] = array(
+			'identifier' => 'row',
+			'children' => array(),
 		);
+		foreach ($row_data as $column_id => $column_data)
+		{
+			$xml_children[$row_id]['children'][$column_id] = array(
+				'identifier' => 'section',
+				'children' => array(),
+			);
+			foreach ($column_data['extra'] as $extra_id => $extra_data)
+			{
+				$xml_children[$row_id]['children'][$column_id]['children'][$extra_id] = array(
+					'value' => $extra_data,
+				);
+			}
+			if (!empty($column_data['modules']))
+				foreach ($column_data['modules'] as $id_position => $modules)
+				{
+					$xml_children[$row_id]['children'][$column_id]['children'][$id_position] = array(
+						'identifier' => 'module',
+						'children' => array(),
+					);
+					foreach ($modules as $module_id => $module_data)
+						if ($module_id == 'type')
+						{
+							$xml_children[$row_id]['children'][$column_id]['children'][$id_position]['children'][$module_id] = array(
+								'value' => $module_data,
+							);
+						}
+				}
+		}
+	}
+	$xml_data = array(
+		'layouts' => array(
+			'identifier' => 'layout',
+			'children' => $xml_children,
+		),
+	);
+	$context['sub_template'] = 'generic_xml';
+	$context['xml_data'] = $xml_data;
+	$context['template_layers'] = array('render_save');
+	$_REQUEST['xml'] = true;
 
 	return true;
 }

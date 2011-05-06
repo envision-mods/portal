@@ -50,8 +50,7 @@
 		</operation>
 		<operation>
 			<search position="after"><![CDATA[// Otherwise, it was set - so let's go to that action.]]></search>
-			<add><![CDATA[if ((isset($_REQUEST['action']) && $_REQUEST['action'] == 'admin' && isset($_GET['area']) && $_GET['area'] == 'epmodules' && isset($_GET['sa'])) && ($_GET['sa'] == 'epaddlayout' || $_GET['sa'] == 'epaddlayout2' || $_GET['sa'] == 'epeditlayout' || $_GET['sa'] == 'epeditlayout2'))
-		$context['smf_actions'] = array_keys($actionArray);
+			<add><![CDATA[$context['smf_actions'] = array_keys($actionArray);
 
 	]]></add>
 		</operation>
@@ -127,6 +126,15 @@
 		<operation>
 			<search position="replace"><![CDATA['#c']]></search>
 			<add><![CDATA['?action=forum#c']]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Display.php">
+		<operation>
+			<search position="replace"><![CDATA[	// This is just a regular attachment...]]></search>
+			<add><![CDATA[	elseif (isset($_REQUEST['type']) && $_REQUEST['type'] == 'envision')
+		$request = integrate_envision_attachments();
+	// This is just a regular attachment...]]></add>
 		</operation>
 	</file>
 

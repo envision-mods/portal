@@ -16,5 +16,8 @@ $txt['ep_remove_layouts'] = 'Remove';
 $txt['ep_confirm_remove_layouts'] = 'Are you sure you want to remove the selected layouts?';
 $txt['ep_remove_all_layouts'] = 'Remove All';
 $txt['ep_confirm_remove_all_layouts'] = 'Are you sure you want to remove all your layouts?';
+$txt['ep_import_layouts'] = 'Import';
+$txt['ep_export_layouts'] = 'Export';
+$txt['ep_export_all_layouts'] = 'Export All';
 
 ?>

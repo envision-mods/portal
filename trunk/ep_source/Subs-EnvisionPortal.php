@@ -1678,14 +1678,16 @@ function envision_integrate_load_permissions(&$permissionGroups, &$permissionLis
 	// If this is a guest limit the available permissions.
 	if (isset($context['group']['id']) && $context['group']['id'] == -1)
 		$permissionList['membergroup'] += array(
-			'ep_view' => array(false, 'ep_', 'ep_'),
+			'epview' => array(false, 'ep', 'ep'),
 		);
 	else
 		$permissionList['membergroup'] += array(
-			'ep_view' => array(false, 'ep_', 'ep_'),
-			'ep_create_layouts' => array(false, 'ep_', 'ep_'),
-			'ep_modify_layouts' => array(true, 'ep_', 'ep_'),
-			'ep_delete_layouts' => array(true, 'ep_', 'ep_'),
+			'epview' => array(false, 'ep', 'ep'),
+			'epcreate_layouts' => array(false, 'ep', 'ep'),
+			'epmodify_layouts' => array(true, 'ep', 'ep'),
+			'epdelete_layouts' => array(true, 'ep', 'ep'),
+			'epimport_layouts' => array(true, 'ep', 'ep'),
+			'epexport_layouts' => array(true, 'ep', 'ep'),
 		);
 }
 
@@ -1731,6 +1733,103 @@ function envision_integrate_profile_areas(&$profile_areas)
 	ep_include_hook('load_profile_files');
 	ep_include_language_hook('load_profile_language_files', $sourcedir . '/ep_plugin_language');
 	ep_call_hook('load_profile_areas', array(&$profile_areas));
+}
+
+function integrate_envision_attachments()
+{
+	global $smcFunc, $user_info;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member
+		FROM {db_prefix}attachments
+		WHERE id_attach = {int:id_attach}
+		LIMIT 1',
+		array(
+			'id_attach' => $_REQUEST['attach'],
+		)
+	);
+
+	$row = $smcFunc['db_fetch_assoc']($request);
+
+	if ($user_info['id'] == $row['id_member'])
+		isAllowedTo('ep_' . $types[$type][3] . '_own');
+	else
+		isAllowedTo('ep_' . $types[$type][3] . '_any');
+
+	$smcFunc['db_data_seek']($request, 0);
+	return $request;
+}
+
+function renderAttachmentCallBack($buffer)
+{
+	global $context, $modSettings, $sourcedir, $smcFunc, $user_info;
+
+	// check that something was actually written to the buffer
+	if (strlen($buffer) > 0)
+	{
+		// We need to know where this thing is going.
+		if (!empty($modSettings['currentAttachmentUploadDir']))
+		{
+			if (!is_array($modSettings['attachmentUploadDir']))
+				$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+
+			// Just use the current path for temp files.
+			$attach_dir = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
+			$id_folder = $modSettings['currentAttachmentUploadDir'];
+		}
+		else
+		{
+			$attach_dir = $modSettings['attachmentUploadDir'];
+			$id_folder = 1;
+		}
+
+		$name = 'xml_layout_' . time() . '.xml';
+		$filename = 'post_tmp_' . $user_info['id'] . '_0';
+		$file = $attach_dir . '/' . $filename;
+		if (!touch($file))
+			return $buffer;
+		$fh = fopen($file, 'w');
+		fwrite($fh, $buffer);
+		fclose($fh);
+
+		// Make it an attachment.
+		$attachment_options = array(
+			'post' => 0,
+			'poster' => $user_info['id'],
+			'name' => $name,
+			'tmp_name' => $filename,
+			'size' => filesize($file),
+			'approved' => true,
+			'skip_thumbnail' => true,
+		);
+
+		require_once($sourcedir . '/Subs-Post.php');
+		createAttachment($attachment_options);
+		$context['attach_id'] = $attachment_options['id'];
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}attachments
+			SET id_member = {int:id_member}
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'id_member' => $user_info['id'],
+				'id_attach' => $attachment_options['id'],
+			)
+		);
+	}
+	return $buffer;
+}
+
+// End the buffer and offer to download the attachment.
+function saveRenderedAttachment()
+{
+	global $context, $scripturl;
+	$buffer = ob_get_clean();
+
+	if (isset($context['attach_id']))
+		redirectexit($scripturl . '?action=dlattach;attach=' . $context['attach_id'] . ';type=envision');
+	else
+		// Saving as attachment failed. Just print the data to the browser...
+		echo $buffer;
 }
 
 ?>

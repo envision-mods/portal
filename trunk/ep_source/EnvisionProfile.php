@@ -44,7 +44,7 @@ function Layouts()
 		'add2' => 'AddEnvisionLayout2',
 		'edit' => 'EditEnvisionLayout',
 		'edit2' => 'EditEnvisionLayout2',
-		'delete' => 'DeleteEnvisionLayout',
+		'actions' => 'Actions',
 		'managemodules' => 'ManageEnvisionModules',
 		'savemodules' => 'SaveEnvisionModules',
 	);
@@ -68,11 +68,15 @@ function Display()
 	{
 		$can_modify = allowedTo('ep_modify_layouts_own');
 		$can_delete = allowedTo('ep_delete_layouts_own');
+		$can_import = allowedTo('ep_import_layouts_own');
+		$can_export = allowedTo('ep_export_layouts_own');
 	}
 	else
 	{
 		$can_modify = allowedTo('ep_modify_layouts_any');
 		$can_delete = allowedTo('ep_delete_layouts_any');
+		$can_import = allowedTo('ep_import_layouts_any');
+		$can_export = allowedTo('ep_export_layouts_any');
 	}
 
 	// Our options for our list.
@@ -166,15 +170,13 @@ function Display()
 			),
 		),
 		'form' => array(
-			'href' => $scripturl . '?action=profile;area=layouts;sa=delete;u=' . $context['id_member'],
+			'href' => $scripturl . '?action=profile;area=layouts;sa=actions;u=' . $context['id_member'],
 		),
 		'additional_rows' => array(
 			array(
 				'position' => 'below_table_data',
-				'value' => '
-					<input type="submit" name="remove" value="' . $txt['ep_remove_layouts'] . '" onclick="return confirm(' . JavaScriptEscape($txt['ep_confirm_remove_layouts']) . ');" class="button_submit" />
-					<input type="submit" name="removeall" value="' . $txt['ep_remove_all_layouts'] . '" onclick="return confirm(' . JavaScriptEscape($txt['ep_confirm_remove_all_layouts']) . ');" class="button_submit" />',
-					'class' => 'righttext',
+				'value' => '',
+				'class' => 'floatright',
 			),
 		),
 	);
@@ -183,7 +185,21 @@ function Display()
 	if (!$can_modify)
 		unset($listOptions['columns']['edit'], $listOptions['columns']['managemodules']);
 
-	if (!$can_delete)
+	if ($can_import)
+		$listOptions['additional_rows'][0]['value'] .= '
+					<input type="submit" name="import" value="' . $txt['ep_import_layouts'] . '" class="button_submit" />';
+
+	if ($can_export)
+		$listOptions['additional_rows'][0]['value'] .= '
+					<input type="submit" name="export" value="' . $txt['ep_export_layouts'] . '" class="button_submit" />
+					<input type="submit" name="exportall" value="' . $txt['ep_export_all_layouts'] . '" class="button_submit" />';
+
+	if ($can_delete)
+		$listOptions['additional_rows'][0]['value'] .= '
+					<input type="submit" name="remove" value="' . $txt['ep_remove_layouts'] . '" onclick="return confirm(' . JavaScriptEscape($txt['ep_confirm_remove_layouts']) . ');" class="button_submit" />
+					<input type="submit" name="removeall" value="' . $txt['ep_remove_all_layouts'] . '" onclick="return confirm(' . JavaScriptEscape($txt['ep_confirm_remove_all_layouts']) . ');" class="button_submit" />';
+
+	if (!$can_delete && !$can_import && !$can_export)
 		unset($listOptions['columns']['check'], $listOptions['form'], $listOptions['additional_rows']);
 
 	require_once($sourcedir . '/Subs-List.php');
@@ -385,11 +401,14 @@ function AddEnvisionLayout2()
 }
 
 /**
- * Calls {@link EnvisionDeleteLayout()} to delete a layout specified in $_POST['layout_picker'].
+ * A multi-purpose function which does one of three things:
+ * - Calls {@link importLayout()} to import a layout from an XML file
+ * - Calls {@link deleteLayout()} to delete a layout specified in $_POST['remove'].
+ * - Calls {@link exportLayout()} to export a layout specified in $_POST['remove'].
  *
  * @since 1.0
  */
-function DeleteEnvisionLayout()
+function Actions()
 {
 	global $smcFunc, $sourcedir, $context, $user_info;
 
@@ -397,38 +416,67 @@ function DeleteEnvisionLayout()
 
 	require_once($sourcedir . '/ep_source/Subs-EnvisionLayouts.php');
 
-	if ($user_info['id'] == $context['id_member'])
-		isAllowedTo('ep_delete_layouts_own');
-	else
-		isAllowedTo('ep_delete_layouts_any');
-
-	if (isset($_POST['removeall']) || isset($_POST['remove'], $_POST['delete']))
+	if (isset($_POST['import']))
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT id_layout, name
-			FROM {db_prefix}ep_layouts
-			WHERE id_member = {int:id_member}' . (isset($_POST['delete']) ? '
-				AND id_layout IN ({array_int:layouts})' : ''),
-			array(
-				'id_member' => $context['id_member'],
-				'layouts' => isset($_POST['delete']) ? $_POST['delete'] : array(),
-			)
+		if ($user_info['id'] == $context['id_member'])
+			isAllowedTo('ep_import_layouts_own');
+		else
+			isAllowedTo('ep_import_layouts_any');
+
+		if (!importLayout($row[0]))
+			fatal_lang_error('no_layout_selected', false);
+		else
+			logEpAction('import_layout', $context['id_member'], $log_extra);
+
+		redirectexit('action=profile;area=layouts;u=' . $context['id_member']);
+	}
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_layout, name
+		FROM {db_prefix}ep_layouts
+		WHERE id_member = {int:id_member}' . (isset($_POST['delete']) ? '
+			AND id_layout IN ({array_int:layouts})' : ''),
+		array(
+			'id_member' => $context['id_member'],
+			'layouts' => isset($_POST['delete']) ? $_POST['delete'] : array(),
+		)
+	);
+
+	while ($row = $smcFunc['db_fetch_row']($request))
+	{
+		$log_extra = array(
+			'layout_name' => $row[1],
 		);
 
-		while ($row = $smcFunc['db_fetch_row']($request))
+		if (isset($_POST['removeall']) || isset($_POST['remove'], $_POST['delete']))
 		{
-			$log_extra = array(
-				'layout_name' => $row[1],
-			);
+			if ($user_info['id'] == $context['id_member'])
+				isAllowedTo('ep_delete_layouts_own');
+			else
+				isAllowedTo('ep_delete_layouts_any');
 
 			if (!deleteLayout($row[0]))
 				fatal_lang_error('no_layout_selected', false);
 			else
 				logEpAction('delete_layout', $context['id_member'], $log_extra);
 		}
+
+		if (isset($_POST['exportall']) || isset($_POST['export'], $_POST['delete']))
+		{
+			if ($user_info['id'] == $context['id_member'])
+				isAllowedTo('ep_export_layouts_own');
+			else
+				isAllowedTo('ep_export_layouts_any');
+
+			if (!exportLayout($row[0]))
+				fatal_lang_error('no_layout_selected', false);
+			else
+				logEpAction('export_layout', $context['id_member'], $log_extra);
+		}
 	}
 
-	redirectexit('action=profile;area=layouts;u=' . $context['id_member']);
+	if (!isset($_POST['exportall']) && !isset($_POST['export']))
+		redirectexit('action=profile;area=layouts;u=' . $context['id_member']);
 }
 
 /**
