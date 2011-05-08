@@ -811,21 +811,31 @@ function SaveEnvisionModules()
 						);
 					}
 				}
+			else
+			{
+				if ($epcol_data == 0 && is_numeric($epcol_id))
+					// Empty section. Remove what's there.
+					$smcFunc['db_query']('', '
+						DELETE FROM {db_prefix}ep_module_positions
+						WHERE id_layout_position = {int:id_layout_position}',
+						array(
+							'id_layout_position' => (int) $epcol_id,
+						)
+					);
 
-		/*$epcol_id = str_replace('epcol_', '', $epcol_idb);
-
-		if (!is_array($_POST[$epcol_idb]))
-			// Doing the enabled checkboxes...
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}ep_layout_positions
-				SET
-					enabled = {int:enabled_value}
-				WHERE id_layout_position = {int:epcol_id}',
-				array(
-					'epcol_id' => (int)str_replace('column_', '', $epcol_idb),
-					'enabled_value' => (!empty($_POST[$epcol_idb]) ? 1 : 0),
-				)
-			);*/
+				if (!is_numeric($epcol_id))
+					// Doing the enabled checkboxes...
+					$smcFunc['db_query']('', '
+						UPDATE {db_prefix}ep_layout_positions
+						SET
+							status = {string:status}
+						WHERE id_layout_position = {int:epcol_id}',
+						array(
+							'epcol_id' => (int) str_replace('column_', '', $epcol_idb),
+							'status' => !empty($_POST[$epcol_idb]) ? 'active' : 'inactive',
+						)
+					);
+			}
 	}
 
 	// !!! Do we die here or use obexit(false)?

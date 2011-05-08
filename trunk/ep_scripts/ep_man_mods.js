@@ -39,11 +39,24 @@ $j(document).ready(function() {
 		revert: "invalid"
 	});
 
+	$j("#disabled_module_container").droppable({
+			accept: ".module_container .draggable_module",
+			drop: function(event, ui) {
+				ui.helper.remove();
+				ui.draggable.remove();
+			},
+		});
+
 
 	$j("#save").click(function() {
 		var submit_data = sessVar + "=" + sessId + "&";
-		$j(".DragBox").each(function() {
-			submit_data += $j(this).parent().attr("id") + "[]=" + $j(this).attr("id").replace("envisionmod_", "") + "&";
+		$j(".module_container").each(function() {
+			if ($j(this).children().length != 0)
+				$j(this).children(".draggable_module").each(function() {
+					submit_data += $j(this).parent().attr("id") + "[]=" + $j(this).attr("id").replace("envisionmod_", "") + "&";
+				});
+			else
+				submit_data += $j(this).attr("id") + "=0&";
 		});
 		$j(".check_enabled").each(function() {
 			submit_data += $j(this).attr("id") + "=" + ($j(this).is(":checked") ? 1 : 0) + "&";
