@@ -1336,8 +1336,15 @@ function load_envision_menu($menu_buttons)
 		return $menu_buttons;
 
 	$new_menu_buttons = array();
-
+	$db_buttons = array();
+	
 	while ($row = $smcFunc['db_fetch_assoc']($request))
+		$db_buttons[$row['id_button']] = $row;
+		
+	$smcFunc['db_free_result']($request);
+	
+	reset($db_buttons);
+	while (list($key, $row) = each($db_buttons))
 	{
 		$permissions = explode(',', $row['permissions']);
 
@@ -1350,27 +1357,42 @@ function load_envision_menu($menu_buttons)
 			'target' => $row['target'],
 			'active_button' => false,
 		);
-
+		
+		$new_menu_buttons = array();
+		$is_added = false;
 		foreach ($menu_buttons as $area => $info)
 		{
 			if ($area == $row['parent'] && $row['position'] == 'before')
-				$new_menu_buttons[$row['slug']] = $ep_temp_menu;
+			{
+				$new_menu_buttons[$row['id_button']] = $ep_temp_menu;
+				$is_added = true;
+			}
 
 			$new_menu_buttons[$area] = $info;
 
 			if ($area == $row['parent'] && $row['position'] == 'after')
-				$new_menu_buttons[$row['slug']] = $ep_temp_menu;
+			{
+				$new_menu_buttons[$row['id_button']] = $ep_temp_menu;
+				$is_added = true;
+			}
 
 			if ($area == $row['parent'] && $row['position'] == 'child_of')
-				$new_menu_buttons[$row['parent']]['sub_buttons'][$row['slug']] = $ep_temp_menu;
+			{
+				$new_menu_buttons[$row['parent']]['sub_buttons'][$row['id_button']] = $ep_temp_menu;
+				$is_added = true;
+			}
 
 			if ($row['position'] == 'child_of' && isset($info['sub_buttons']) && array_key_exists($row['parent'], $info['sub_buttons']))
-				$new_menu_buttons[$area]['sub_buttons'][$row['parent']]['sub_buttons'][$row['slug']] = $ep_temp_menu;
+			{
+				$new_menu_buttons[$area]['sub_buttons'][$row['parent']]['sub_buttons'][$row['id_button']] = $ep_temp_menu;
+				$is_added = true;
+			}
 		}
-	}
-
-	if (!empty($new_menu_buttons))
 		$menu_buttons = $new_menu_buttons;
+		unset($db_buttons[$key]);
+		if(!$is_added && array_key_exists($row['parent'], $db_buttons))
+			$db_buttons[$key] = $row;
+	}
 
 	ep_call_hook('load_envision_menu', array(&$menu_buttons));
 	return $menu_buttons;
