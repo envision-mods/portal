@@ -124,35 +124,31 @@ function ManageEnvisionModules()
 	$context['page_title'] = $txt['ep_admin_title_manage_modules'];
 	$context['in_url'] = $scripturl . '?action=admin;area=epmodules;sa=epmanlayout';
 
-	if (empty($_SESSION['selected_layout']))
-		$_SESSION['selected_layout'] = array(
-			'id_layout' => 1,
-			'name' => 'Homepage',
-		);
-
-	if (empty($_SESSION['layouts']))
+	if (empty($context['layout_list']))
 	{
 		$request = $smcFunc['db_query']('', '
 			SELECT
 				id_layout, name
 			FROM {db_prefix}ep_layouts
-			WHERE id_member = {int:zero}',
+			WHERE id_member = {int:id_member}',
 			array(
-				'zero' => 0,
+				'id_member' => 0,
 			)
 		);
 
 		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$_SESSION['layouts'][$row['id_layout']] = $row['name'];
+			$context['layout_list'][$row['id_layout']] = $row['name'];
 	}
 
-	if (!empty($_POST['layout_picker']))
-		$_SESSION['selected_layout'] = array(
-			'id_layout' => (int) $_POST['layout_picker'],
-			'name' => $_SESSION['layouts'][$_POST['layout_picker']],
-		);
+	if (empty($context['layout_list']))
+		fatal_lang_error('cant_find_layout_id', false);
 
-	loadLayout($_SESSION['selected_layout']['id_layout']);
+	if (empty($_REQUEST['in']) || empty($context['layout_list'][$_REQUEST['in']]))
+		$_REQUEST['in'] = key($context['layout_list']);
+
+	$selected_layout = !empty($_REQUEST['in']) ? (int) $_REQUEST['in'] : fatal_lang_error('cant_find_layout_id', false);
+
+	loadLayout($selected_layout);
 
 	foreach ($context['ep_columns'] as &$row_data)
 		foreach ($row_data as &$column_data)
@@ -370,6 +366,7 @@ function ModifyModule2()
 
 	$module_context = ep_load_module_context();
 	$info = $module_context[$module_type];
+	$fields_to_save = array();
 	ep_fill_default_fields($info);
 
 	if (!empty($data))
@@ -380,63 +377,35 @@ function ModifyModule2()
 	foreach ($data as $key => $field)
 	{
 		if (isset($_POST[$key]) && is_array($_POST[$key]))
-			$_POST[$key] = implode(',', $_POST[$key]);
+			$fields_to_save[$key] = implode(',', $_POST[$key]);
 
 		if ($field['type'] == 'check' && !isset($_POST[$key]))
-			$_POST[$key] = 0;
+			$fields_to_save[$key] = 0;
 
 		if (!empty($field['order']))
-			$_POST[$key] = implode(',', $_POST[$key . 'order']) . ';' . $_POST[$key];
+			$fields_to_save[$key] = implode(',', $_POST[$key . 'order']) . ';' . $_POST[$key];
 
-		if ($field['value'] == $_POST[$key])
-			unset($_POST[$key]);
+		if ($field['value'] != $_POST[$key])
+			$fields_to_save[$key] = $_POST[$key];
 	}
 
 	// Update them, ignoring the ones they left alone.
-	foreach ($_POST as $key => $field)
+	foreach ($fields_to_save as $key => $field)
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT
-				id_field
-			FROM {db_prefix}ep_module_fields
-			WHERE name = {string:key}',
-			array(
-				'key' => $key,
-			)
-		);
-		list ($id_field) = $smcFunc['db_fetch_row']($request);
-
 		// If the field's value is an array, concatenate it.
 		if (is_array($field))
 			$field = implode(',', $field);
 
-		if (!empty($id_field))
-		{
-			$request = $smcFunc['db_query']('', '
-				UPDATE {db_prefix}ep_module_field_data
-				SET value = {string:value}
-				WHERE name = {string:key}
-					AND id_module_position = {int:id_module_position}',
-				array(
-					'key' => $key,
-					'value' => $field,
-					'id_module_position' => $_GET['in'],
-				)
-			);
-
-			// Are we out of luck? Maybe it's a new field...
-			if ($smcFunc['db_affected_rows']() != 1)
-				$smcFunc['db_insert']('replace',
-					'{db_prefix}ep_module_field_data',
-					array(
-						'id_module_position' => 'int', 'name' => 'string', 'value' => 'string'
-					),
-					array(
-						$_GET['in'], $key, $field
-					),
-					array('name', 'id_module_position')
-				);
-		}
+		$smcFunc['db_insert']('replace',
+			'{db_prefix}ep_module_field_data',
+			array(
+				'id_module_position' => 'int', 'name' => 'string', 'value' => 'string'
+			),
+			array(
+				$_GET['in'], $key, $field
+			),
+			array('name', 'id_module_position')
+		);
 	}
 
 	// Looks like we're done here. Depart.
