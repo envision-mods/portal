@@ -691,6 +691,9 @@ function ManageEnvisionModules()
 			$context['layout_list'][$row['id_layout']] = $row['name'];
 	}
 
+	if (empty($context['layout_list']))
+		fatal_lang_error('cant_find_layout_id', false);
+
 	if (empty($_REQUEST['in']) || empty($context['layout_list'][$_REQUEST['in']]))
 		$_REQUEST['in'] = key($context['layout_list']);
 
