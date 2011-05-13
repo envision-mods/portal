@@ -1332,17 +1332,17 @@ function load_envision_menu($menu_buttons)
 		)
 	);
 
-	if ($smcFunc['db_num_rows']($request) == 0)
+	if (empty($request) || $smcFunc['db_num_rows']($request) == 0)
 		return $menu_buttons;
 
 	$new_menu_buttons = array();
 	$db_buttons = array();
-	
+
 	while ($row = $smcFunc['db_fetch_assoc']($request))
 		$db_buttons[$row['id_button']] = $row;
-		
+
 	$smcFunc['db_free_result']($request);
-	
+
 	reset($db_buttons);
 	while (list($key, $row) = each($db_buttons))
 	{
@@ -1357,7 +1357,7 @@ function load_envision_menu($menu_buttons)
 			'target' => $row['target'],
 			'active_button' => false,
 		);
-		
+
 		$new_menu_buttons = array();
 		$is_added = false;
 		foreach ($menu_buttons as $area => $info)
