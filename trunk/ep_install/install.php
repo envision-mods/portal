@@ -347,9 +347,9 @@ function DatabasePopulation()
 			'name' => 'module_field_data',
 			'columns' => array(
 				array(
-					'name' => 'id_field',
-					'type' => 'int',
-					'size' => 10,
+					'name' => 'name',
+					'type' => 'varchar',
+					'size' => 80,
 					'unsigned' => true,
 				),
 				array(
@@ -366,7 +366,7 @@ function DatabasePopulation()
 			'indexes' => array(
 				array(
 					'type' => 'primary',
-					'columns' => array('id_field', 'id_module_position')
+					'columns' => array('name', 'id_module_position')
 				),
 			),
 		),
