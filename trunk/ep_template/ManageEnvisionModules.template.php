@@ -139,14 +139,14 @@ function template_modify_modules()
 			</form>
 			</div>
 
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var moduleFieldsSendingHandler = new moduleFields({
-				sUrl: \'', $context['post_url'], ';xml\',
-				sSelf: \'addShoutSendingHandler\',
-				sSessionVar: ', JavaScriptEscape($context['session_var']), ',
-				sSessionId: ', JavaScriptEscape($context['session_id']), '
-			});
-		// ]]></script>
+			<script type="text/javascript"><!-- // --><![CDATA[
+				var moduleFieldsSendingHandler = new moduleFields({
+					sUrl: \'', $context['post_url'], ';xml\',
+					sSelf: \'addShoutSendingHandler\',
+					sSessionVar: ', JavaScriptEscape($context['session_var']), ',
+					sSessionId: ', JavaScriptEscape($context['session_id']), '
+				});
+			// ]]></script>
 			<br class="clear" />';
 }
 
@@ -159,6 +159,59 @@ function template_manage_modules()
 {
 	global $txt, $context, $scripturl, $settings, $user_info, $options;
 
+	if (isset($_REQUEST['xml']))
+		foreach ($context['ep_columns'] as $row_id => $row_data)
+		{
+			echo '
+						<tr class="tablerow', $row_id, '" valign="top">';
+
+			foreach ($row_data as $column_id => $column_data)
+			{
+					echo '
+							<td class="tablecol_', $column_id, '" colspan="', $column_data['colspan'], '">
+
+								<div id="module_container_', $column_data['id_layout_position'], '" class="enabled w100">
+									<div class="cat_bar block_header">
+										<h3 class="catbg centertext">
+											', (!$column_data['is_smf'] ? '<input type="checkbox" ' . (!empty($column_data['enabled']) ? 'checked="checked" ' : '') . 'id="column_' . $column_data['id_layout_position'] . '" class="check_enabled input_check" /><label for="column_' . $column_data['id_layout_position'] . '">' . $txt['ep_admin_modules_manage_col_section'] . '</label>' : $txt['ep_is_smf_section']), '
+										</h3>
+									</div>
+									<div class="roundframe blockframe ', (!$column_data['is_smf'] ? 'module' : 'smf'), '_container" id="ep', (!$column_data['is_smf'] ? 'col_' . $column_data['id_layout_position'] : 'smf'), '">';
+
+						if (!empty($column_data['modules']))
+						{
+							foreach ($column_data['modules'] as $module => $id)
+							{
+								if ($id['is_smf'])
+								{
+									echo '
+											<div class="smf_content" id="smfmod_', $id['id'], '"><strong>', $txt['ep_smf_mod'], '</strong></div>
+											<script type="text/javascript"><!-- // --><![CDATA[
+												var smf_container = document.getElementById("smfmod_', $id['id'], '").parentNode;
+												smf_container.className = "roundframe blockframe";
+											// ]]></script>';
+									continue;
+								}
+								echo '
+											<div class="DragBox plainbox draggable_module centertext" id="envisionmod_' . $id['id'] . '">
+												<p>
+													', $id['module_title'], ' ', $id['modify_link'], '
+												</p>
+											</div>';
+							}
+						}
+						echo '
+										</div>
+										<span class="lowerframe"><span></span></span>
+									</div>
+								</td>';
+			}
+
+					echo '
+							</tr>';
+		}
+	else
+	{
 	// Build the normal button array.
 	$envision_buttons = array(
 		'add' => array('text' => 'add_layout', 'image' => 'reply.gif', 'lang' => true, 'url' => $scripturl . '?action=admin;area=epmodules;sa=epaddlayout;' . $context['session_var'] . '=' . $context['session_id']),
@@ -172,12 +225,12 @@ function template_manage_modules()
 	echo '
 	<div class="floatleft w100">
 		<div class="floatright">
-			<form action="', $context['in_url'], '" method="post" accept-charset="', $context['character_set'], '">
-				<select onchange="this.form.submit();" name="in" class="w100">';
+			<form action="', $context['in_url'], '" method="post" accept-charset="', $context['character_set'], '" id="eplc">
+				<select id="in" class="w100">';
 
 		foreach ($context['layout_list'] as $id_layout => $layout_name)
 			echo '
-					<option value="', $id_layout, '"', ($_SESSION['selected_layout']['id_layout'] == $id_layout ? ' selected="selected"' : ''), '>', $layout_name, '</option>';
+					<option value="', $id_layout, '">', $layout_name, '</option>';
 
 	echo '
 				</select>
@@ -216,7 +269,7 @@ function template_manage_modules()
 				<div class="module_page floatleft">';
 
 	echo '
-					<table>';
+					<table id="epmodulestable">';
 
 	foreach ($context['ep_columns'] as $row_id => $row_data)
 	{
@@ -270,12 +323,12 @@ function template_manage_modules()
 	}
 	echo '
 						</table>
-						<span class="botslice"><span></span></span>
 					</div>
 					<br class="clear" />
 						<div class="padding righttext">
 							<input type="submit" name="save" id="save" value="', $txt['save'], '" class="button_submit" />
 						</div>';
+	}
 }
 
 /**

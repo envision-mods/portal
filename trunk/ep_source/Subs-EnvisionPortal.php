@@ -1111,7 +1111,7 @@ function loadLayout($url, $return = false)
 			$ep_modules[$row['x_pos']][$row['y_pos']] = array(
 				'is_smf' => $smf_col,
 				'id_layout_position' => $row['id_layout_position'],
-				'html' => ($row['colspan'] >= 2 ? ' colspan="' . $row['colspan'] . '"' : '') . ($context['ep_home'] && in_array($row['y_pos'], array(0, 2)) || !$context['ep_home'] && $row['y_pos'] <= 1 && !$smf_col ? ' style="width: 200px;"' : ''),
+				'html' => ($row['colspan'] >= 2 ? ' colspan="' . $row['colspan'] . '"' : '') . (!empty($context['ep_home']) && in_array($row['y_pos'], array(0, 2)) || empty($context['ep_home']) && $row['y_pos'] <= 1 && !$smf_col ? ' style="width: 200px;"' : ''),
 				'extra' => $row,
 			);
 

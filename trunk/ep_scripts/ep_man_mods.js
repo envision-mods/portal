@@ -40,13 +40,12 @@ $j(document).ready(function() {
 	});
 
 	$j("#disabled_module_container").droppable({
-			accept: ".module_container .draggable_module",
-			drop: function(event, ui) {
-				ui.helper.remove();
-				ui.draggable.remove();
-			},
-		});
-
+		accept: ".module_container .draggable_module",
+		drop: function(event, ui) {
+			ui.helper.remove();
+			ui.draggable.remove();
+		},
+	});
 
 	$j("#save").click(function() {
 		var submit_data = sessVar + "=" + sessId + "&";
@@ -89,6 +88,19 @@ $j(document).ready(function() {
 		});
 	});
 
+	$j("#in").change(function() {
+		ajax_indicator(true);
+		$j.ajax({
+			dataType: "text",
+			type: "POST",
+			url: smf_prepareScriptUrl(smf_scripturl) + postUrl2,
+			data: "in=" + $j("#in option:selected").val(),
+			success: function(data) {
+				ajax_indicator(false);
+				$j("#epmodulestable").html(data);
+			}
+		});
+	});
 
 	$j(".module_container .DragBox").dblclick(function() {
 		$j(this).fadeOut().remove();

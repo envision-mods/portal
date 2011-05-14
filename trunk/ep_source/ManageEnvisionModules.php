@@ -180,12 +180,16 @@ function ManageEnvisionModules()
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_man_mods.js"></script>
 	<script type="text/javascript">
 		var postUrl = "action=admin;area=epmodules;sa=epmanlayout;xml;";
+		var postUrl2 = "action=admin;area=epmodules;xml;";
 		var sessVar = "' . $context['session_var'] . '";
 		var sessId = "' . $context['session_id'] . '";
 		var errorString = ' . JavaScriptEscape($txt['error_string']) . ';
 		var modulePositionsSaved = ' . JavaScriptEscape($txt['module_positions_saved']) . ';
 		var clickToClose = ' . JavaScriptEscape($txt['click_to_close']) . ';
 	</script>';
+
+	if (isset($_REQUEST['xml']))
+		$context['template_layers'] = array();
 }
 
 /**
@@ -1322,7 +1326,7 @@ function layoutPostError($layout_errors, $sub_template, $layout_name = '', $curr
  */
 function AddEnvisionLayout()
 {
-	global $context, $txt, $smcFunc;
+	global $context, $txt, $smcFunc, $scripturl;
 
 	// Just a few precautionary measures.
 	if (!allowedTo('admin_forum'))
@@ -1433,7 +1437,7 @@ function AddEnvisionLayout()
  */
 function AddEnvisionLayout2()
 {
-	global $context, $txt, $smcFunc;
+	global $context, $txt, $smcFunc, $sourcedir;
 
 	// Just a few precautionary measures.
 	if (!allowedTo('admin_forum'))
