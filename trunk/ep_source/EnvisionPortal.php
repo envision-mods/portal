@@ -44,15 +44,6 @@ function ep_init($init_action = '')
 
 	$context['ep_restricted_names'] = array_merge($envision_names, $reserved_names);
 
-	// XML mode? Save time (cut it in half) and CPU cycles by bailing out.
-	if (isset($_REQUEST['xml']))
-	{
-		// !!! TODO: Put all XML functions into Subs-EnvisionXml.php
-		require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
-
-		return;
-	}
-
 	// No need to load this function in this case.
 	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
 		return;
@@ -71,6 +62,15 @@ function ep_init($init_action = '')
 
 	// Templates
 	$context['ep_module_template'] = $boarddir . '/ep_extra/module_templates/';
+
+	// XML mode? Save time (cut it in half) and CPU cycles by bailing out.
+	if (isset($_REQUEST['xml']))
+	{
+		// !!! TODO: Put all XML functions into Subs-EnvisionXml.php
+		require_once($sourcedir . '/ep_source/Subs-EnvisionModules.php');
+
+		return;
+	}
 
 	// Is Envision Portal disabled? Can you view it?
 	if (empty($modSettings['ep_portal_mode']) || !allowedTo('ep_view'))

@@ -19,7 +19,7 @@ function template_modify_modules()
 
 	echo '
 	<div id="admincenter">
-		<form name="epmodule" id="epmodule" action="', $scripturl, '?action=admin;area=epmodules;sa=modify2;in=', $_GET['in'], ';', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">';
+		<form name="epmodule" id="epmodule" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="moduleFieldsSendingHandler.send(); return false;">';
 
 	echo '
 			<div class="title_bar">
@@ -131,14 +131,22 @@ function template_modify_modules()
 		</dl>
 			<hr class="hrcolor" />
 		<p class="righttext">
-		<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />
+		<input type="submit" name="save" id="btnsave" value="', $txt['save'], '" class="button_submit" />
 		</p>
 		</div>
 		<span class="lowerframe"><span></span></span>
-			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</form>
 			</div>
+
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var moduleFieldsSendingHandler = new moduleFields({
+				sUrl: \'', $context['post_url'], ';xml\',
+				sSelf: \'addShoutSendingHandler\',
+				sSessionVar: ', JavaScriptEscape($context['session_var']), ',
+				sSessionId: ', JavaScriptEscape($context['session_id']), '
+			});
+		// ]]></script>
 			<br class="clear" />';
 }
 

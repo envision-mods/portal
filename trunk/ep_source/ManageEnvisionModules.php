@@ -276,7 +276,7 @@ function SaveEnvisionModules()
  */
 function ModifyModule()
 {
-	global $context, $smcFunc, $txt, $helptxt;
+	global $context, $smcFunc, $txt, $helptxt, $scripturl, $settings;
 
 	// Load the default module configurations.
 	$module_context = ep_load_module_context();
@@ -334,12 +334,15 @@ function ModifyModule()
 	$context['ep_module'] = $data;
 	$context['ep_module_type'] = $module_type;
 	$context['page_title'] = $txt['ep_modify_mod'];
+	$context['post_url'] = $scripturl . '?action=admin;area=epmodules;sa=modify2;in=' . $_GET['in'];
 	$context['sub_template'] = 'modify_modules';
+	$context['html_headers'] .= '
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>';
 }
 
 function ModifyModule2()
 {
-	global $smcFunc, $context;
+	global $smcFunc, $context, $txt;
 
 	// Figure out which fields did not change and remove them.
 	$request = $smcFunc['db_query']('', '
@@ -409,7 +412,23 @@ function ModifyModule2()
 	}
 
 	// Looks like we're done here. Depart.
-	redirectexit('action=admin;area=epmodules;sa=modify;in=' . $_GET['in']);
+	if (!isset($_REQUEST['xml']))
+		redirectexit('action=admin;area=epmodules;sa=modify;in=' . $_GET['in']);
+	else
+	{
+		$context['template_layers'] = array();
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'items' => array(
+				'identifier' => 'item',
+				'children' => array(
+					array(
+						'value' => $txt['save'],
+					),
+				),
+			),
+		);
+	}
 }
 
 /**
