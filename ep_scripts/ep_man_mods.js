@@ -102,6 +102,34 @@ $j(document).ready(function() {
 		});
 	});
 
+	$j(".button_strip_add, .draggable_module a").click(function() {
+		ajax_indicator(true);
+		$j.ajax({
+			dataType: "text",
+			type: "GET",
+			url: this.href + ";xml",
+			success: function(data) {
+				ajax_indicator(false);
+				$j("#admincenter").replaceWith(data);
+			}
+		});
+		return false;
+	});
+
+	$j(".button_strip_edit").click(function() {
+		ajax_indicator(true);
+		$j.ajax({
+			dataType: "text",
+			type: "GET",
+			url: this.href + "in=" + $j("#in option:selected").val() + ";xml",
+			success: function(data) {
+				ajax_indicator(false);
+				$j("#admincenter").replaceWith(data);
+			}
+		});
+		return false;
+	});
+
 	$j(".module_container .DragBox").dblclick(function() {
 		$j(this).fadeOut().remove();
 	});

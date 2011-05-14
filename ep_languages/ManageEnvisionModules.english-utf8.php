@@ -37,7 +37,7 @@ $txt['click_to_close'] = 'Click to close this message.';
 // General Strings
 $txt['ep_modify_mod'] = 'Envision Portal - Modify Modules';
 $txt['ep_module_not_installed'] = 'Sorry, unable to retrieve the modules id value, please make sure this module is installed.';
-$txt['ep_modsettings'] = '&nbsp;Settings';
+$txt['ep_modsettings'] = 'Settings';
 $txt['ep_module_title'] = 'Module&#039;s Title<div class="smalltext">(Can not be empty)</div>';
 $txt['ep_module_icon'] = 'Module&#039;s Icon';
 $txt['ep_module_link'] = 'Module&#039;s Title Link';
