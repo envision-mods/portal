@@ -62,6 +62,9 @@ function loadGeneralSettingParameters3($subActions = array(), $defaultAction = '
 
 	$context['html_headers'] .= '
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>';
+
+	if (isset($_REQUEST['xml']))
+		$context['template_layers'] = array();
 }
 
 /**
@@ -180,16 +183,13 @@ function ManageEnvisionModules()
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_man_mods.js"></script>
 	<script type="text/javascript">
 		var postUrl = "action=admin;area=epmodules;sa=epmanlayout;xml;";
-		var postUrl2 = "action=admin;area=epmodules;xml;";
+		var postUrl2 = "action=admin;area=epmodules;xml;partial";
 		var sessVar = "' . $context['session_var'] . '";
 		var sessId = "' . $context['session_id'] . '";
 		var errorString = ' . JavaScriptEscape($txt['error_string']) . ';
 		var modulePositionsSaved = ' . JavaScriptEscape($txt['module_positions_saved']) . ';
 		var clickToClose = ' . JavaScriptEscape($txt['click_to_close']) . ';
 	</script>';
-
-	if (isset($_REQUEST['xml']))
-		$context['template_layers'] = array();
 }
 
 /**
@@ -340,8 +340,6 @@ function ModifyModule()
 	$context['page_title'] = $txt['ep_modify_mod'];
 	$context['post_url'] = $scripturl . '?action=admin;area=epmodules;sa=modify2;in=' . $_GET['in'];
 	$context['sub_template'] = 'modify_modules';
-	$context['html_headers'] .= '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>';
 }
 
 function ModifyModule2()
@@ -1541,7 +1539,7 @@ function DeleteEnvisionLayout()
  */
 function EditEnvisionLayout()
 {
-	global $context, $smcFunc, $txt;
+	global $context, $smcFunc, $txt, $scripturl;
 
 	if (!allowedTo('admin_forum'))
 		return;
@@ -1554,11 +1552,10 @@ function EditEnvisionLayout()
 	// Variables in here are recycled
 	AddEnvisionLayout();
 
+	$selected_layout = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
 	$context['page_title'] = $txt['edit_layout_title'];
 	$context['sub_template'] = 'edit_layout';
-	$context['post_url'] = $scripturl . '?action=admin;area=epmodules;sa=epeditlayout2';
-
-	$selected_layout = isset($_POST['layout_picker']) && !empty($_POST['layout_picker']) ? (int) $_POST['layout_picker'] : fatal_lang_error('cant_find_layout_id', false);
+	$context['post_url'] = $scripturl . '?action=admin;area=epmodules;sa=epeditlayout2;in=' . $selected_layout;
 
 	if (!isset($context['row_pos_error_ids']))
 	{

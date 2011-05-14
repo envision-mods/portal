@@ -19,12 +19,13 @@ function template_modify_modules()
 
 	echo '
 	<div id="admincenter">
+		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
 		<form name="epmodule" id="epmodule" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="moduleFieldsSendingHandler.send(); return false;">';
 
 	echo '
 			<div class="title_bar">
 				<h3 class="titlebg">
-					', $txt['ep_module_' . $context['ep_module_type']] . $txt['ep_modsettings'], '
+					', $txt['ep_module_' . $context['ep_module_type']] . ' ' . $txt['ep_modsettings'], '
 				</h3>
 			</div>';
 
@@ -63,7 +64,7 @@ function template_modify_modules()
 		{
 			case 'text': case 'int':
 				echo '
-					<input type="text" name="', $key, '" id="', $field['label'], '"value="', $field['value'], '" class="input_text" />';
+					<input type="text" name="', $key, '" id="', $field['label'], '" value="', $field['value'], '" class="input_text" />';
 				break;
 
 			case 'large_text': case 'html':
@@ -125,6 +126,9 @@ function template_modify_modules()
 		if (!empty($field['postinput']))
 			echo '
 					', $field['postinput'];
+
+		echo '
+				</dd>';
 	}
 
 	echo '
@@ -137,8 +141,6 @@ function template_modify_modules()
 		<span class="lowerframe"><span></span></span>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</form>
-			</div>
-
 			<script type="text/javascript"><!-- // --><![CDATA[
 				var moduleFieldsSendingHandler = new moduleFields({
 					sUrl: \'', $context['post_url'], ';xml\',
@@ -147,7 +149,7 @@ function template_modify_modules()
 					sSessionId: ', JavaScriptEscape($context['session_id']), '
 				});
 			// ]]></script>
-			<br class="clear" />';
+			</div>';
 }
 
 /**
@@ -159,7 +161,7 @@ function template_manage_modules()
 {
 	global $txt, $context, $scripturl, $settings, $user_info, $options;
 
-	if (isset($_REQUEST['xml']))
+	if (isset($_REQUEST['partial']))
 		foreach ($context['ep_columns'] as $row_id => $row_data)
 		{
 			echo '
@@ -215,7 +217,7 @@ function template_manage_modules()
 	// Build the normal button array.
 	$envision_buttons = array(
 		'add' => array('text' => 'add_layout', 'image' => 'reply.gif', 'lang' => true, 'url' => $scripturl . '?action=admin;area=epmodules;sa=epaddlayout;' . $context['session_var'] . '=' . $context['session_id']),
-		'edit' => array('text' => 'edit_layout', 'image' => 'reply.gif', 'lang' => true, 'url' => 'javascript:void(0);', 'custom' => 'onclick="javascript:submitLayout(\'editlayout\', \'' . $scripturl . '?action=admin;area=epmodules;sa=epeditlayout;\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');"'),
+		'edit' => array('text' => 'edit_layout', 'image' => 'reply.gif', 'lang' => true, 'url' => $scripturl . '?action=admin;area=epmodules;sa=epeditlayout;'),
 		'del' => array('text' => 'delete_layout', 'image' => 'reply.gif', 'lang' => true, 'url' => 'javascript:void(0);', 'custom' => 'onclick="javascript:submitLayout(\'' . $txt['confirm_delete_layout'] . '\', \'' . $scripturl . '?action=admin;area=epmodules;sa=epdellayout;\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');"'),
 	);
 
@@ -223,6 +225,7 @@ function template_manage_modules()
 		unset($envision_buttons['del']);
 
 	echo '
+	<div id="admincenter">
 	<div class="floatleft w100">
 		<div class="floatright">
 			<form action="', $context['in_url'], '" method="post" accept-charset="', $context['character_set'], '" id="eplc">
@@ -327,7 +330,8 @@ function template_manage_modules()
 					<br class="clear" />
 						<div class="padding righttext">
 							<input type="submit" name="save" id="save" value="', $txt['save'], '" class="button_submit" />
-						</div>';
+						</div>
+	</div>';
 	}
 }
 
@@ -478,7 +482,7 @@ function template_basic_layout()
 					</span>
 				</dt>
 				<dd>
-					<select id="actions_list" name="layouts" class="layout_style" size="10" multiple class="layout_list', (isset($context['layout_error']['no_actions']) ? ' layout_error' : ''), '">';
+					<select id="actions_list" name="layouts" size="10" multiple="multiple" class="layout_list', (isset($context['layout_error']['no_actions']) ? ' layout_error' : ''), ' layout_style">';
 
 	foreach ($context['current_actions'] as $cur_action)
 		echo '

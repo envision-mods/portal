@@ -5,7 +5,7 @@ function moduleFields(oOptions)
 
 moduleFields.prototype.send = function ()
 {
-	if (typeof document.querySelectorAll == "undefined")
+	if (typeof document.querySelectorAll != "undefined")
 	{
 		var x = [
 			this.opt.sSessionVar + '=' + this.opt.sSessionId
