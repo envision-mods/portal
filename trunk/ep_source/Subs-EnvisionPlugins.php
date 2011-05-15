@@ -163,7 +163,7 @@ function ep_add_hook($hook, $function, $permanent = true)
 	global $modSettings;
 
 	// Do nothing if it's already there, except if we're asking for registration and it isn't permanented yet.
-	if ((!$permanent || in_array($function, $modSettings['ep_permanented_hooks'][$hook])) && ($in_hook = in_array($function, $modSettings['ep_hooks'][$hook])))
+	if ((!$permanent || in_array($function, $modSettings['ep_permanented_hooks'][$hook])) && ($in_hook = @in_array($function, $modSettings['ep_hooks'][$hook])))
 		return false;
 
 	// Add it!

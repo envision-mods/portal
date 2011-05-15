@@ -661,3 +661,9 @@ div.epsitemenu div a.sm:hover
 {
 	width: 75%;
 }
+
+.action_label
+{
+	text-transform: capitalize;
+	margin-left: 0.5em;
+}
