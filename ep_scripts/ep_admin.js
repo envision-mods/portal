@@ -43,6 +43,7 @@ function addAction()
 {
 	var user_defined = false;
 	var actions = document.getElementById("actions");
+	var actionVal = actions.options[actions.selectedIndex].value;
 	if (document.getElementById("action_smf_actions").style.display == "none")
 	{
 		var user_defined = true;
@@ -55,64 +56,27 @@ function addAction()
 			if (udefined == exceptions[p]) return;
 
 		document.getElementById("udefine").value = "";
+		actionVal = udefined;
 	}
-	var layouts = document.getElementById("lay_right");
-	var action_list = document.getElementById("actions_list");
-	var opt = document.createElement("option");
-	var nextIn = action_list.options.length;
-	var action_val = user_defined == false ? actions.options[actions.selectedIndex].text : udefined;
-	var i = action_list.options.length;
-	while (i--)
-		if (action_list.options[i].text == action_val)
-			return;
-
-	action_list.options.add(opt);
-	opt.text = action_val;
-	var hidden = document.createElement("input");
-	hidden.name = 'layout_actions[]';
-	hidden.id = "envision_action" + nextIn;
-	hidden.type = 'hidden';
-	hidden.value = action_val;
-	layouts.appendChild(hidden);
-}
-
-function removeActions()
-{
-	var action_list = document.getElementById("actions_list");
-	var parent = document.getElementById("lay_right");
-
-	// Remember selected items.
-	// Opera deselects all selected options when removing any of them, so this fixes that.
-	var is_selected = [];
-	for (var i = 0; i < action_list.options.length; ++i)
-		is_selected[i] = action_list.options[i].selected;
-
-	// Remove selected items.
-	i = action_list.options.length;
-	while (i--)
+	var element = document.getElementById("envision_action" + actionVal);
+	if (element == null)
 	{
-		if (is_selected[i])
-		{
-			action_list.remove(i);
-			parent.removeChild(document.getElementById("envision_action" + i));
-		}
+		var action_list = document.getElementById("actions_list");
+		var oDiv = document.createElement("div");
+		var oLabel = document.createElement("label");
+		oLabel.setAttribute("for", "envision_action" + actionVal);
+		oLabel.innerHTML = actionVal;
+		oLabel.className = "action_label";
+		var checkbox = document.createElement("input");
+		checkbox.name = 'layout_actions[]';
+		checkbox.id = "envision_action" + actionVal;
+		checkbox.type = 'checkbox';
+		checkbox.checked = true;
+		checkbox.value = actionVal;
+		oDiv.appendChild(checkbox);
+		oDiv.appendChild(oLabel);
+		action_list.appendChild(oDiv);
 	}
-
-	var s = 0;
-	// Reorder them
-	for(var p=0; p < parent.childNodes.length; p++)
-	{
-		if (parent.childNodes[p].nodeName == '#text') continue;
-		var action = parent.childNodes[p].id;
-
-		if (action.indexOf('envision_action') == 0)
-		{
-			parent.childNodes[p].id = 'envision_action' + s;
-			s++;
-		}
-	}
-
-	return true;
 }
 
 function moveDown(element)
@@ -604,7 +568,7 @@ function removeHiddenElements(formName)
  * As its name suggests, this function is run right before the form to edit a layout is submitted.
  *
  * The hidden inputs that are created use somewhat obscure values.
- * - cId is the colum IDs. This is a bit tricky to understand. It has three integers seperated by underscores: the first integer is the row number, or x_pos for the database; the second is the column, or y_pos; and the third and final number is the position, id_layout_position.
+ * - cId is the column IDs. This is a bit tricky to understand. It has three integers seperated by underscores: the first integer is the row number, or x_pos for the database; the second is the column, or y_pos; and the third and final number is the position, id_layout_position.
  *
  * @todo check the colspans and ensure they are evenly distributted.
  * @since 1.0
@@ -631,4 +595,5 @@ function beforeLayoutEditSubmit()
 			y_pos++;
 		}
 	}
+	epc_FormSendingHandler.send();
 }

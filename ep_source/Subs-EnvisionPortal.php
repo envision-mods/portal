@@ -1183,7 +1183,7 @@ function ep_process_module($module_context, $data, $full_layout)
 	// Load user-defined module configurations.
 	$request = $smcFunc['db_query']('', '
 		SELECT
-			em.type AS module_type, value
+			name, em.type AS module_type, value
 		FROM {db_prefix}ep_module_positions AS emp
 			LEFT JOIN {db_prefix}ep_modules AS em ON (em.id_module = emp.id_module)
 			LEFT JOIN {db_prefix}ep_module_field_data AS emd ON (emd.id_module_position = emp.id_position)

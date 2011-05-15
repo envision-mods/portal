@@ -20,7 +20,7 @@ function template_modify_modules()
 	echo '
 	<div id="admincenter">
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
-		<form name="epmodule" id="epmodule" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="moduleFieldsSendingHandler.send(); return false;">';
+		<form name="epmodule" id="epmodule" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="epc_FormSendingHandler.send(); return false;">';
 
 	echo '
 			<div class="title_bar">
@@ -142,9 +142,8 @@ function template_modify_modules()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</form>
 			<script type="text/javascript"><!-- // --><![CDATA[
-				var moduleFieldsSendingHandler = new moduleFields({
+				var epc_FormSendingHandler = new epc_Form({
 					sUrl: \'', $context['post_url'], ';xml\',
-					sSelf: \'addShoutSendingHandler\',
 					sSessionVar: ', JavaScriptEscape($context['session_var']), ',
 					sSessionId: ', JavaScriptEscape($context['session_id']), '
 				});
@@ -238,11 +237,13 @@ function template_manage_modules()
 	echo '
 				</select>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			</form>';
-
-	template_button_strip($envision_buttons, 'right');
-
-	echo '
+			</form><div class="buttonlist floatright">
+			<ul>
+				<li><a href="' . $scripturl . '?action=admin;area=epmodules;sa=epaddlayout;c576382=8ed4dca41ab5f5ad424ac7c0c64bb603" class="button_strip_add"><span>' . $txt['add_layout'] . '</span></a></li>
+				<li><a href="' . $scripturl . '?action=admin;area=epmodules;sa=epeditlayout;" class="button_strip_edit"><span>' . $txt['edit_layout'] . '</span></a></li>
+				<li><a onclick="submitLayout(\'' . $txt['confirm_delete_layout'] . '\', \'' . $scripturl . '?action=admin;area=epmodules;sa=epdellayout;\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');" href="javascript:void(0);" class="button_strip_del"><span class="last">' . $txt['delete_layout'] . '</span></a></li>
+			</ul>
+		</div>
 		</div>
 				<div id="messages"></div></div>
 				<div class="module_page floatright">
@@ -345,9 +346,7 @@ function template_add_modules()
 	global $txt, $context, $scripturl, $settings;
 
 	echo '
-			<div id="admincenter">';
-
-	echo '
+			<div id="admincenter">
 				<div class="cat_bar">
 					<h3 class="catbg">
 						', $context['page_title'], '
@@ -361,7 +360,7 @@ function template_add_modules()
 	if (!empty($context['module_info']))
 	{
 		echo '
-				<table border="0" width="100%" cellspacing="1" cellpadding="4" class="tborder" id="stats">
+				<table border="0" width="100%" cellspacing="1" cellpadding="4" id="stats">
 					<tr class="titlebg" valign="middle" align="center">
 					<td align="left" width="25%">', $txt['module_name'], '</td>
 					<td align="left" width="75%">', $txt['module_description'], '</td>
@@ -406,18 +405,17 @@ function template_add_modules()
 									<strong>', $txt['module_to_upload'], '</strong>
 								</dt>
 								<dd>
-									<input name="ep_modules" type="file" class="input_file" size="38">
+									<input name="ep_modules" type="file" class="input_file" size="38" />
 								</dd>
 							</dl>
 							<div class="righttext">
-								<input name="upload" type="submit" value="' . $txt['module_upload'] . '" class="button_submit">
+								<input name="upload" type="submit" value="' . $txt['module_upload'] . '" class="button_submit" />
 								<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 							</div>
 						</form>
 					</div>
 					<span class="botslice"><span></span></span>
-				</div></div>
-			<br class="clear" />';
+				</div></div>';
 }
 
 function template_basic_layout()
@@ -482,14 +480,14 @@ function template_basic_layout()
 					</span>
 				</dt>
 				<dd>
-					<select id="actions_list" name="layouts" size="10" multiple="multiple" class="layout_list', (isset($context['layout_error']['no_actions']) ? ' layout_error' : ''), ' layout_style">';
+					<div id="actions_list" class="layout_list', (isset($context['layout_error']['no_actions']) ? ' layout_error' : ''), ' layout_style plainbox">';
 
 	foreach ($context['current_actions'] as $cur_action)
 		echo '
-						<option value="', $cur_action, '">', $cur_action, '</option>';
+						<div><input id="envision_action', $cur_action, '" name="layout_actions[]" type="checkbox" value="', $cur_action, '" checked="checked" /><label for="envision_action', $cur_action, '" class="action_label">', $cur_action, '</label></div>';
 
 	echo '
-					</select><br />
+					</div><br />
 					<input type="button" value="', $txt['ep_remove_actions'], '" onclick="javascript:removeActions();" class="button_submit smalltext" />
 				</dd>';
 }
@@ -510,7 +508,8 @@ function template_add_layout()
 			var exceptions = nonallowed_actions.split("|");
 		// ]]></script>
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
-		<form action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>
+		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
+		<form name="epFlayouts" id="epLayouts" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="epc_FormSendingHandler.send(); return false;">
 		<div class="cat_bar">
 			<h3 class="catbg">
 				', $txt['add_layout'], '
@@ -556,18 +555,19 @@ function template_add_layout()
 						<hr class="hrcolor" />
 						<div id="lay_right" class="righttext">
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-							<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />';
-
-		foreach ($context['current_actions'] as $k => $cur_action)
-			echo
-									'<input id="envision_action', $k, '" name="layout_actions[]" type="hidden" value="', $cur_action, '" />';
-
-		echo '
+							<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
 							<input type="submit" name="save" id="save" value="', $txt['save'], '" class="button_submit" />
 						</div>
 					</div>
 					<span class="lowerframe"><span></span></span>
 				</form>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var epc_FormSendingHandler = new epc_Form({
+				sUrl: \'', $context['post_url'], ';xml\',
+				sSessionVar: ', JavaScriptEscape($context['session_var']), ',
+				sSessionId: ', JavaScriptEscape($context['session_id']), '
+			});
+		// ]]></script>
 	</div>';
 }
 
@@ -592,7 +592,8 @@ function template_edit_layout()
 			var delAllRowsError = ', JavaScriptEscape($txt['ep_cant_delete_all']), ';
 		// ]]></script>
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
-		<form name="epFlayouts" id="epLayouts"  action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="beforeLayoutEditSubmit()">
+		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
+		<form name="epFlayouts" id="epLayouts"  action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="beforeLayoutEditSubmit(); return false;">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $txt['edit_layout'], '
@@ -753,19 +754,20 @@ function template_edit_layout()
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', (!empty($_POST['layout_picker']) ? '
 							<input type="hidden" id="layout_picker" name="layout_picker" value="' . $_POST['layout_picker'] . '" />' : ''), '
 							<input type="hidden" id="remove_positions" name="remove_positions" value="" />
-							<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />';
-
-	foreach ($context['current_actions'] as $k => $cur_action)
-		echo '
-							<input id="envision_action', $k, '" name="layout_actions[]" type="hidden" value="', $cur_action, '" />';
-
-	echo '
+							<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
 							<input type="submit" name="save" id="save" value="', $txt['save'], '" class="button_submit" />
 						</div>
 					</div>
 					<span class="lowerframe"><span></span></span>
 				</div>
 			</form>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var epc_FormSendingHandler = new epc_Form({
+				sUrl: \'', $context['post_url'], ';xml\',
+				sSessionVar: ', JavaScriptEscape($context['session_var']), ',
+				sSessionId: ', JavaScriptEscape($context['session_id']), '
+			});
+		// ]]></script>
 		</div>';
 }
 

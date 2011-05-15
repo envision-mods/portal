@@ -177,12 +177,12 @@ function ManageEnvisionModules()
 			'module_title' => $module_context[$row['type']]['module_title']['value'],
 		);
 
-	$context['html_headers'] .= '
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
+	$context['insert_after_template'] .= '
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/jquery-ui-1.7.3.custom.min.js"></script>
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_man_mods.js"></script>
 	<script type="text/javascript">
-		var postUrl = "action=admin;area=epmodules;sa=epmanlayout;xml;";
+		var postUrl = "action=admin;area=epmodules;sa=epsavelayout;xml;";
 		var postUrl2 = "action=admin;area=epmodules;xml;partial";
 		var sessVar = "' . $context['session_var'] . '";
 		var sessId = "' . $context['session_id'] . '";
@@ -418,14 +418,13 @@ function ModifyModule2()
 		redirectexit('action=admin;area=epmodules;sa=modify;in=' . $_GET['in']);
 	else
 	{
-		$context['template_layers'] = array();
 		$context['sub_template'] = 'generic_xml';
 		$context['xml_data'] = array(
 			'items' => array(
 				'identifier' => 'item',
 				'children' => array(
 					array(
-						'value' => $txt['save'],
+						'value' => 'action=admin;area=epmodules;xml',
 					),
 				),
 			),
@@ -1048,7 +1047,10 @@ function InstallEnvisionModule()
 	ep_add_hook('load_module_fields', 'module_' . $name . '_fields');
 
 	// Time to go...
-	redirectexit('action=admin;area=epmodules;sa=epaddmodules');
+	if (!isset($_REQUEST['xml']))
+		redirectexit('action=admin;area=epmodules;sa=epaddmodules');
+	else
+		redirectexit('action=admin;area=epmodules;sa=epaddmodules;xml');
 }
 
 /**
@@ -1074,7 +1076,10 @@ function UninstallEnvisionModule()
 
 	uninstallModule($name);
 
-	redirectexit('action=admin;area=epmodules;sa=epaddmodules');
+	if (!isset($_REQUEST['xml']))
+		redirectexit('action=admin;area=epmodules;sa=epaddmodules');
+	else
+		redirectexit('action=admin;area=epmodules;sa=epaddmodules;xml');
 }
 
 /**
@@ -1190,7 +1195,10 @@ function DeleteEnvisionModule()
 	deltree($context['ep_module_modules_dir'] . '/' . $name);
 
 	// A light heart and an easy step paves the way ;)
-	redirectexit('action=admin;area=epmodules;sa=epaddmodules');
+	if (!isset($_REQUEST['xml']))
+		redirectexit('action=admin;area=epmodules;sa=epaddmodules');
+	else
+		redirectexit('action=admin;area=epmodules;sa=epaddmodules;xml');
 }
 
 /**
@@ -1382,18 +1390,18 @@ function AddEnvisionLayout()
 	{
 		$request = $smcFunc['db_query']('', '
 			SELECT action
-			FROM {db_prefix}ep_layouts AS el
-				LEFT JOIN {db_prefix}ep_layout_actions AS ela ON (ela.id_layout = el.id_layout)
-			WHERE ela.action = {int:current_layout}
-				AND el.id_member = {int:zero}',
+			FROM {db_prefix}ep_layout_actions
+			WHERE id_layout = {int:current_layout}',
 			array(
-				'current_layout' => $_SESSION['selected_layout']['id_layout'],
-				'zero' => 0,
+				'current_layout' => $_GET['in'],
 			)
 		);
 
 		while ($row = $smcFunc['db_fetch_assoc']($request))
-			$exceptions += explode(',', $row['actions']);
+		{
+			$exceptions[] = $row['action'];
+			$context['current_actions'][] = $row['action'];
+		}
 	}
 
 	$countActions = count($context['smf_actions']);
@@ -1482,6 +1490,7 @@ function AddEnvisionLayout2()
 			if (isset($txt['ep_' . $error_type]))
 				$context['layout_error']['messages'][] = $txt['ep_' . $error_type];
 		}
+		die(var_dump($context['layout_error']));
 		return AddEnvisionLayout();
 	}
 
@@ -1506,7 +1515,22 @@ function AddEnvisionLayout2()
 
 	$_SESSION['layouts'][$iid] = $layout_name;
 
-	redirectexit('action=admin;area=epmodules;sa=epmanmodules');
+	if (!isset($_REQUEST['xml']))
+		redirectexit('action=admin;area=epmodules');
+	else
+	{
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'items' => array(
+				'identifier' => 'item',
+				'children' => array(
+					array(
+						'value' => 'action=admin;area=epmodules;xml',
+					),
+				),
+			),
+		);
+	}
 }
 
 /**
@@ -1591,7 +1615,7 @@ function EditEnvisionLayout()
  */
 function EditEnvisionLayout2()
 {
-	global $context, $txt, $smcFunc;
+	global $context, $txt, $smcFunc, $sourcedir;
 
 	// Just a few precautionary measures.
 	if (!allowedTo('admin_forum'))
@@ -1604,7 +1628,7 @@ function EditEnvisionLayout2()
 	$layout_name = '';
 	$layout_actions = array();
 	$layout_positions = array();
-	$selected_layout = isset($_POST['layout_picker']) && !empty($_POST['layout_picker']) ? (int) $_POST['layout_picker'] : fatal_lang_error('cant_find_layout_id', false);
+	$selected_layout = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
 
 	if ($_SESSION['show_smf'])
 	{
@@ -1675,6 +1699,7 @@ function EditEnvisionLayout2()
 			if (isset($txt['ep_' . $error_type]))
 				$context['layout_error']['messages'][] = $txt['ep_' . $error_type];
 		}
+		die(var_dump($regulatory_check, $context['layout_error']));
 		return EditEnvisionLayout();
 	}
 
@@ -1701,7 +1726,22 @@ function EditEnvisionLayout2()
 		$_SESSION['layouts'][$selected_layout] = $layout_name;
 	}
 
-	redirectexit('action=admin;area=epmodules;sa=epmanmodules');
+	if (!isset($_REQUEST['xml']))
+		redirectexit('action=admin;area=epmodules');
+	else
+	{
+		$context['sub_template'] = 'generic_xml';
+		$context['xml_data'] = array(
+			'items' => array(
+				'identifier' => 'item',
+				'children' => array(
+					array(
+						'value' => 'action=admin;area=epmodules;xml',
+					),
+				),
+			),
+		);
+	}
 }
 
 /**
