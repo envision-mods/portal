@@ -1218,10 +1218,11 @@ function ep_process_module($module_context, $data, $full_layout)
 		require_once($context['ep_module_modules_dir'] . '/' . $data['type'] . '/main.php');
 
 	// Load the module template.
-	if (empty($data['template']) || !empty($data['template']) && !file_exists($context['ep_module_template'] . $data['template'].'.php'))
-		$data['template'] = 'default';
+	if (empty($fields['module_template']['value']) || !empty($fields['module_template']['value']) && !file_exists($context['ep_module_template'] . $fields['module_template']['value']))
+		$fields['module_template']['value'] = 'default.php';
 
-	require_once($context['ep_module_template'] . $data['template'] . '.php');
+	require_once($context['ep_module_template'] . $fields['module_template']['value']);
+	$data['module_template'] = str_replace('.php', '', $fields['module_template']['value']);
 
 	// Correct the title target...
 	if (!isset($fields['module_target']['value']))
