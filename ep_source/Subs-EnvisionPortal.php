@@ -668,12 +668,10 @@ function envisionBuffer($buffer)
 
 	// Add our copyright. Please have a thought for the developers and keep it in place.
 	$search_array = array(
-		', Simple Machines LLC</a>',
-		'class="copyright"',
+		', Simple Machines LLC</a></li>',
 	);
 	$replace_array = array(
-		', Simple Machines LLC</a><br /><a class="new_win" href="http://envisionportal.net/" target="_blank">Envision Portal v' . $portal_ver . ' &copy; 2011 Envision Portal Team</a>',
-		'class="copyright" style="line-height: 1;"',
+		', Simple Machines LLC</a></li><li><a class="new_win" href="http://envisionportal.net/" target="_blank">Envision Portal ' . $portal_ver . ' &copy; 2011 Envision Portal Team</a></li>',
 	);
 
 	if (!empty($context['has_ep_layout']))
@@ -1700,16 +1698,17 @@ function envision_integrate_load_permissions(&$permissionGroups, &$permissionLis
 	// If this is a guest limit the available permissions.
 	if (isset($context['group']['id']) && $context['group']['id'] == -1)
 		$permissionList['membergroup'] += array(
-			'epview' => array(false, 'ep', 'ep'),
+			'ep_view' => array(false, 'ep', 'ep'),
 		);
 	else
 		$permissionList['membergroup'] += array(
-			'epview' => array(false, 'ep', 'ep'),
-			'epcreate_layouts' => array(false, 'ep', 'ep'),
-			'epmodify_layouts' => array(true, 'ep', 'ep'),
-			'epdelete_layouts' => array(true, 'ep', 'ep'),
-			'epimport_layouts' => array(true, 'ep', 'ep'),
-			'epexport_layouts' => array(true, 'ep', 'ep'),
+			'ep_view' => array(false, 'ep', 'ep'),
+			'ep_create_layouts' => array(false, 'ep', 'ep'),
+			'ep_create_unapproved_layouts' => array(false, 'ep', 'ep'),
+			'ep_modify_layouts' => array(true, 'ep', 'ep'),
+			'ep_delete_layouts' => array(true, 'ep', 'ep'),
+			'ep_import_layouts' => array(true, 'ep', 'ep'),
+			'ep_export_layouts' => array(true, 'ep', 'ep'),
 		);
 }
 
