@@ -61,9 +61,8 @@ function ep_template_default($module, $style, $location = 0)
 			echo '
 							<div class="cat_bar"', (!empty($location) ? ' style="margin-top: 7px;"' : ''), '>
 								<h3 class="catbg">
-									', !empty($modSettings['ep_collapse_modules']) && $module['header_display'] != 2 ? '<img class="ep_curveblock floatright hand" id="' . $module['type'] . 'collapse_' . $module['id'] . '" src="' . $settings['images_url'] . '/collapse.gif" alt="" title="' . $txt['ep_core_modules'] . '" />' : '', '
-								' . (empty($module['icon']) ? '' : '
-								<img src="' . $module['icon'] . '" alt="" title="' . $module['title'] . '" class="icon" style="margin-left: 0px;" />&nbsp;') . (empty($module['action']) && empty($module['url']) ? '' : (!empty($module['url']) ? $module['url'] : '<a href="' . $scripturl . '?' . $module['action'] . '">')) . $module['title'] . (empty($module['action']) && empty($module['url']) ? '' : '</a>') . '
+					', !empty($modSettings['ep_collapse_modules']) && $module['header_display'] != 2 ? '<img class="ep_curveblock floatright hand" id="' . $module['type'] . 'collapse_' . $module['id'] . '" src="' . $settings['images_url'] . '/collapse.gif" alt="" title="' . $txt['ep_core_modules'] . '" />' : '', '
+					' . $module['module_icon'] . $module['module_title'] . '
 								</h3>
 							</div>';
 
