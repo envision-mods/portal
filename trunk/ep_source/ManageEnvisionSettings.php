@@ -62,6 +62,14 @@ function Configuration()
 {
 	global $context, $txt, $scripturl, $modSettings, $settings;
 
+	$context['insert_after_template'] .= '
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/jquery-ui-1.7.3.custom.min.js"></script>
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_man_mods.js"></script>';
+
+	if (isset($_REQUEST['xml']))
+		$context['template_layers'] = array();
+
 	$subActions = array(
 		'epinfo' => 'EnvisionPortalInfo',
 		'epgeneral' => 'ModifyEnvisionGeneral',
@@ -231,6 +239,7 @@ function ModifyEnvisionGeneral($return_config = false)
 	$config_vars = array(
 		array('check', 'ep_collapse_modules', 'help' => 'ep_collapse_modules_help'),
 		array('check', 'ep_color_members', 'help' => 'ep_color_members_help'),
+		array('check', 'ep_inline_copyright', 'help' => 'ep_inline_copyright_help'),
 	);
 
 	if ($return_config)
@@ -251,6 +260,18 @@ function ModifyEnvisionGeneral($return_config = false)
 	$context['settings_title'] = $txt['ep_admin_config_general'];
 
 	prepareDBSettingContext($config_vars);
+
+	$context['force_form_onsubmit'] = 'epc_FormSendingHandler.send(); return false;';
+
+	$context['insert_after_template'] .= '
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
+	<script type="text/javascript"><!-- // --><![CDATA[
+		var epc_FormSendingHandler = new epc_Form({
+			sUrl: \'' . $context['post_url'] . ';xml\' .
+			sSessionVar: ' . JavaScriptEscape($context['session_var']) . ' .
+			sSessionId: ' . JavaScriptEscape($context['session_id']) . '
+		});
+	// ]]></script>';
 
 }
 
@@ -306,6 +327,18 @@ function ModifyEnvisionModuleSettings($return_config = false)
 	$context['settings_title'] = $txt['ep_admin_config_modulesettings'];
 
 	prepareDBSettingContext($config_vars);
+
+	$context['force_form_onsubmit'] = 'epc_FormSendingHandler.send(); return false;';
+
+	$context['insert_after_template'] .= '
+	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
+	<script type="text/javascript"><!-- // --><![CDATA[
+		var epc_FormSendingHandler = new epc_Form({
+			sUrl: \'' . $context['post_url'] . ';xml\' .
+			sSessionVar: ' . JavaScriptEscape($context['session_var']) . ' .
+			sSessionId: ' . JavaScriptEscape($context['session_id']) . '
+		});
+	// ]]></script>';
 }
 
 function EnvisionLogs()
@@ -453,7 +486,7 @@ function EnvisionLogs()
 	require_once($sourcedir . '/Subs-List.php');
 	createList($listOptions);
 
-	$context['sub_template'] = 'show_list';
+	$context['sub_template'] = 'ep_admin_log';
 	$context['default_list'] = 'ep_list_logs';
 }
 
