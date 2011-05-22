@@ -336,7 +336,7 @@ function AddEnvisionLayout2()
 	$layout_errors = array();
 	$layout_name = '';
 	$layout_actions = array();
-	$selected_layout = 0;
+	$context['selected_layout'] = 0;
 
 	ep_call_hook('add_member_layout', array(&$_POST));
 
@@ -363,7 +363,7 @@ function AddEnvisionLayout2()
 		$layout_errors[] = 'no_actions';
 
 	// Finally get the layout style they chose.
-	$selected_layout = (int) $_POST['layout_style'];
+	$context['selected_layout'] = (int) $_POST['layout_style'];
 
 	if (!empty($layout_errors))
 	{
@@ -381,8 +381,8 @@ function AddEnvisionLayout2()
 
 	$id_group = 1;
 
-	if (!empty($selected_layout))
-		$insert_positions = ep_get_predefined_layouts($selected_layout);
+	if (!empty($context['selected_layout']))
+		$insert_positions = ep_get_predefined_layouts($context['selected_layout']);
 	else
 		fatal_lang_error('ep_layout_unknown', false);
 
@@ -499,10 +499,10 @@ function EditEnvisionLayout()
 	// Variables in here are recycled
 	AddEnvisionLayout();
 
-	$selected_layout = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
+	$context['selected_layout'] = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
 	$context['page_title'] = $txt['edit_layout_title'];
 	$context['sub_template'] = 'edit_layout';
-	$context['post_url'] = $scripturl . '?action=profile;area=layouts;sa=edit2;u=' . $context['id_member'] . ';in=' . $selected_layout;
+	$context['post_url'] = $scripturl . '?action=profile;area=layouts;sa=edit2;u=' . $context['id_member'] . ';in=' . $context['selected_layout'];
 
 
 	if (!isset($context['row_pos_error_ids']))
@@ -513,7 +513,7 @@ function EditEnvisionLayout()
 		$context['colspans_error_ids'] = array();
 	}
 
-	loadLayout($selected_layout);
+	loadLayout($context['selected_layout']);
 
 	foreach ($context['ep_columns'] as &$row_data)
 		foreach ($row_data as &$column_data)
@@ -557,7 +557,7 @@ function EditEnvisionLayout2()
 	$layout_name = '';
 	$layout_actions = array();
 	$layout_positions = array();
-	$selected_layout = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
+	$context['selected_layout'] = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
 
 	if ($_SESSION['show_smf'])
 	{
@@ -636,7 +636,7 @@ function EditEnvisionLayout2()
 
 	$layout_name = ($_SESSION['show_smf'] ? $smcFunc['htmlspecialchars'](un_htmlspecialchars(trim($_POST['layout_name']))) : '');
 
-	editLayout($selected_layout, $layout_name, $id_member, $layout_actions, $layout_positions, $_POST['smf_radio'], $_POST['remove_positions']);
+	editLayout($context['selected_layout'], $layout_name, $id_member, $layout_actions, $layout_positions, $_POST['smf_radio'], $_POST['remove_positions']);
 
 	// Cleanup...
 	unset($_SESSION['show_smf']);
@@ -644,7 +644,7 @@ function EditEnvisionLayout2()
 	unset($val);
 
 	$log_extra = array(
-		'id_layout' => $selected_layout,
+		'id_layout' => $context['selected_layout'],
 		'layout_name' => $layout_name,
 	);
 
@@ -697,14 +697,9 @@ function ManageEnvisionModules()
 	if (empty($_REQUEST['in']) || empty($context['layout_list'][$_REQUEST['in']]))
 		$_REQUEST['in'] = key($context['layout_list']);
 
-	$selected_layout = !empty($_REQUEST['in']) ? (int) $_REQUEST['in'] : fatal_lang_error('cant_find_layout_id', false);
+	$context['selected_layout'] = !empty($_REQUEST['in']) ? (int) $_REQUEST['in'] : fatal_lang_error('cant_find_layout_id', false);
 
-	$_SESSION['selected_layout'] = array(
-		'id_layout' => (int) $selected_layout,
-		'name' => $context['layout_list'][$selected_layout],
-	);
-
-	loadLayout($_SESSION['selected_layout']['id_layout']);
+	loadLayout($context['selected_layout']);
 
 	foreach ($context['ep_columns'] as &$row_data)
 		foreach ($row_data as &$column_data)
