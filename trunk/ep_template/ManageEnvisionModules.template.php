@@ -220,7 +220,7 @@ function template_manage_modules()
 		'del' => array('text' => 'delete_layout', 'image' => 'reply.gif', 'lang' => true, 'url' => 'javascript:void(0);', 'custom' => 'onclick="javascript:submitLayout(\'' . $txt['confirm_delete_layout'] . '\', \'' . $scripturl . '?action=admin;area=epmodules;sa=epdellayout;\', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\');"'),
 	);
 
-	if ($_SESSION['selected_layout']['name'] == 'Homepage')
+	if ($context['selected_layout'] == 1)
 		unset($envision_buttons['del']);
 
 	echo '

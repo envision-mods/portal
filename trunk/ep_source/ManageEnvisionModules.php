@@ -149,9 +149,9 @@ function ManageEnvisionModules()
 	if (empty($_REQUEST['in']) || empty($context['layout_list'][$_REQUEST['in']]))
 		$_REQUEST['in'] = key($context['layout_list']);
 
-	$selected_layout = !empty($_REQUEST['in']) ? (int) $_REQUEST['in'] : fatal_lang_error('cant_find_layout_id', false);
+	$context['selected_layout'] = !empty($_REQUEST['in']) ? (int) $_REQUEST['in'] : fatal_lang_error('cant_find_layout_id', false);
 
-	loadLayout($selected_layout);
+	loadLayout($context['selected_layout']);
 
 	foreach ($context['ep_columns'] as &$row_data)
 		foreach ($row_data as &$column_data)
@@ -880,7 +880,7 @@ function getEnvisionIcons($directory, $level)
  * Uploads a module.
  *
  * This function checks the file input for several issues.
- * - an error is sent if thee upload did not work out.
+ * - an error is sent if the upload did not work out.
  * - The name is sanitized so all invalid characters aree removed.
  * - Loads SMF's package extractor, read_tgz_file(), and extracts the stored files.
  * - Redirects back when all is done.
@@ -1202,130 +1202,6 @@ function DeleteEnvisionModule()
 }
 
 /**
- * Stops execution of the adding of layouts form if there are errors detected.
- *
- * @since 1.0
- */
-function layoutPostError($layout_errors, $sub_template, $layout_name = '', $curr_actions = array(), $selected_layout = 0)
-{
-	global $context, $txt, $smcFunc;
-
-	$context['page_title'] = $txt[$sub_template . '_title'];
-
-	$context['sub_template'] = $sub_template;
-
-	$context['current_actions'] = array();
-	$context['layout_error'] = array(
-		'messages' => array(),
-	);
-
-	foreach ($layout_errors as $error_type)
-	{
-		$context['layout_error'][$error_type] = true;
-		if (isset($txt['ep_' . $error_type]))
-			$context['layout_error']['messages'][] = $txt['ep_' . $error_type];
-	}
-
-	if (!empty($curr_actions))
-		$context['current_actions'] += $curr_actions;
-
-	if (!empty($layout_name))
-		$context['layout_name'] = $layout_name;
-
-	$context['layout_styles'] = array(
-		1 => 'ep_',
-		2 => 'omega',
-	);
-
-	$context['selected_layout'] = !empty($selected_layout) ? $selected_layout : 0;
-
-	$exceptions = array(
-		'print',
-		'clock',
-		'about:unknown',
-		'about:mozilla',
-		'modifycat',
-		'.xml',
-		'xmlhttp',
-		'dlattach',
-		'envisionaction',
-		'envisionFiles',
-		'printpage',
-		'keepalive',
-		'jseditor',
-		'jsmodify',
-		'jsoption',
-		'suggest',
-		'verificationcode',
-		'viewsmfile',
-		'viewquery',
-		'editpoll2',
-		'login2',
-		'movetopic2',
-		'post2',
-		'quickmod2',
-		'register2',
-		'removetopic2'
-	);
-
-	if (isset($context['edit_layout']))
-		$context['edit_layout'] = true;
-
-	$edit_layout_query = array('curr_layout' => $_SESSION['selected_layout']['id_layout']);
-	$query_array = isset($context['edit_layout']) ? array_merge(array('one' => 1, 'zero' => 0), $edit_layout_query) : array('one' => 1, 'zero' => 0);
-
-	// Need to add all actions, except this layouts actions to the exceptions within this group, so we don't add them twice for different layouts.
-	$request = $smcFunc['db_query']('', '
-		SELECT action
-			FROM {db_prefix}ep_layouts AS el
-				LEFT JOIN {db_prefix}ep_layout_actions AS ela ON (ela.id_layout = el.id_layout)
-			WHERE ela.action = {int:current_layout}
-				AND el.id_member = {int:zero}',
-			array(
-				'current_layout' => $_SESSION['selected_layout']['id_layout'],
-				'zero' => 0,
-			)
-		);
-
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-		$exceptions = array_merge($exceptions, explode(',', $row['actions']));
-
-	$countActions = count($context['smf_actions']);
-
-	$remove_all = array();
-	for ($i = 0; $i < $countActions; $i++)
-	{
-		// Remove the 2's.
-		if (substr($context['smf_actions'][$i], -1) == '2')
-			if (!in_array($context['smf_actions'][$i], $exceptions))
-				$remove_all[] = $context['smf_actions'][$i];
-	}
-
-	if (!empty($remove_all))
-		$remove_all += $exceptions;
-	else
-		$remove_all = $exceptions;
-
-	$context['available_actions'] = array_diff($context['smf_actions'], $remove_all);
-
-	// We do this so the user can type in 2's if they need them.
-	$context['unallowed_actions'] = $exceptions;
-
-	sort($context['available_actions']);
-
-	$context['nonaction_choices'] = array(
-		'topic',
-		'board',
-	);
-
-	// No check for the previous submission is needed.
-	checkSubmitOnce('free');
-
-	// Acquire a new form sequence number.
-	checkSubmitOnce('register');
-}
-
-/**
  * Loads the form for the admin to add a layout.
  *
  * @since 1.0
@@ -1455,7 +1331,7 @@ function AddEnvisionLayout2()
 	$layout_errors = array();
 	$layout_name = '';
 	$layout_actions = array();
-	$selected_layout = 0;
+	$context['selected_layout'] = 0;
 
 	if (!empty($_POST['layout_name']))
 		$layout_name = checkLayoutName(trim($_POST['layout_name']));
@@ -1480,7 +1356,7 @@ function AddEnvisionLayout2()
 		$layout_errors[] = 'no_actions';
 
 	// Finally get the layout style they chose.
-	$selected_layout = (int) $_POST['layout_style'];
+	$context['selected_layout'] = (int) $_POST['layout_style'];
 
 	if (!empty($layout_errors))
 	{
@@ -1499,8 +1375,8 @@ function AddEnvisionLayout2()
 
 	$id_group = 1;
 
-	if (!empty($selected_layout))
-		$insert_positions = ep_get_predefined_layouts($selected_layout);
+	if (!empty($context['selected_layout']))
+		$insert_positions = ep_get_predefined_layouts($context['selected_layout']);
 	else
 		fatal_lang_error('ep_layout_unknown', false);
 
@@ -1508,15 +1384,8 @@ function AddEnvisionLayout2()
 
 	$iid = addLayout($layout_name, 0, $layout_actions, $insert_positions);
 
-	$_SESSION['selected_layout'] = array(
-		'id_layout' => $iid,
-		'name' => $layout_name,
-	);
-
-	$_SESSION['layouts'][$iid] = $layout_name;
-
 	if (!isset($_REQUEST['xml']))
-		redirectexit('action=admin;area=epmodules');
+		redirectexit('action=admin;area=epmodules;in=' . $iid);
 	else
 	{
 		$context['sub_template'] = 'generic_xml';
@@ -1525,7 +1394,7 @@ function AddEnvisionLayout2()
 				'identifier' => 'item',
 				'children' => array(
 					array(
-						'value' => 'action=admin;area=epmodules;xml',
+						'value' => 'action=admin;area=epmodules;in=' . $iid . ';xml',
 					),
 				),
 			),
@@ -1576,10 +1445,10 @@ function EditEnvisionLayout()
 	// Variables in here are recycled
 	AddEnvisionLayout();
 
-	$selected_layout = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
+	$context['selected_layout'] = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
 	$context['page_title'] = $txt['edit_layout_title'];
 	$context['sub_template'] = 'edit_layout';
-	$context['post_url'] = $scripturl . '?action=admin;area=epmodules;sa=epeditlayout2;in=' . $selected_layout;
+	$context['post_url'] = $scripturl . '?action=admin;area=epmodules;sa=epeditlayout2;in=' . $context['selected_layout'];
 
 	if (!isset($context['row_pos_error_ids']))
 	{
@@ -1589,7 +1458,7 @@ function EditEnvisionLayout()
 		$context['colspans_error_ids'] = array();
 	}
 
-	loadLayout($selected_layout);
+	loadLayout($context['selected_layout']);
 
 	foreach ($context['ep_columns'] as &$row_data)
 		foreach ($row_data as &$column_data)
@@ -1628,7 +1497,7 @@ function EditEnvisionLayout2()
 	$layout_name = '';
 	$layout_actions = array();
 	$layout_positions = array();
-	$selected_layout = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
+	$context['selected_layout'] = !empty($_GET['in']) ? (int) $_GET['in'] : fatal_lang_error('cant_find_layout_id', false);
 
 	if ($_SESSION['show_smf'])
 	{
@@ -1708,26 +1577,15 @@ function EditEnvisionLayout2()
 
 	$layout_name = ($_SESSION['show_smf'] ? $smcFunc['htmlspecialchars'](un_htmlspecialchars(trim($_POST['layout_name']))) : '');
 
-	editLayout($selected_layout, $layout_name, 0, $layout_actions, $layout_positions, $_POST['smf_radio'], $_POST['remove_positions']);;
+	editLayout($context['selected_layout'], $layout_name, 0, $layout_actions, $layout_positions, $_POST['smf_radio'], $_POST['remove_positions']);;
 
 	// Cleanup...
 	unset($_SESSION['show_smf']);
 	unset($regulatory_check);
 	unset($val);
 
-	// Update the session with the new name.
-	if (!empty($layout_name))
-	{
-		$_SESSION['selected_layout'] = array(
-			'id_layout' => (int) $selected_layout,
-			'name' => $layout_name,
-		);
-
-		$_SESSION['layouts'][$selected_layout] = $layout_name;
-	}
-
 	if (!isset($_REQUEST['xml']))
-		redirectexit('action=admin;area=epmodules');
+		redirectexit('action=admin;area=epmodules;in=' . $context['selected_layout']);
 	else
 	{
 		$context['sub_template'] = 'generic_xml';
@@ -1736,7 +1594,7 @@ function EditEnvisionLayout2()
 				'identifier' => 'item',
 				'children' => array(
 					array(
-						'value' => 'action=admin;area=epmodules;xml',
+						'value' => 'action=admin;area=epmodules;in=' . $context['selected_layout'] . ';xml',
 					),
 				),
 			),
