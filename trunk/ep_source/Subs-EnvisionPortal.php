@@ -655,7 +655,7 @@ function list_getNumLogs()
 
 function envisionBuffer($buffer)
 {
-	global $portal_ver, $context;
+	global $portal_ver, $context, $modSettings;
 
 	/*
 	Fix the category links across the board, even in mods and themes
@@ -668,11 +668,17 @@ function envisionBuffer($buffer)
 
 	// Add our copyright. Please have a thought for the developers and keep it in place.
 	$search_array = array(
-		', Simple Machines LLC</a></li>',
+		', Simple Machines LLC</a>',
 	);
-	$replace_array = array(
-		', Simple Machines LLC</a></li><li><a class="new_win" href="http://envisionportal.net/" target="_blank">Envision Portal ' . $portal_ver . ' &copy; 2011 Envision Portal Team</a></li>',
-	);
+
+	if (!empty($modSettings['ep_inline_copyright']))
+		$replace_array = array(
+			', Simple Machines LLC</a> | <a class="new_win" href="http://envisionportal.net/" target="_blank">Envision Portal ' . $portal_ver . ' &copy; 2011 Envision Portal Team</a>',
+		);
+	else
+		$replace_array = array(
+			', Simple Machines LLC</a></span></li><li class="copyright"><span><a class="new_win" href="http://envisionportal.net/" target="_blank">Envision Portal ' . $portal_ver . ' &copy; 2011 Envision Portal Team</a>',
+		);
 
 	if (!empty($context['has_ep_layout']))
 	{
