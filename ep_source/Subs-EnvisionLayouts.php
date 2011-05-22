@@ -322,7 +322,7 @@ function exportLayout($id_layout)
  * @return mixed the ID of the new layout on success; false otherwise.
  * @since 1.0
  */
-function addLayout($layout_name, $id_member, $layout_actions, $insert_positions)
+function addLayout($layout_name, $id_member, $layout_actions, $insert_positions, $approved = 1)
 {
 	global $smcFunc;
 
@@ -330,15 +330,18 @@ function addLayout($layout_name, $id_member, $layout_actions, $insert_positions)
 	$columns = array(
 		'name' => 'string-65',
 		'id_member' => 'int',
+		'approved' => 'int',
 	);
 
 	$data = array(
 		$layout_name,
 		$id_member,
+		$approved,
 	);
 
 	$keys = array(
 		'id_layout',
+		'approved',
 	);
 
 	$smcFunc['db_insert']('insert', '{db_prefix}ep_layouts',  $columns, $data, $keys);

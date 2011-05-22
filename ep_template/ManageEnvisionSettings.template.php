@@ -8,6 +8,17 @@
  * @since 1.0
 */
 
+function template_ep_admin_log()
+{
+	echo '
+	<div id="admincenter">';
+
+	loadSubTemplate('show_list');
+
+	echo '
+	</div>';
+}
+
 /**
  * Renders the general imformation page.
  *
@@ -26,8 +37,8 @@ function template_portal_info()
 	global $context, $txt, $portal_ver, $forum_version;
 
 	echo '
-	<div id="ep_update_section"></div>
-	<div id="ep_admin_center">
+	<div id="admincenter">
+		<div id="ep_update_section"></div>
 		<div id="ep_admin_section">
 			<div id="ep_live_news" class="floatleft">
 				<div class="cat_bar">
