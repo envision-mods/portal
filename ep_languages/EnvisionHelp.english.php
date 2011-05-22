@@ -5,6 +5,7 @@ global $helptxt;
 
 $helptxt['ep_collapse_modules_help'] = 'Sets ability collapse of the modules.';
 $helptxt['ep_color_members_help'] = 'Enable/Disable showing of nicknames color based on membergroups color.';
+$helptxt['ep_inline_copyright_help'] = 'Option to display the copyright on the same line as SMF\'s';
 $helptxt['ep_module_display_style_help'] = 'Sets the current display for all modules appearance within Envision Portal.';
 $helptxt['ep_module_enable_animationshelp'] = 'Enable or Disable module animations when expanding and collapsing a module.';
 $helptxt['ep_module_animation_speed_help'] = 'Sets how fast the modules throughout Envision Portal will expand and collapse.  Note:  Module animations must be enabled for this to take effect.  The default is set at Normal.';

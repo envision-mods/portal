@@ -56,6 +56,7 @@ $txt['ep_admin_config_general'] = 'General Settings';
 // Settings titles
 $txt['ep_collapse_modules'] = 'Enable collapsible modules';
 $txt['ep_color_members'] = 'Color members with member group color';
+$txt['ep_inline_copyright'] = 'Inline copyright display';
 
 /***********************************
 		Module Settings Tab
