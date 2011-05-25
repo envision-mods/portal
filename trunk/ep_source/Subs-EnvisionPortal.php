@@ -19,7 +19,7 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 	global $context, $txt;
 
 	// Default module configurations.
-	$envisionModules = array(
+	$ep_module_context = array(
 		'announce' => array(
 			'module_title' => array(
 				'value' => $txt['ep_module_announce'],
@@ -301,99 +301,6 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 				'value' => '0',
 			),
 		),
-		'shoutbox' => array(
-			'module_title' => array(
-				'value' => $txt['ep_module_shoutbox'],
-			),
-			'module_icon' => array(
-				'value' => 'comments.png',
-			),
-			'id' => array(
-				'type' => 'callback',
-				'callback_func' => 'db_select',
-				'preload' => create_function('&$field', '
-					$field[\'options\'] = ep_db_select(array(
-						\'select1\' => \'id_shoutbox\',
-						\'select2\' => \'name\',
-						\'table\' => \'{db_prefix}ep_shoutboxes\',
-					));
-
-					return $field;'),
-				'size' => '30',
-				'value' => '1',
-			),
-			'refresh_rate' => array(
-				'type' => 'int',
-				'value' => '1',
-			),
-			'max_count' => array(
-				'type' => 'int',
-				'value' => '15',
-			),
-			'max_chars' => array(
-				'type' => 'int',
-				'value' => '128',
-			),
-			'text_size' => array(
-				'type' => 'select',
-				'value' => '1',
-				'options' => 'small;medium',
-			),
-			'member_color' => array(
-				'type' => 'check',
-				'value' => '1',
-			),
-			'message' => array(
-				'type' => 'text',
-				'value' => '',
-			),
-			'message_position' => array(
-				'type' => 'select',
-				'value' => '1',
-				'options' => 'top;after;bottom',
-			),
-			'message_groups' => array(
-				'type' => 'callback',
-				'callback_func' => 'checklist',
-				'preload' => create_function('&$field', '
-					$field[\'options\'] = ep_list_groups($field[\'value\'], \'3\', array(), true);
-
-					return $field;'),
-				'value' => '-3',
-				'float' => true,
-			),
-			'mod_groups' => array(
-				'type' => 'callback',
-				'callback_func' => 'checklist',
-				'preload' => create_function('&$field', '
-					$field[\'options\'] = ep_list_groups($field[\'value\'], \'-1,0,4\', array(), true);
-
-					return $field;'),
-				'value' => '1',
-				'float' => true,
-			),
-			'mod_own' => array(
-				'type' => 'callback',
-				'callback_func' => 'checklist',
-				'preload' => create_function('&$field', '
-					$field[\'options\'] = ep_list_groups($field[\'value\'], \'-1,3\', array(), true);
-
-					return $field;'),
-				'value' => '0,1,2',
-				'options' => '-1,3',
-				'float' => true,
-			),
-			'bbc' => array(
-				'type' => 'callback',
-				'callback_func' => 'checklist',
-				'preload' => create_function('&$field', '
-					$field[\'options\'] = ep_list_bbc($field[\'value\']);
-
-					return $field;'),
-				'value' => 'b;i;u;s;pre;left;center;right;url;sup;sub;php;nobbc;me',
-				'float' => true,
-			),
-		),
 		'custom' => array(
 			'module_title' => array(
 				'value' => $txt['ep_module_custom'],
@@ -416,9 +323,9 @@ function ep_load_module_context($installed_mods = array(), $new_layout = false)
 	// Let other modules hook in to the system.
 	ep_include_hook('load_module_files', $context['ep_module_modules_dir']);
 	ep_include_language_hook('load_module_language_files', $context['ep_module_modules_dir']);
-	ep_call_hook('load_module_fields', array(&$envisionModules));
+	ep_call_hook('load_module_fields', array(&$ep_module_context));
 
-	return $envisionModules;
+	return $ep_module_context;
 }
 
 function ep_parse_string($str = '', $type = 'filepath', $replace = true)
