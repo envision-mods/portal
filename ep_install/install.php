@@ -278,8 +278,7 @@ function DatabasePopulation()
 					array(12, 'new_members'),
 					array(13, 'staff'),
 					array(14, 'sitemenu'),
-					array(15, 'shoutbox'),
-					array(16, 'custom'),
+					array(15, 'custom'),
 				),
 				'keys' => array('id_module', 'type')
 			)
