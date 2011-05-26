@@ -70,7 +70,7 @@ function ManageEnvisionPlugins()
  */
 function SavePlugin()
 {
-	global $context, $smcFunc, $txt, $sourcedir;
+	global $context, $modSettings;
 
 	$plugins_list = listPlugins(true);
 	if (isset($_POST['ep_plugins_c']))
@@ -82,19 +82,12 @@ function SavePlugin()
 				if (isset($plugins_list[$which]['code']['enable']) && is_callable($plugins_list[$which]['code']['enable']))
 					$plugins_list[$which]['code']['enable']();
 
-				$columns = array(
-					'type' => 'string',
-				);
+				if (!isset($modSettings['ep_plugins']))
+					$modSettings['ep_plugins'] = array();
 
-				$data = array(
-					$which,
-				);
-
-				$keys = array(
-					'type',
-				);
-
-				$smcFunc['db_insert']('insert', '{db_prefix}ep_plugins',  $columns, $data, $keys);
+				$plugins = unserialize($modSettings['ep_plugins']);
+				$plugins[] = $which;
+				updateSettings(array('ep_plugins' => serialize($plugins)));
 
 				logEpAction('enable_plugin', 0, array($which));
 			}
@@ -105,13 +98,9 @@ function SavePlugin()
 				if (isset($plugins_list[$which]['code']['disable']) && is_callable($plugins_list[$which]['code']['disable']))
 					$plugins_list[$which]['code']['disable']();
 
-				$smcFunc['db_query']('', '
-					DELETE FROM {db_prefix}ep_plugins
-					WHERE type = {string:type}',
-					array(
-						'type' => $which,
-					)
-				);
+				$plugins = unserialize($modSettings['ep_plugins']);
+				$plugins = array_diff($plugins, array($which));
+				updateSettings(array('ep_plugins' => serialize($plugins)));
 
 				logEpAction('disable_plugin', 0, array($which));
 			}
