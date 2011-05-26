@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+	<title>Mailer</title>
+	<description parsebbc="true">Send mail with attachments. Know that SMF's regular mailing services are NOT affected.</description>
+	<version>1.0</version>
+	<name>r</name>
+</plugin>

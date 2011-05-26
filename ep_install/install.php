@@ -102,6 +102,12 @@ function DatabasePopulation()
 					'type' => 'varchar',
 					'size' => 40,
 				),
+				array(
+					'name' => 'approved',
+					'type' => 'tinyint',
+					'size' => 1,
+					'unsigned' => true,
+				),
 			),
 			'indexes' => array(
 				array(

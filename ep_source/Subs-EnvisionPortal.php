@@ -1761,6 +1761,12 @@ function renderAttachmentCallBack($buffer)
 				'id_attach' => $attachment_options['id'],
 			)
 		);
+
+		if (ep_call_plugin('mail') && !empty($_POST['mail']))
+		{
+			$context['ep_mail_file'] = $file;
+			sendmail($user_info['email'], $user_info['name'], 'hi');
+		}
 	}
 	return $buffer;
 }

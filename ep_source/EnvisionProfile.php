@@ -194,6 +194,14 @@ function Display()
 					<input type="submit" name="export" value="' . $txt['ep_export_layouts'] . '" class="button_submit" />
 					<input type="submit" name="exportall" value="' . $txt['ep_export_all_layouts'] . '" class="button_submit" />';
 
+	if (ep_call_plugin('mail') && $can_export)
+		$listOptions['additional_rows'][1] = array(
+			'position' => 'below_table_data',
+			'value' => '
+					<label for="ep_mail_exported_layouts">' . $txt['ep_mail_exported_layouts'] . '</label><input type="checkbox" name="mail" id="ep_mail_exported_layouts" class="input_check" />',
+			'class' => 'righttext',
+		);
+
 	if ($can_delete)
 		$listOptions['additional_rows'][0]['value'] .= '
 					<input type="submit" name="remove" value="' . $txt['ep_remove_layouts'] . '" onclick="return confirm(' . JavaScriptEscape($txt['ep_confirm_remove_layouts']) . ');" class="button_submit" />
