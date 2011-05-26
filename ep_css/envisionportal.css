@@ -667,3 +667,34 @@ div.epsitemenu div a.sm:hover
 	text-transform: capitalize;
 	margin-left: 0.5em;
 }
+
+h3.ep_plain
+{
+	border-bottom: 1px solid #D8D2C2;
+	margin-bottom: 4px;
+}
+h3.ep_plain img.icon
+{
+	vertical-align: middle;
+	margin-top: -2pt;
+}
+.ep_main div.roundframe div.innerframe div[id]
+{
+	padding: 0.5em 4px;
+}
+
+#ep_plugins_list img.ep_plugins_image
+{
+	float: left;
+	margin-bottom: 1em;
+	margin-right: 1em;
+}
+#ep_plugins_list h4
+{
+	padding-top: 1em;
+}
+#ep_plugins_list div.options
+{
+	float: right;
+	padding-top: 0.5em;
+}

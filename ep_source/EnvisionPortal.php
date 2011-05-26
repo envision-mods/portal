@@ -55,6 +55,8 @@ function ep_init($init_action = '')
 
 	// Modules
 	$context['ep_module_modules_dir'] = $boarddir . '/ep_extra/modules';
+	$context['ep_plugins_dir'] = $boarddir . '/ep_extra/plugins';
+	$context['ep_plugins_url'] = $boardurl . '/ep_extra/plugins';
 
 	// This is changeable from the Envision Admin -> Configuration -> Module Settings area, so we need to load up the correct filepath that is in there.
 	$context['ep_module_icon_url'] = $boardurl . '/' . $modSettings['ep_icon_directory'] . '/';
