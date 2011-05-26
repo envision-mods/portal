@@ -38,7 +38,7 @@ if (!defined('SMF'))
  */
 function loadGeneralSettingParameters3($subActions = array(), $defaultAction = '')
 {
-	global $context, $txt, $settings, $envisionModules, $restrictedNames;
+	global $context, $txt, $settings, $restrictedNames;
 
 	// You need to be an admin to edit settings!
 	isAllowedTo('admin_forum');
@@ -122,7 +122,7 @@ function Modules()
  */
 function ManageEnvisionModules()
 {
-	global $context, $smcFunc, $txt, $scripturl, $modSettings, $settings, $envisionModules;
+	global $context, $smcFunc, $txt, $scripturl, $modSettings, $settings;
 
 	$context['page_title'] = $txt['ep_admin_title_manage_modules'];
 	$context['in_url'] = $scripturl . '?action=admin;area=epmodules;sa=epmanlayout';

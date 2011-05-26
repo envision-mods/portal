@@ -422,7 +422,7 @@ function module_error($type = 'error', $error_type = 'general', $log_error = fal
  * - delete_layout for when a layout is deleted;
  * - export_layout for when a layout is exported to XML;
  * - import_layout for when a layout is imported from XML.
- * $param int $id_member the affected member's ID. Note this becomes a key for the extra column; the currently logged member's ID gets iinserted into the relevant column.
+ * $param int $id_member the affected member's ID. Use a zero to ignore this. Note this becomes a key for the extra column; the currently logged member's ID gets inserted into the relevant column.
  * @param array $extra associative array of extra info that goes with the log. For instance, 'id_member' would  be a key with the affected member's ID as its value.
  */
 function logEpAction($action, $id_member, $extra)
@@ -436,7 +436,8 @@ function logEpAction($action, $id_member, $extra)
 		'extra' => 'string',
 	);
 
-	$extra['id_member'] = $id_member;
+	if (!empty($id_member))
+		$extra['id_member'] = $id_member;
 
 	$data = array(
 		$action, $user_info['id'], time(), serialize($extra),
@@ -686,6 +687,84 @@ function listModules()
 		}
 
 		return $module_info;
+	}
+	else
+		return array();
+}
+
+function ep_get_plugin_info($dirname, $file, $installing = false)
+{
+	global $boarddir, $context, $modSettings, $scripturl, $smcFunc;
+
+	// If the required info file does not exist let's silently die...
+	if (!file_exists($dirname . '/' . $file . '/plugin.xml'))
+		return false;
+
+	// And finally, get the file's contents
+	$file_info = file_get_contents($dirname . '/' . $file . '/plugin.xml');
+	$file_setting = $dirname . '/' . $file . '/scripts/script.php';
+	$func_name = 'plugin_' . $file . '_info';
+
+	// Parse info.xml into an xmlArray.
+	loadClassFile('Class-Package.php');
+	$plugin_info1 = new xmlArray($file_info);
+	$plugin_info1 = $plugin_info1->path('plugin[0]');
+
+	// Required XML elements and attributes. Quit if any one is missing.
+	if (!$plugin_info1->exists('title')) return false;
+	if (!$plugin_info1->exists('description')) return false;
+	if (!file_exists($file_setting)) return false;
+	require_once($file_setting);
+
+	// If installing, run the script.
+	if ($installing && is_callable($func_name))
+		$results = $func_name();
+	else
+		$results = array();
+
+	return array_merge(array(
+		'title' => $plugin_info1->fetch('title'),
+		'description' => ($plugin_info1->exists('description/@parsebbc')) ? ($plugin_info1->fetch('description/@parsebbc') ? parse_bbc($plugin_info1->fetch('description')) : $plugin_info1->fetch('description')) : $plugin_info1->fetch('description'),
+		'enabled' => false,
+	), $results);
+}
+
+function listPlugins($installing = false)
+{
+	global $context, $modSettings, $sourcedir, $scripturl, $smcFunc, $txt;
+	$plugin_names = array();
+
+	// Let's loop throuugh each folder and get their plugin data. If anything goes wrong we shall skip it.
+	$files = scandir($context['ep_plugins_dir']);
+
+	foreach ($files as $file)
+	{
+		$retVal = ep_get_plugin_info($context['ep_plugins_dir'], $file, $installing);
+		if ($retVal === false)
+			continue;
+		else
+		{
+			$plugin_names[] = $file;
+			$plugin_info[$file] = $retVal;
+		}
+	}
+
+	if (isset($plugin_info))
+	{
+		// Find out if any of these are installed.
+		$request = $smcFunc['db_query']('', '
+			SELECT type
+			FROM {db_prefix}ep_plugins
+			WHERE type IN ({array_string:plugin_names})',
+			array(
+				'plugin_names' => $plugin_names,
+			)
+		);
+
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+			$plugin_info[$row['type']]['enabled'] = true;
+
+		return $plugin_info;
 	}
 	else
 		return array();
@@ -1406,6 +1485,16 @@ function add_ep_admin_areas($admin_areas)
 				'subsections' => array(
 					'epmanmodules' => array($txt['ep_admin_manage_modules'], ''),
 					'epaddmodules' => array($txt['ep_admin_add_modules'], ''),
+				),
+			),
+			'epplugins' => array(
+				'label' => $txt['ep_admin_plugins'],
+				'file' => 'ep_source/ManageEnvisionPlugins.php',
+				'function' => 'plugins',
+				'icon' => 'epplugins.png',
+				'subsections' => array(
+					'epmanplugins' => array($txt['ep_admin_manage_plugins'], ''),
+					'epaddplugins' => array($txt['ep_admin_add_plugins'], ''),
 				),
 			),
 			'eppages' => array(
