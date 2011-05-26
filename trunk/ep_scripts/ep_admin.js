@@ -595,5 +595,4 @@ function beforeLayoutEditSubmit()
 			y_pos++;
 		}
 	}
-	epc_FormSendingHandler.send();
 }

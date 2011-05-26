@@ -20,7 +20,7 @@ function template_modify_modules()
 	echo '
 	<div id="admincenter">
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
-		<form name="epmodule" id="epmodule" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="epc_FormSendingHandler.send(); return false;">';
+		<form name="epmodule" id="epmodule" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '">';
 
 	echo '
 			<div class="title_bar">
@@ -147,6 +147,11 @@ function template_modify_modules()
 					sSessionVar: ', JavaScriptEscape($context['session_var']), ',
 					sSessionId: ', JavaScriptEscape($context['session_id']), '
 				});
+
+				document.getElementById("epmodule").onsubmit = function()
+				{
+					return epc_FormSendingHandler.send();
+				};
 			// ]]></script>
 			</div>';
 }
@@ -509,7 +514,7 @@ function template_add_layout()
 		// ]]></script>
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
-		<form name="epFlayouts" id="epLayouts" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="epc_FormSendingHandler.send(); return false;">
+		<form name="epFlayouts" id="epLayouts" action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '">
 		<div class="cat_bar">
 			<h3 class="catbg">
 				', $txt['add_layout'], '
@@ -567,6 +572,11 @@ function template_add_layout()
 				sSessionVar: ', JavaScriptEscape($context['session_var']), ',
 				sSessionId: ', JavaScriptEscape($context['session_id']), '
 			});
+
+				document.getElementById("epLayouts").onsubmit = function()
+				{
+					return epc_FormSendingHandler.send();
+				};
 		// ]]></script>
 	</div>';
 }
@@ -593,7 +603,7 @@ function template_edit_layout()
 		// ]]></script>
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_admin.js"></script>
 		<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
-		<form name="epFlayouts" id="epLayouts"  action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '" onsubmit="beforeLayoutEditSubmit(); return false;">
+		<form name="epFlayouts" id="epLayouts"  action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $txt['edit_layout'], '
@@ -767,6 +777,12 @@ function template_edit_layout()
 				sSessionVar: ', JavaScriptEscape($context['session_var']), ',
 				sSessionId: ', JavaScriptEscape($context['session_id']), '
 			});
+
+			document.getElementById("epLayouts").onsubmit = function()
+			{
+				beforeLayoutEditSubmit();
+				return epc_FormSendingHandler.send();
+			};
 		// ]]></script>
 		</div>';
 }
