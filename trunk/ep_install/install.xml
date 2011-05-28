@@ -2,7 +2,7 @@
 <!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 	<id>EnvisionPortal:EnvisionPortal</id>
-	<version>1.1 DEV</version>
+	<version>1.0 DEV</version>
 
 	<file name="$boarddir/index.php">
 		<operation>
@@ -122,19 +122,23 @@
 		</operation>
 	</file>
 
-	<file name="$themedir/scripts/script.js">
-		<operation>
-			<search position="replace"><![CDATA['#c']]></search>
-			<add><![CDATA['?action=forum#c']]></add>
-		</operation>
-	</file>
-
 	<file name="$sourcedir/Display.php">
 		<operation>
 			<search position="replace"><![CDATA[	// This is just a regular attachment...]]></search>
 			<add><![CDATA[	elseif (isset($_REQUEST['type']) && $_REQUEST['type'] == 'envision')
 		$request = integrate_envision_attachments();
 	// This is just a regular attachment...]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/ManageServer.php">
+		<operation>
+			<search position="after"><![CDATA[// Check we have themes with a path and a name - just in case - and add the path.]]></search>
+			<add><![CDATA[// Add Envision Portal to the list of possible places to look.
+	$themes['ep'] = array('name' => $txt['ep_'], 'theme_dir' => $settings['default_theme_dir'] . '/languages/ep_languages');
+	$lang_dirs['ep'] = $settings['default_theme_dir'] . '/languages/ep_languages';
+
+	]]></add>
 		</operation>
 	</file>
 
