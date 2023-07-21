@@ -1,6 +1,0 @@
-Directory: "./ep_plugins_extra/css"
-------------------------
-This directory is used for storing any CSS files that are to be
-used by any plugins. All plugin authors are encouraged to make use
-of this directory as best they can when adding extra CSS for their
-plugins.

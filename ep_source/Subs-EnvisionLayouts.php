@@ -1,24 +1,25 @@
 <?php
 /**************************************************************************************
-* Subs-EnvisionLayouts.php                                                            *
-/**************************************************************************************
-* EnvisionPortal                                                                      *
-* Community Portal Application for SMF                                                *
-* =================================================================================== *
-* Software by:                  EnvisionPortal (http://envisionportal.net/)           *
-* Software for:                 Simple Machines Forum                                 *
-* Copyright 2011 by:            EnvisionPortal (http://envisionportal.net/)           *
-* Support, News, Updates at:    http://envisionportal.net/                            *
-**************************************************************************************/
+ * EnvisionPortal                                                                      *
+ * Community Portal Application for SMF                                                *
+ * =================================================================================== *
+ * Software by:                  EnvisionPortal (http://envisionportal.net/)           *
+ * Software for:                 Simple Machines Forum                                 *
+ * Copyright 2011 by:            EnvisionPortal (http://envisionportal.net/)           *
+ * Support, News, Updates at:    http://envisionportal.net/                            *
+ **************************************************************************************/
 
-if (!defined('SMF'))
+if (!defined('SMF')) {
 	die('Hacking attempt...');
+}
 
-function list_getLayouts($start, $items_per_page, $sort, $where, $where_params = array())
+function list_getLayouts($start, $items_per_page, $sort, $where, $where_params = [])
 {
 	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $smcFunc['db_query'](
+		'',
+		'
 		SELECT
 			el.id_layout, name, action,
 			mem.id_member, mem.real_name, mg.group_name
@@ -29,16 +30,15 @@ function list_getLayouts($start, $items_per_page, $sort, $where, $where_params =
 		WHERE ' . $where . '
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
-		array_merge($where_params, array(
+		array_merge($where_params, [
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
-		))
+		])
 	);
 
-	$layout = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
+	$layout = [];
+	while ($row = $smcFunc['db_fetch_assoc']($request)) {
 		$layout[$row['id_layout']] = $row;
 
 		$action_request = $smcFunc['db_query']('', '
@@ -46,14 +46,15 @@ function list_getLayouts($start, $items_per_page, $sort, $where, $where_params =
 				action
 			FROM {db_prefix}ep_layout_actions
 			WHERE id_layout = {int:id_layout}',
-			array(
+			[
 				'id_layout' => $row['id_layout'],
-			)
+			]
 		);
 
-		$actions = array();
-		while ($action = $smcFunc['db_fetch_row']($action_request))
+		$actions = [];
+		while ($action = $smcFunc['db_fetch_row']($action_request)) {
 			$actions[] = $action[0];
+		}
 		$smcFunc['db_free_result']($action_request);
 
 		$layout[$row['id_layout']]['action_list'] = implode(', ', $actions);
@@ -63,18 +64,20 @@ function list_getLayouts($start, $items_per_page, $sort, $where, $where_params =
 	return $layout;
 }
 
-function list_getNumLayouts($where, $where_params = array())
+function list_getNumLayouts($where, $where_params = [])
 {
 	global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
+	$request = $smcFunc['db_query'](
+		'',
+		'
 		SELECT COUNT(id_layout)
 		FROM {db_prefix}ep_layouts
 		WHERE ' . $where,
-		array_merge($where_params, array(
-		))
+		array_merge($where_params, [
+		])
 	);
-	list ($num_layouts) = $smcFunc['db_fetch_row']($request);
+	[$num_layouts] = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
 	return $num_layouts;
@@ -90,30 +93,31 @@ function checkLayoutName($layout_name)
 		FROM {db_prefix}ep_layouts
 		WHERE LOWER(name) = {string:layout_name}
 			AND id_member = {int:zero}',
-		array(
+		[
 			'zero' => 0,
 			'layout_name' => strtolower($layout_name),
-		)
+		]
 	);
 
-	if ($smcFunc['db_num_rows']($request) !== 0)
-	{
-		list ($id_layout) = $smcFunc['db_fetch_row']($request);
-		if (isset($_POST['layout_picker']) && $id_layout == $_POST['layout_picker'])
+	if ($smcFunc['db_num_rows']($request) !== 0) {
+		[$id_layout] = $smcFunc['db_fetch_row']($request);
+		if (isset($_POST['layout_picker']) && $id_layout == $_POST['layout_picker']) {
 			return $layout_name;
-		else
+		} else {
 			return false;
-	}
-	else
+		}
+	} else {
 		return $layout_name;
+	}
 }
 
 /**
  * Loads all the section values minus the disabled modules section for any pre-defined layouts.
  *
  * @param int $style specifies which prese layout style to use.
- * - 1 - Default Envision Portal Layout)
- * - 2 - (OMEGA Layout) <--- This actually covers all layout styles, so no need for anymore!
+ *                   - 1 - Default Envision Portal Layout)
+ *                   - 2 - (OMEGA Layout) <--- This actually covers all layout styles, so no need for anymore!
+ *
  * @return array the layout formatted according to $style.
  *
  * @since 1.0
@@ -121,124 +125,121 @@ function checkLayoutName($layout_name)
 function ep_get_predefined_layouts($style)
 {
 	// Here's Envision's default layout:
-	switch ((int) $style)
-	{
+	switch ((int)$style) {
 		case 2:
 			// OMEGA
-			return array(
+			return [
 				// row 0
-				array(
+				[
 					'x_pos' => 0,
 					'y_pos' => 0,
 					'colspan' => 0,
 					'status' => 'active',
-				),
-				array(
+				],
+				[
 					'x_pos' => 0,
 					'y_pos' => 1,
 					'colspan' => 0,
 					'status' => 'active',
-				),
-				array(
+				],
+				[
 					'x_pos' => 0,
 					'y_pos' => 2,
 					'colspan' => 0,
 					'status' => 'active',
-				),
-				array(
+				],
+				[
 					'x_pos' => 0,
 					'y_pos' => 3,
 					'colspan' => 0,
 					'status' => 'active',
-				),
+				],
 				// row 1
-				array(
+				[
 					'x_pos' => 1,
 					'y_pos' => 0,
 					'colspan' => 0,
 					'status' => 'active',
-				),
-				array(
+				],
+				[
 					'smf' => true,
 					'x_pos' => 1,
 					'y_pos' => 1,
 					'colspan' => 2,
 					'status' => 'active',
-				),
-				array(
+				],
+				[
 					'x_pos' => 1,
 					'y_pos' => 3,
 					'colspan' => 0,
 					'status' => 'active',
-				),
+				],
 				// row 2
-				array(
+				[
 					'x_pos' => 2,
 					'y_pos' => 0,
 					'colspan' => 0,
 					'status' => 'active',
-				),
-				array(
+				],
+				[
 					'x_pos' => 2,
 					'y_pos' => 1,
 					'colspan' => 0,
 					'status' => 'active',
-				),
-				array(
+				],
+				[
 					'x_pos' => 2,
 					'y_pos' => 2,
 					'colspan' => 0,
 					'status' => 'active',
-				),
-				array(
+				],
+				[
 					'x_pos' => 2,
 					'y_pos' => 3,
 					'colspan' => 0,
 					'status' => 'active',
-				)
-			);
-			break;
+				],
+			];
 		// Default - Envision Portal
 		default:
-			return array(
+			return [
 				// top
-				array(
+				[
 					'x_pos' => 0,
 					'y_pos' => 0,
 					'colspan' => 3,
-					'status' => 'active'
-				),
+					'status' => 'active',
+				],
 				// left
-				array(
+				[
 					'x_pos' => 1,
 					'y_pos' => 0,
 					'colspan' => 0,
 					'status' => 'active',
-				),
+				],
 				// middle
-				array(
+				[
 					'smf' => true,
 					'x_pos' => 1,
 					'y_pos' => 1,
 					'colspan' => 0,
 					'status' => 'active',
-				),
+				],
 				// right
-				array(
+				[
 					'x_pos' => 1,
 					'y_pos' => 2,
 					'colspan' => 0,
 					'status' => 'active',
-				),
+				],
 				// bottom
-				array(
+				[
 					'x_pos' => 2,
 					'y_pos' => 0,
 					'colspan' => 3,
 					'status' => 'inactive',
-				)
-			);
-			break;
+				],
+			];
 	}
 }
 
@@ -246,6 +247,7 @@ function ep_get_predefined_layouts($style)
  * Export a layout in its entirety. Assumes permissions have been worked out.
  *
  * @param int $id_layout the layout to delete
+ *
  * @return bool true on success; false otherwise.
  * @since 1.0
  */
@@ -255,58 +257,56 @@ function exportLayout($id_layout)
 
 	checkSession();
 
-	if (empty($id_layout) && !is_int($id_layout))
+	if (empty($id_layout) && !is_int($id_layout)) {
 		return false;
+	}
 
-	$layout_data = loadLayout((int) $id_layout, true);
-	$xml_children = array();
+	$layout_data = loadLayout((int)$id_layout, true);
+	$xml_children = [];
 
-	ep_call_hook('export_layout', array(&$id_layout, &$layout_data));
+	ep_call_hook('export_layout', [&$id_layout, &$layout_data]);
 
-	foreach ($layout_data as $row_id => $row_data)
-	{
-		$xml_children[$row_id] = array(
+	foreach ($layout_data as $row_id => $row_data) {
+		$xml_children[$row_id] = [
 			'identifier' => 'row',
-			'children' => array(),
-		);
-		foreach ($row_data as $column_id => $column_data)
-		{
-			$xml_children[$row_id]['children'][$column_id] = array(
+			'children' => [],
+		];
+		foreach ($row_data as $column_id => $column_data) {
+			$xml_children[$row_id]['children'][$column_id] = [
 				'identifier' => 'section',
-				'children' => array(),
-			);
-			foreach ($column_data['extra'] as $extra_id => $extra_data)
-			{
-				$xml_children[$row_id]['children'][$column_id]['children'][$extra_id] = array(
+				'children' => [],
+			];
+			foreach ($column_data['extra'] as $extra_id => $extra_data) {
+				$xml_children[$row_id]['children'][$column_id]['children'][$extra_id] = [
 					'value' => $extra_data,
-				);
+				];
 			}
-			if (!empty($column_data['modules']))
-				foreach ($column_data['modules'] as $id_position => $modules)
-				{
-					$xml_children[$row_id]['children'][$column_id]['children'][$id_position] = array(
+			if (!empty($column_data['modules'])) {
+				foreach ($column_data['modules'] as $id_position => $modules) {
+					$xml_children[$row_id]['children'][$column_id]['children'][$id_position] = [
 						'identifier' => 'module',
-						'children' => array(),
-					);
-					foreach ($modules as $module_id => $module_data)
-						if ($module_id == 'type')
-						{
-							$xml_children[$row_id]['children'][$column_id]['children'][$id_position]['children'][$module_id] = array(
+						'children' => [],
+					];
+					foreach ($modules as $module_id => $module_data) {
+						if ($module_id == 'type') {
+							$xml_children[$row_id]['children'][$column_id]['children'][$id_position]['children'][$module_id] = [
 								'value' => $module_data,
-							);
+							];
 						}
+					}
 				}
+			}
 		}
 	}
-	$xml_data = array(
-		'layouts' => array(
+	$xml_data = [
+		'layouts' => [
 			'identifier' => 'layout',
 			'children' => $xml_children,
-		),
-	);
+		],
+	];
 	$context['sub_template'] = 'generic_xml';
 	$context['xml_data'] = $xml_data;
-	$context['template_layers'] = array('render_save');
+	$context['template_layers'] = ['render_save'];
 	$_REQUEST['xml'] = true;
 
 	return true;
@@ -315,95 +315,69 @@ function exportLayout($id_layout)
 /**
  * Add a new layout. Assumes permissions have been worked out.
  *
- * @param int $id_member the ID of the member creating the layout; usee 0 for admin layouts.
- * $param string $layout_name the namee of the new layout.
- * @param array $layout_actions array of the actions to show this layout on. Pseudo-actions, such as board or topic are wrapped with brackets [].
- * @param array $insert_positions an array of all the layout positions to be inserted. Returned from {@link ep_get_predefined_layouts()}.
- * @return mixed the ID of the new layout on success; false otherwise.
+ * @param string $layout_name      the name of the new layout.
+ * @param array  $layout_actions   array of the actions to show this layout on. Pseudo-actions, such as board or topic
+ *                                 are wrapped with brackets [].
+ * @param array  $layout_positions an array of all the layout positions to be inserted.
+ *
+ * @return int|false the ID of the new layout on success; false otherwise.
  * @since 1.0
  */
-function addLayout($layout_name, $id_member, $layout_actions, $insert_positions, $approved = 1)
+function addLayout(string $layout_name, array $layout_actions, array $layout_positions)
 {
 	global $smcFunc;
 
-	// Add the module info to the database
-	$columns = array(
-		'name' => 'string-65',
-		'id_member' => 'int',
-		'approved' => 'int',
-	);
-
-	$data = array(
-		$layout_name,
-		$id_member,
-		$approved,
-	);
-
-	$keys = array(
-		'id_layout',
-		'approved',
-	);
-
-	$smcFunc['db_insert']('insert', '{db_prefix}ep_layouts',  $columns, $data, $keys);
-
-	// We need to tell the actions table which ID was inserted
+	$smcFunc['db_insert']('insert', '{db_prefix}ep_layouts', ['name' => 'string-40'], [$layout_name], ['id_layout']);
 	$iid = $smcFunc['db_insert_id']('{db_prefix}ep_layouts', 'id_layout');
 
-	// Do not continue if it failed.
-	if (empty($iid))
+	if (empty($iid)) {
 		return false;
+	}
 
-	// Add the module info to the database
-	$columns = array(
+	$columns = [
 		'id_layout' => 'int',
 		'action' => 'string',
-	);
-	if (count($layout_actions) == 1)
-		$data = array(
+	];
+
+	$data = [];
+	foreach ($layout_actions as $layout_action) {
+		$data[] = [
 			$iid,
-			$layout_actions[0],
-		);
-	else
-		foreach ($layout_actions as $layout_action)
-			$data[] = array(
-				$iid,
-				$layout_action,
-			);
+			$layout_action,
+		];
+	}
 
-	$keys = array(
-		'id_layout',
-	);
+	$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_actions', $columns, $data, ['id_layout']);
 
-	$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_actions',  $columns, $data, $keys);
-
-	// One more to go - insert the layout.
-	$columns = array(
+	$columns = [
 		'id_layout' => 'int',
 		'x_pos' => 'int',
+		'rowspan' => 'int',
 		'y_pos' => 'int',
 		'colspan' => 'int',
 		'status' => 'string',
 		'is_smf' => 'int',
-	);
+	];
 
-	$keys = array(
+	$keys = [
 		'id_layout',
 		'id_layout_position',
-	);
+	];
 
-	foreach ($insert_positions as $insert_position)
-	{
-		$data = array(
+	$data = [];
+	foreach ($layout_positions as $layout_position) {
+		$data[] = [
 			$iid,
-			$insert_position['x_pos'],
-			$insert_position['y_pos'],
-			$insert_position['colspan'],
-			$insert_position['status'],
-			(int) !empty($insert_position['smf']),
-		);
-
-		$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_positions',  $columns, $data, $keys);
+			$layout_position['x_pos'],
+			$layout_position['rowspan'],
+			$layout_position['y_pos'],
+			$layout_position['colspan'],
+			$layout_position['status'],
+			$layout_position['is_smf'],
+		];
 	}
+
+	$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_positions', $columns, $data, $keys);
 
 	return $iid;
 }
@@ -411,173 +385,162 @@ function addLayout($layout_name, $id_member, $layout_actions, $insert_positions,
 /**
  * Edit of a layout. Assumes permissions have been worked out.
  *
- * @param int $selected_layout the ID of the layout to edit.
- * @param int $id_member the ID of the member creating the layout; usee 0 for admin layouts.
- * $param string $layout_name the namee of the new layout.
- * @param array $layout_actions array of the actions to show this layout on. Pseudo-actions, such as board or topic are wrapped with brackets [].
- * @param array $layout_positions an array of all the layout positions to be inserted.
- * @param int $smf_pos the position ID of SMF. Usually, all layouts that are not the homepage (which hass the id_layout of 1) have SMF residing somewhere on them.
- * @param array $remove_positions an array of all position IDs to be removed. Leave empty to not delete a thing..
+ * @param int    $id_layout        the ID of the layout to edit.
+ * @param string $layout_name      the name of the new layout.
+ * @param array  $layout_actions   array of the actions to show this layout on. Pseudo-actions, such as board or topic
+ *                                 are wrapped with brackets [].
+ * @param array  $layout_positions an array of all the layout positions to be inserted.
+ * @param int    $smf_pos          the position ID of SMF. Usually, all layouts that are not the homepage (which hass
+ *                                 the id_layout of 1) have SMF residing somewhere on them.
+ * @param array  $remove_positions an array of all position IDs to be removed. Leave empty to not delete a thing..
+ *
  * @return bool true on success; false otherwise.
  * @since 1.0
  */
-function editLayout($selected_layout, $layout_name, $id_member, $layout_actions, $layout_positions, $smf_pos, $remove_positions = array())
-{
+function editLayout(
+	int $id_layout,
+	string $layout_name,
+	array $layout_actions,
+	array $layout_positions,
+	int $smf_pos,
+	array $remove_positions = []
+): bool {
 	global $smcFunc;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_layout
-		FROM {db_prefix}ep_layouts
-		WHERE id_layout = {int:id_layout}
-			AND id_member = {int:id_member}',
-		array(
-			'id_member' => $id_member,
-			'id_layout' => $selected_layout,
-		)
-	);
-
-	list ($id_layout) = $smcFunc['db_fetch_row']($request);
-
-	if (empty($id_layout))
-		return false;
-
-	$request = $smcFunc['db_query']('', '
-		SELECT id_layout
-		FROM {db_prefix}ep_layout_positions
-		WHERE id_layout = {int:id_layout}
-			AND is_smf = {int:smf}',
-		array(
-			'smf' => 1,
-			'id_layout' => $selected_layout,
-		)
-	);
-
-	list ($old_smf_pos) = $smcFunc['db_fetch_row']($request);
 
 	// Update the name
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}ep_layouts
 		SET name = {string:layout_name}
 		WHERE id_layout = {int:id_layout}',
-		array(
+		[
 			'layout_name' => $layout_name,
-			'id_layout' => $selected_layout,
-		)
+			'id_layout' => $id_layout,
+		]
 	);
 
 	// Delete old actions
 	$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}ep_layout_actions
 		WHERE id_layout = {int:id_layout}',
-		array(
-			'id_layout' => $selected_layout,
-		)
+		[
+			'id_layout' => $id_layout,
+		]
 	);
 
-	// Add the layout actions to the database
-	$columns = array(
+	$columns = [
 		'id_layout' => 'int',
 		'action' => 'string',
-	);
+	];
 
-	$data = array();
-	if (count($layout_actions) == 1)
-		$data = array(
-			$selected_layout,
-			$layout_actions[0],
-		);
-	else
-		foreach ($layout_actions as $layout_action)
-			$data[] = array(
-				$selected_layout,
-				$layout_action,
-			);
+	$data = [];
+	foreach ($layout_actions as $layout_action) {
+		$data[] = [
+			$id_layout,
+			$layout_action,
+		];
+	}
 
-	$keys = array(
+	$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_actions', $columns, $data, ['id_layout']);
+
+	$columns = [
+		'id_layout' => 'int',
+		'x_pos' => 'int',
+		'rowspan' => 'int',
+		'y_pos' => 'int',
+		'colspan' => 'int',
+		'status' => 'string',
+		'is_smf' => 'int',
+	];
+
+	$keys = [
 		'id_layout',
-	);
+		'id_layout_position',
+	];
 
-	$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_actions',  $columns, $data, $keys);
-
-	// Update or add positions
-	foreach ($_POST['cId'] as $data)
-	{
-		list (, , $id_layout_position) = explode('_', $data);
-
-		if (strpos($id_layout_position, 'add') !== false)
-		{
-			// We have a new one to add.
-			$columns = array(
-				'id_layout' => 'int',
-				'x_pos' => 'int',
-				'y_pos' => 'int',
-				'colspan' => 'int',
-				'status' => 'string',
-				'is_smf' => 'int',
-			);
-
-			$keys = array(
-				'id_layout',
-				'id_layout_position',
-			);
-
-			$data = array(
-				$selected_layout,
-				$layout_positions['x_pos'][$id_layout_position],
-				$layout_positions['y_pos'][$id_layout_position],
-				$layout_positions['colspan'][$id_layout_position],
-				$layout_positions['status'][$id_layout_position],
-				$layout_positions['is_smf'][$id_layout_position],
-			);
-
-			$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_positions',  $columns, $data, $keys);
+	$data = [];
+	$update_params = [];
+	$update_query = [
+		'x_pos' => '',
+		'rowspan' => '',
+		'y_pos' => '',
+		'colspan' => '',
+		'status' => '',
+		'is_smf' => '',
+	];
+	foreach ($layout_positions as $layout_position) {
+		if (isset($layout_position['id_layout_position'])) {
+			$update_query['x_pos'] .= 'WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:x_pos' . $layout_position['id_layout_position'] . '}';
+			$update_query['rowspan'] .= 'WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:rowspan' . $layout_position['id_layout_position'] . '}';
+			$update_query['y_pos'] .= 'WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:y_pos' . $layout_position['id_layout_position'] . '}';
+			$update_query['colspan'] .= 'WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:colspan' . $layout_position['id_layout_position'] . '}';
+			$update_query['status'] .= 'WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {string:status' . $layout_position['id_layout_position'] . '}';
+			$update_query['is_smf'] .= 'WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:is_smf' . $layout_position['id_layout_position'] . '}';
+			$update_params += [
+				'id_layout_position' . $layout_position['id_layout_position'] => $layout_positions['id_layout_position'],
+				'x_pos' . $layout_position['id_layout_position'] => $layout_positions['x_pos'],
+				'rowspan' . $layout_position['id_layout_position'] => $layout_positions['rowspan'],
+				'y_pos' . $layout_position['id_layout_position'] => $layout_positions['y_pos'],
+				'colspan' . $layout_position['id_layout_position'] => $layout_positions['colspan'],
+				'status' . $layout_position['id_layout_position'] => $layout_positions['status'],
+				'is_smf' . $layout_position['id_layout_position'] => $layout_positions['is_smf'],
+			];
+		} else {
+			$data[] = [
+				$id_layout,
+				$layout_position['x_pos'],
+				$layout_position['rowspan'],
+				$layout_position['y_pos'],
+				$layout_position['colspan'],
+				$layout_position['status'],
+				$layout_position['is_smf'],
+			];
 		}
+	}
 
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}ep_layout_positions
-			SET x_pos = {int:x_pos},
-				y_pos = {int:y_pos},
-				colspan = {int:colspan},
-				status = {string:status},
-				is_smf = {int:is_smf}
-			WHERE id_layout_position = {int:id_layout_position}',
-			array(
-				'id_layout_position' => $id_layout_position,
-				'x_pos' => $layout_positions['x_pos'][$id_layout_position],
-				'y_pos' => $layout_positions['y_pos'][$id_layout_position],
-				'colspan' => $layout_positions['colspans'][$id_layout_position],
-				'status' => $layout_positions['status'][$id_layout_position],
-				'is_smf' => $layout_positions['is_smf'][$id_layout_position],
-			)
+	if ($update_params == []) {
+		$smcFunc['db_insert']('insert', '{db_prefix}ep_layout_positions', $columns, $data, $keys);
+	} else {
+		$smcFunc['db_query'](
+			'',
+			'
+			UPDATE
+				{db_prefix}ep_layout_positions
+			SET
+				x_pos = CASE id_layout_position {raw:x_pos} END,
+				rowspan = CASE id_layout_position {raw:rowsspan} END,
+				y_pos = CASE id_layout_position {raw:y_pos} END,
+				colspan = CASE id_layout_position {raw:colspan} END,
+				status = CASE id_layout_position {raw:status} END,
+				is_smf = CASE id_layout_position {raw:is_smf} END
+			WHERE
+				id_layout = {int:id_layout}',
+			array_merge($update_params, [
+				'id_layout' => $id_layout,
+				'x_pos' => implode(' ', $update_query['x_pos']),
+				'rowspan' => implode(' ', $update_query['rowspan']),
+				'y_pos' => implode(' ', $update_query['y_pos']),
+				'colspan' => implode(' ', $update_query['colspans']),
+				'status' => implode(' ', $update_query['status']),
+				'is_smf' => implode(' ', $update_query['is_smf']),
+			])
 		);
 	}
 
-	if ($selected_layout == 1 && $old_smf_pos != $smf_pos)
-	{
-		// The admin has chosen to move SMF. So modules in the way must begone.
-		$smcFunc['db_query']('', '
+	$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}ep_module_positions
 			WHERE id_layout_position = {int:id_layout_position}',
-			array(
-				'id_layout_position' => $_POST['old_smf_pos'],
-			)
-		);
-	}
+		[
+			'id_layout_position' => $smf_pos,
+		]
+	);
 
-	if (!empty($remove_positions))
-	{
-		// The admin has chosen to remove some columns.
-		$killdata = explode('_', $remove_positions);
-
-		// Remove the empty item
-		unset($killdata[0]);
-
+	if ($remove_positions != []) {
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}ep_layout_positions
-			WHERE id_layout_position IN({array_int:remove_ids})',
-			array(
-				'remove_ids' => $killdata,
-			)
+			WHERE id_layout_position IN ({array_int:remove_ids})',
+			[
+				'remove_ids' => $remove_positions,
+			]
 		);
 	}
 
@@ -587,28 +550,26 @@ function editLayout($selected_layout, $layout_name, $id_member, $layout_actions,
 /**
  * Removes all traces of a layout. Assumes permissions have been worked out.
  *
- * @param int $id_layout the layout to delete
+ * @param int[] $layout_list the layout to delete
+ *
  * @return bool true on success; false otherwise.
  * @since 1.0
  */
-function deleteLayout($id_layout)
+function deleteLayouts(array $layout_list): bool
 {
-	global $smcFunc, $user_info;
+	global $smcFunc;
 
 	checkSession();
 
-	// !!! TODO: Check if the layout exists and find module fields linke to this layout
-
-	ep_call_hook('add_layout', array(&$id_layout));
-
-	foreach (array('layouts', 'layout_positions', 'layout_actions') as $table_name)
+	foreach (['layouts', 'actions', 'layout_positions', 'module_positions'] as $table_name) {
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}ep_' . $table_name . '
-			WHERE id_layout = {int:id_layout}',
-			array(
-				'id_layout' => $id_layout,
-			)
+			WHERE id_layout IN ({int:layout_list})',
+			[
+				'layout_list' => $layout_list,
+			]
 		);
+	}
 
 	return true;
 }

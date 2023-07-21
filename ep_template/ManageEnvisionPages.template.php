@@ -1,156 +1,155 @@
 <?php
-// Version 1.0; ManageEnvisionPages
+
+declare(strict_types=1);
 
 /**
- * This file handles the visuals of Envision Page management.
- *
- * @package template
- * @since 1.0
-*/
-
-/**
- * Main template for ading a page.
- *
- * @since 1.0
+ * @package   Envision Portal
+ * @version   2.0.2
+ * @author    John Rayes <live627@gmail.com>
+ * @copyright Copyright (c) 2014, John Rayes
+ * @license   http://opensource.org/licenses/MIT MIT
  */
 
-function template_main()
+function template_form_above(): void
 {
-	global $context, $scripturl, $boardurl, $txt, $smcFunc, $settings;
+	global $context, $scripturl;
 
-	// Let's begin our AJAX code, followed by all the content.
 	echo '
-	<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
-	<script type="text/javascript">
-
-		$(document).ready(function() {
-			$("#pnbox").keyup(function() {
-				var page_name = $(this).val();
-				$("#pn").html(ajax_notification_text);
-				$.ajax({
-					type: "GET",
-					url: "', $boardurl, '/ep_ajax.php?check=true;pn=" + page_name + ";id=', $context['page_data']['id'], '",
-					success: function(data) {
-						$("#pn").html(data);
-					},
-					error: function(XMLHttpRequest, textStatus, errorThrown) {
-						$("#pn").html(textStatus);
-					}
-				});
-			});
-		});
-	</script>
-		<form action="', $scripturl, '?action=admin;area=eppages;sa=epsavepage" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify" class="flow_hidden">
+		<form action="', $scripturl, '?action=admin;area=eppages;sa=savepage" method="post" accept-charset="', $context['character_set'], '" name="postmodify" id="postmodify">
 			<div class="cat_bar">
 				<h3 class="catbg">
 					', $context['page_title'], '
 				</h3>
 			</div>
 			<span class="upperframe"><span></span></span>
-				<div class="roundframe">';
+			<div class="roundframe noup">';
+}
 
-	// If an error occurred, explain what happened.
-	if (!empty($context['post_error']))
-	{
+function template_errors_above(): void
+{
+	global $context, $txt;
+
+	if (!empty($context['post_error'])) {
 		echo '
 					<div class="errorbox" id="errors">
-						<strong>', $txt[$context['error_title']], '</strong>
+						<b>', $txt[$context['error_title']], '</b>
 						<ul>';
 
-		foreach ($context['post_error'] as $error)
+		foreach ($context['post_error'] as $error) {
 			echo '
-							<li>', $txt[$error], '</li';
+							<li>', $txt[$error], '</li>';
+		}
 
 		echo '
 						</ul>
 					</div>';
 	}
+}
+
+function template_errors_below(): void
+{
+}
+
+function template_main(): void
+{
+	global $context, $txt, $scripturl;
+
+	$sel = fn(bool $x, string $str): string => $x ? ' ' . $str : '';
 
 	echo '
-					<dl id="post_header">
-						<dt>
-							', $txt['ep_envision_pages_page_name'], ':
-						</dt>
-						<dd>
-							<input type="text" name="page_name" id="pnbox" value="', $context['page_data']['page_name'], '" tabindex="1" class="input_text" class="full_width" />
-							<div id="pn"></div>
-						</dd>
-						<dt>
-							', $txt['ep_envision_pages_page_type'], ':
-						</dt>
-						<dd>
-							<input type="radio" class="input_check" name="type" value="0"', $context['page_data']['type'] == 0 ? ' checked="checked"' : '', '/>', $txt['ep_envision_pages_page_php'], '<br />
-							<input type="radio" class="input_check" name="type" value="1"', $context['page_data']['type'] == 1 ? ' checked="checked"' : '', '/>', $txt['ep_envision_pages_page_html'], '<br />
-							<input type="radio" class="input_check" name="type" value="2"', $context['page_data']['type'] == 2 ? ' checked="checked"' : '', '/>', $txt['ep_envision_pages_page_bbc'], '
-						</dd>
-						<dt>
-							', $txt['ep_envision_pages_page_title'], ':
-						</dt>
-						<dd>
-							<input type="text" name="title" value="', $context['page_data']['title'], '" tabindex="1" class="input_text" class="full_width" />
-						</dd>
-						<dt>
-							', $txt['ep_envision_pages_page_perms'], ':
-						</dt>
-						<dd>
-							<fieldset id="group_perms">
-								<legend><a href="javascript:void(0);" onclick="document.getElementById(\'group_perms\').style.display = \'none\';document.getElementById(\'group_perms_groups_link\').style.display = \'block\'; return false;">', $txt['avatar_select_permission'], '</a></legend>';
+					<div class="settings-grid">
+						<b>', $txt['envision_pages_page_name'], ':</b>
+						<input type="text" name="name" value="', $context['data']['name'], '" style="width: 98%;" />
+						<b>', $txt['envision_pages_page_slug'], ':</b>
+						<span>
+							<input type="text" name="slug" value="', $context['data']['slug'], '" style="width: 98%;" />
+							<span class="smalltext">', $txt['envision_pages_page_slug_desc'], '</span>
+						</span>
+						<b>', $txt['envision_pages_page_description'], ':</b>
+						<span>
+							<input type="text" name="description" value="', $context['data']['description'], '" style="width: 98%;" />
+						</span>
+						<b>', $txt['envision_pages_page_type'], ':</b>
+						<span>';
 
-	$all_checked = true;
-
-	// List all the groups to configure permissions for.
-	foreach ($context['page_data']['permissions'] as $permission)
-	{
+	foreach ($context['data']['types'] as [$cn, $type, $obj]) {
 		echo '
-								<div id="permissions_', $permission['id'], '">
-									<label for="check_group', $permission['id'], '">
-										<input type="checkbox" class="input_check" name="permissions[]" value="', $permission['id'], '" id="check_group', $permission['id'], '"', $permission['checked'] ? ' checked="checked"' : '', ' />
-										<span', ($permission['is_post_group'] ? ' class="border-bottom" title="' . $txt['mboards_groups_post_group'] . '"' : ''), '>', $permission['name'], '</span>
-									</label>
-								</div>';
-
-		if (!$permission['checked'])
-			$all_checked = false;
+							<label>
+								<input type="radio" name="type" data-mode="', $obj->getMode(
+		), '" value="', $cn, '"', $sel(
+			$context['data']['type'] == $cn,
+			' checked'
+		), '/>', $txt['envision_pages_' . $type], '
+							</label>';
 	}
 
 	echo '
-								<input type="checkbox" class="input_check" onclick="invertAll(this, this.form, \'permissions[]\');" id="check_group_all"', $all_checked ? ' checked="checked"' : '', ' />
-								<label for="check_group_all"><em>', $txt['check_all'], '</em></label><br />
+						</span>
+						<b>', $txt['envision_pages_page_perms'], ':</b>
+						<span>
+							<fieldset class="group_perms">
+								<legend> ', $txt['avatar_select_permission'], '</legend>';
+
+	foreach ($context['data']['permissions'] as $id => $permission) {
+		echo '
+								<label>
+									<input type="checkbox" name="permissions[]" value="', $id, '"', $sel(
+			$permission['checked'],
+			'checked'
+		), ' />
+									<span';
+
+		if ($permission['is_post_group']) {
+			echo ' title="' . $txt['mboards_groups_post_group'] . '"';
+		}
+
+		echo '>', $permission['name'], '</span>
+								</label>
+								<br>';
+	}
+
+	echo '
 							</fieldset>
-							<a href="javascript:void(0);" onclick="document.getElementById(\'group_perms\').style.display = \'block\'; document.getElementById(\'group_perms_groups_link\').style.display = \'none\'; return false;" id="group_perms_groups_link" style="display: none;">[ ', $txt['avatar_select_permission'], ' ]</a>
-							<script type="text/javascript"><!-- // --><![CDATA[
-								document.getElementById("group_perms").style.display = "none";
-								document.getElementById("group_perms_groups_link").style.display = "";
-							// ]]></script>
-						</dd>
-						<dt>
-							', $txt['ep_envision_pages_page_status'], ':
-						</dt>
-						<dd>
-							<input type="radio" class="input_check" name="status" value="1"', $context['page_data']['status'] == 1 ? ' checked="checked"' : '', ' />', $txt['ep_envision_pages_page_active'], ' <br />
-							<input type="radio" class="input_check" name="status" value="0"', $context['page_data']['status'] == 0 ? ' checked="checked"' : '', ' />', $txt['ep_envision_pages_page_nactive'], '
-						</dd>
-						<dt>
-							', $txt['ep_envision_pages_page_header'], ':
-						</dt>
-						<dd>
-							', template_control_richedit($context['ep_header_content']), '
-						</dd>
-						<dt>
-							', $txt['ep_envision_pages_page_body'], ':
-						</dt>
-						<dd>
-							', template_control_richedit($context['page_content']), '
-						</dd>
-					</dl>
-					<input name="pid" value="', $context['page_data']['id'], '" type="hidden" />
-					<div class="righttext padding">
-						<input name="submit" value="Submit" class="button_submit" type="submit" />
-					</div>
-				</div>
-			</form>
-			<span class="lowerframe"><span></span></span>
-			<br class="clear" />';
+						</span>
+						<b>', $txt['envision_pages_page_status'], ':</b>
+						<span>
+							<input type="radio" name="status" value="active"', $sel(
+		$context['data']['status'] == 'active',
+		'checked'
+	), ' />', $txt['envision_pages_page_active'], ' 
+							<input type="radio" name="status" value="inactive"', $sel(
+		$context['data']['status'] == 'inactive',
+		'checked'
+	), ' />', $txt['envision_pages_page_inactive'], '
+						</span>
+					</div>';
 }
 
-?>
+function template_form_below(): void
+{
+	global $context, $txt;
+
+	echo '
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>
+<br>
+<textarea name="body" style="width: 98%; height: 30em;" rows="30">', htmlspecialchars($context['data']['body']), '</textarea>
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input name="in" value="', $context['data']['id'], '" type="hidden" />
+					<div class="righttext padding">
+						<input name="submit" value="', $txt['admin_manage_menu_submit'], '" class="button_submit button" type="submit" />
+					</div>
+				</div>
+			<span class="lowerframe"><span></span></span>
+			</form>
+			<script>
+				const f = document.forms.postmodify;
+				const c = new EpManage;
+				c.initGroupToggle(f);
+				c.makeChecks(f);
+				let type = \'text\';
+				for (let o of f.type)
+					if (o.checked)
+						type = o.dataset.mode;
+				c.initAceEdior(f, f.body, type);
+			</script>';
+}

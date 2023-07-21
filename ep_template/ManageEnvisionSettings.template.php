@@ -5,8 +5,8 @@
  * This file handles showing Envision Portal's settings.
  *
  * @package template
- * @since 1.0
-*/
+ * @since   1.0
+ */
 
 function template_ep_admin_log()
 {
@@ -29,9 +29,9 @@ function template_ep_admin_log()
  * - list of current forum admins
  * - credits
  *
- * @see EnvisionPortalInfo()
+ * @see   EnvisionPortalInfo()
  * @since 1.0
-*/
+ */
 function template_portal_info()
 {
 	global $context, $txt, $portal_ver, $forum_version;
@@ -74,9 +74,10 @@ function template_portal_info()
 							', implode(', ', $context['administrators']);
 
 	// If we have lots of admins... don't show them all.
-	if (!empty($context['more_admins_link']))
+	if (!empty($context['more_admins_link'])) {
 		echo '
 							(', $context['more_admins_link'], ')';
+	}
 
 	echo '
 						</div>
@@ -95,31 +96,31 @@ function template_portal_info()
 			<div class="content">';
 
 	// Start the credits.
-	foreach ($context['credits'] as $section)
-	{
+	foreach ($context['credits'] as $section) {
 		// Show some "pre text".
-		if (isset($section['pretext']))
+		if (isset($section['pretext'])) {
 			echo '
 				<p>', $section['pretext'], '</p><br />';
+		}
 
 		// Show the section title.
-		if (isset($section['title']))
+		if (isset($section['title'])) {
 			echo '
 				<p><strong>', $section['title'], '</strong></p>';
+		}
 
 		// And now, list the members and groups.
-		foreach ($section['groups'] as $group)
-		{
+		foreach ($section['groups'] as $group) {
 			// Make sure there are members first.
-			if (!empty($group['members']))
-			{
+			if (!empty($group['members'])) {
 				echo '
 				<p>';
 
 				// Show the title.
-				if (!empty($group['title']))
+				if (!empty($group['title'])) {
 					echo '
 					<strong>', $group['title'], '</strong>: ';
+				}
 
 				echo '<span class="smalltext">' . implode(', ', $group['members']) . '</span>';
 
@@ -129,15 +130,17 @@ function template_portal_info()
 		}
 
 		// Thanking our translators!
-		if (isset($section['translators']))
+		if (isset($section['translators'])) {
 			echo '
 			<div class="centertext"><span class="smalltext">', $section['translators'], '</span></div>';
+		}
 
 		// And for some "post text".
-		if (isset($section['posttext']))
+		if (isset($section['posttext'])) {
 			echo '
 			<br />
 				<p>', $section['posttext'], '</p>';
+		}
 	}
 	echo '
 				<hr />
@@ -148,7 +151,9 @@ function template_portal_info()
 	</div>
 	<br class="clear" />';
 
-	$context['insert_after_template'] .= '<script type="text/javascript" src="http://news.envisionportal.net/news.js?v=' . urlencode($portal_ver) . ';smf_version=' . urlencode($forum_version) . '"></script>';
+	$context['insert_after_template'] .= '<script type="text/javascript" src="http://news.envisionportal.net/news.js?v=' . urlencode(
+			$portal_ver
+		) . ';smf_version=' . urlencode($forum_version) . '"></script>';
 }
 
 ?>

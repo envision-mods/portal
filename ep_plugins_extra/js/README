@@ -1,6 +1,0 @@
-Directory: "./ep_plugins_extra/js"
-------------------------
-This directory is used for storing any javascript that is to be
-used by any plugins. All plugin authors are encouraged to make use
-of this directory as best they can when adding extra javascript for their
-plugins.

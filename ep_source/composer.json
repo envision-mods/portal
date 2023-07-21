@@ -1,0 +1,14 @@
+{
+    "require": {
+        "php": ">=7.4",
+        "league/commonmark": "^2.3",
+        "cocur/slugify": "^4.3",
+        "live627/fast-liquid-parser": "^1.0",
+        "simonvomeyser/commonmark-ext-lazy-image": "^2.0"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    }
+}

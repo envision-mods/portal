@@ -6,10 +6,33 @@
 	<version>1.0</version>
 	<type>modification</type>
 
-	<install for="2.0 RC5, 2.0 RC6">
-		<readme type="file" parsebbc="true">ep_install/install.txt</readme>
-		<modification format="xml" type="file">ep_install/install.xml</modification>
-		<database>ep_install/install.php</database>
+	<install for="2.0 - 2.0.99">
+		<code type="inline"><![CDATA[<?php
+define('REQUIRED_PHP_VERSION', '7.4');
+if (version_compare(PHP_VERSION, REQUIRED_PHP_VERSION, '<'))
+	fatal_error(
+		sprintf(
+			'This mod requires a minimum of PHP %s in order to function. (You are currently running PHP %s)',
+			REQUIRED_PHP_VERSION,
+			PHP_VERSION
+		),
+		false
+	);
+add_integration_function('integrate_pre_include', '$sourcedir/ep_source/Subs-EnvisionPortal.php');
+add_integration_function('integrate_pre_load', 'envision_integrate_pre_load');
+add_integration_function('integrate_load_theme', 'envision_integrate_load_theme');
+add_integration_function('integrate_actions', 'envision_integrate_actions');
+add_integration_function('integrate_menu_buttons', 'add_ep_menu_buttons');
+add_integration_function('integrate_menu_buttons', 'EnvisionPortal\Menu::main');
+add_integration_function('integrate_admin_areas', 'add_ep_admin_areas');
+add_integration_function('integrate_buffer', 'envisionBuffer');
+add_integration_function('integrate_whos_online', 'envision_whos_online');
+add_integration_function('integrate_core_features', 'envision_integrate_core_features');
+add_integration_function('integrate_load_permissions', 'envision_integrate_load_permissions');
+?>]]></code>
+		<readme parsebbc="true">install.txt</readme>
+		<modification>install.xml</modification>
+		<database>install.php</database>
 		<require-dir name="ep_extra" destination="$boarddir" />
 		<require-dir name="ep_source" destination="$sourcedir" />
 		<require-dir name="ep_css" destination="$themedir/css" />
@@ -17,26 +40,25 @@
 		<require-dir name="ep_scripts" destination="$themedir/scripts" />
 		<require-dir name="ep_template" destination="$themedir" />
 		<require-dir name="ep_images" destination="$themedir/images" />
-
-		<!-- Until SMF fixes their bug where the images directory for the
-			 Core Features is hard-coded into the template and the image
-			 parameter is not processed, we need to do this. Sigh. -->
-		<require-file name="ep_images/feature_ep.png" destination="$themedir/images/admin" />
-		<!-- Also, we need this file to go by itself on the root directory of SMF -->
-		<require-file name="ep_ajax.php" destination="$boarddir" />
-		<!-- Envision Plugins -->
-		<require-dir name="ep_plugins_source" destination="$sourcedir" />
-		<require-dir name="ep_plugins_template" destination="$themedir" />
-		<require-dir name="ep_plugins_language" destination="$languagedir" />
-		<require-dir name="ep_plugins_extra" destination="$boarddir" />
-
 		<redirect url="?action=admin;area=corefeatures#js_feature_ep" />
 	</install>
-	<uninstall for="2.0 RC5, 2.0 RC6">
-		<readme type="file" parsebbc="true">ep_uninstall/uninstall.txt</readme>
-		<modification format="xml" type="file" reverse="true">ep_install/install.xml</modification>
-		<database>ep_uninstall/uninstall.php</database>
-		<code>ep_uninstall/uninstall-required.php</code>
+	<uninstall for="2.0 - 2.0.99">
+		<readme parsebbc="true">uninstall.txt</readme>
+		<modification reverse="true">install.xml</modification>
+		<database>uninstall.php</database>
+		<code type="inline"><![CDATA[<?php
+remove_integration_function('integrate_pre_include', '$sourcedir/ep_source/Subs-EnvisionPortal.php');
+remove_integration_function('integrate_pre_load', 'envision_integrate_pre_load');
+remove_integration_function('integrate_load_theme', 'envision_integrate_load_theme');
+remove_integration_function('integrate_actions', 'envision_integrate_actions');
+remove_integration_function('integrate_menu_buttons', 'add_ep_menu_buttons');
+remove_integration_function('integrate_menu_buttons', 'EnvisionPortal\Menu::main');
+remove_integration_function('integrate_admin_areas', 'add_ep_admin_areas');
+remove_integration_function('integrate_buffer', 'envisionBuffer');
+remove_integration_function('integrate_whos_online', 'envision_whos_online');
+remove_integration_function('integrate_core_features', 'envision_integrate_core_features');
+remove_integration_function('integrate_load_permissions', 'envision_integrate_load_permissions');
+?>]]></code>
 		<remove-dir name="$sourcedir/ep_source" />
 		<remove-dir name="$themedir/ep_template" />
 		<remove-dir name="$imagesdir/ep_images" />
@@ -44,14 +66,6 @@
 		<remove-dir name="$themedir/css/ep_css" />
 		<remove-dir name="$themedir/scripts/ep_scripts" />
 		<remove-dir name="$boarddir/ep_extra" />
-		<remove-file name="$imagesdir/admin/feature_ep.png" />
-		<remove-file name="$boarddir/ep_ajax.php" />
-		<!-- Envision Plugins -->
-		<remove-dir name="$sourcedir/ep_plugins_source" />
-		<remove-dir name="$themedir/ep_plugins_template" />
-		<remove-dir name="$boarddir/ep_plugins_extra" />
-		<remove-dir name="$languagedir/ep_plugins_language" />
-
 	</uninstall>
 
 </package-info>

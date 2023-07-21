@@ -18,8 +18,8 @@ $txt['ep_admin_config_info_desc'] = 'This page allows you to see announcements l
 $txt['ep_admin_config_general_desc'] = 'This page allows you to change the features and options of Envision Portal.';
 
 /***********************************
-		Information Tab
-***********************************/
+ * Information Tab
+ ***********************************/
 // Title
 $txt['ep_admin_config_info'] = 'Envision Portal Info.';
 
@@ -48,8 +48,8 @@ $txt['ep_credits_all_friends'] = 'All of the Envision Portal Friends';
 $txt['ep_credits_contribute'] = 'Do you like Envision Portal? <a href="http://envisionportal.net/index.php?action=contribute">Contribute to the project!</a>';
 
 /***********************************
-		General Settings Tab
-***********************************/
+ * General Settings Tab
+ ***********************************/
 // Title
 $txt['ep_admin_config_general'] = 'General Settings';
 
@@ -59,8 +59,8 @@ $txt['ep_color_members'] = 'Color members with member group color';
 $txt['ep_inline_copyright'] = 'Inline copyright display';
 
 /***********************************
-		Module Settings Tab
-***********************************/
+ * Module Settings Tab
+ ***********************************/
 // Title
 $txt['ep_admin_config_modulesettings'] = 'Module Settings';
 

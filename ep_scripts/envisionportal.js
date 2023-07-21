@@ -1,166 +1,53 @@
-/**************************************************************************************
-* envisionportal.js                                                                   *
-***************************************************************************************
-* Envision Portal                                                                     *
-* Community Portal Application for SMF                                                *
-* =================================================================================== *
-* Software by:                  EnvisionPortal (http://envisionportal.net/)           *
-* Software for:                 Simple Machines Forum                                 *
-* Copyright 2011 by:            EnvisionPortal (http://envisionportal.net/)           *
-* Support, News, Updates at:    http://envisionportal.net/                            *
-**************************************************************************************/
+function initModuleToggles(bIsGuest, sSessionId, sSessionVar) {
+	const t = document.getElementById("ep_main");
+	const fn = function (el, event) {
+		if (this.lastChild.src == smf_images_url + "/expand.gif") {
+			this.lastChild.src = smf_images_url + "/collapse.gif";
+			el.nextElementSibling.style.display = "";
+			el.nextElementSibling.nextElementSibling.style.display = "";
+			el.nextElementSibling.nextElementSibling.nextElementSibling.style.display = "";
 
-var start = 0;
-var colLStart = 0;
-var colRStart = 0;
-var rlit = 0;
-var rrit = 0;
-var mHeights = new Array();
-var cWidthLeft = null;
-var cWidthRight = null;
-
-function collapseModule(type, targetId)
-{
-	var test = null;
-	var epheader = null;
-
-	// Block Style
-	if (document.getElementById("ep_" + type + "module_" + targetId) != test)
-	{
-		epheader = document.getElementById("ep_" + type + "module_" + targetId);
-		removeClassName(epheader, "block_header");
-	}
-}
-
-function expandModule(type, targetId)
-{
-	var test = null;
-	var epheader = null;
-
-	// Block Style
-	if (document.getElementById("ep_" + type + "module_" + targetId) != test)
-	{
-		epheader = document.getElementById("ep_" + type + "module_" + targetId);
-		addClassName(epheader, "block_header");
-	}
-}
-
-function collapseModuleAnim(type, targetId, epmodule, speed)
-{
-	var epmoduleimage = type + "collapse_" + targetId;
-	var epheader = null;
-	var test = null;
-
-	// Block Style
-	if (document.getElementById("ep_" + type + "module_" + targetId) != test)
-		epheader = document.getElementById("ep_" + type + "module_" + targetId);
-
-	var module = document.getElementById(epmodule);
-	var modHeight = module.offsetHeight;
-	module.style.overflowY = "hidden";
-
-	if (!mHeights[targetId] && start == 0)
-	{
-		document.cookie = "ep_" + type + "module_height_" + targetId + "=" + modHeight;
-		mHeights[targetId] = modHeight;
-	}
-
-	var minHeight = 0;
-	var moveBy = Math.round(speed * 10);
-	var intId = setInterval(function() {
-		var curHeight = module.offsetHeight;
-		var newHeight = curHeight - moveBy;
-		if (newHeight > minHeight)
-		{
-			start = 1;
-			module.style.height = newHeight + "px";
-		}
-		else {
-			clearInterval(intId);
-			module.style.height = "0px";
-			if(epheader != test)
-				removeClassName(epheader, "block_header");
-
-			start = 0;
-			module.style.display = "none";
-		}
-	}, 30);
-}
-
-function expandModuleAnim(type, targetId, epmodule, speed)
-{
-	var epmoduleimage = type + "collapse_" + targetId;
-	var epheader = null;
-	var test = null;
-
-	// Block Style
-	if (document.getElementById("ep_" + type + "module_" + targetId) != test)
-		epheader = document.getElementById("ep_" + type + "module_" + targetId);
-
-	var module = document.getElementById(epmodule);
-
-	if (epheader != test)
-		addClassName(epheader, "block_header");
-
-	module.style.height = "0px";
-	module.style.overflowY = "hidden";
-	module.style.display = "";
-	if (!mHeights[targetId])
-		var match = getCookie("ep_" + type + "module_height_" + targetId);
-	else
-		var match = mHeights[targetId];
-
-	var modHeight = parseInt(match);
-	var moveBy = Math.round(speed * 10);
-
-	var intId = setInterval(function() {
-		var curHeight = module.offsetHeight;
-		var newHeight = curHeight + moveBy;
-		if (newHeight < modHeight)
-		{
-			module.style.height = newHeight + "px";
-			start = 1;
-		}
-		else {
-			clearInterval(intId);
-			if(epheader != test)
-				module.style.overflowY = "hidden";
+			if (bIsGuest)
+				localStorage.setItem('ep_hide_module_' + el.dataset.id, '0');
 			else
-				module.style.overflowY = "auto";
+				smf_setThemeOption('ep_hide_module_' + el.dataset.id, '0', null, sSessionId, sSessionVar, null);
+		} else {
+			this.lastChild.src = smf_images_url + "/expand.gif";
+			el.nextElementSibling.style.display = "none";
+			el.nextElementSibling.nextElementSibling.style.display = "none";
+			el.nextElementSibling.nextElementSibling.nextElementSibling.style.display = "none";
 
-			module.style.height = "";
-			start = 0;
+			if (bIsGuest)
+				localStorage.setItem('ep_hide_module_' + el.dataset.id, '1');
+			else
+				smf_setThemeOption('ep_hide_module_' + el.dataset.id, '1', null, sSessionId, sSessionVar, null);
 		}
-	}, 30);
+
+		event.stopPropagation();
+		event.preventDefault();
+	};
+
+	for (const col of t.children)
+		if (col.className == "ep_col")
+			for (const el of col.children)
+				if (el.firstElementChild && el.firstElementChild.className == "ep_upshrink catbg") {
+					const i = document.createElement("img");
+					if ((bIsGuest && localStorage.getItem('ep_hide_module_' + el.dataset.id) == '1') || (!bIsGuest && el.dataset.collapsed == '1')) {
+						i.src = smf_images_url + "/expand.gif";
+						el.nextElementSibling.style.display = "none";
+						el.nextElementSibling.nextElementSibling.style.display = "none";
+						el.nextElementSibling.nextElementSibling.nextElementSibling.style.display = "none";
+					} else
+						i.src = smf_images_url + "/collapse.gif";
+
+					const a = document.createElement("a");
+					a.append(i);
+					a.href = "#";
+					a.addEventListener("click", fn.bind(a, el));
+					el.firstElementChild.appendChild(a);
+				}
 }
 
-function getCookie(c_name)
-{
-	if (document.cookie.length > 0)
-	{
-		var c_start = document.cookie.indexOf(c_name + "=");
-		if (c_start!=-1)
-		{
-			c_start = c_start + c_name.length + 1;
-			var c_end = document.cookie.indexOf(";", c_start);
-			if (c_end == -1) c_end = document.cookie.length;
-			return unescape(document.cookie.substring(c_start, c_end));
-		}
-	}
-	return "";
-}
-
-function addClassName(oElement, sClass)
-{
-	oElement.className += " " + sClass;
-}
-
-function removeClassName(oElement, sClass)
-{
-	oElement.className = oElement.className.replace(" " + sClass, "");
-}
-
-function replaceClassName(oElement, sClassFind, sClassReplace)
-{
-	oElement.className = oElement.className.replace(sClassFind, sClassReplace);
+function ep_change_theme(obj) {
+	obj.parentNode.previousElementSibling.firstElementChild.src = obj.options[obj.selectedIndex].dataset.url;
 }

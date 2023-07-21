@@ -1,700 +1,258 @@
-/* Styles for Envision Portal.
-------------------------------------------------------- */
+@media (min-width: 721px) {
+	#ep_main {
+		display: grid;
+		grid-gap: 1em;
+		grid-template-columns: 200px auto 200px;
+	}
 
-/* ************************************* */
-/* General styles                        */
-/* ************************************* */
-
-.w100
-{
-	width: 100%;
+	#ep_main > div {
+		grid-column: var(--col);
+		grid-row: var(--row);
+	}
 }
 
-.ep_main
-{
-	width: 100%;
-	border-spacing: 5px;
+@media (max-width: 720px) {
+	#ep_main > div:not(:first-child) {
+		margin-top: 1em;
+	}
 }
 
-.ep_column
-{
-	vertical-align: top;
-}
-
-.ep_collapse_links
-{
-	text-align: right;
-	width: 100%;
-}
-
-.ep_leftpadding
-{
-	padding-left: 5px;
-}
-
-.ep_padding
-{
-	padding: 0 5px 0px 0px;
-}
-
-.smf_content
-{
-	margin: 0;
-	padding: 0.5em 1.2em;
-}
-
-.smf_content, .ep_paddingcenter, .ep_center
-{
-	text-align: center;
-}
-
-.ep_paddingcenter
-{
-	padding: 5px;
-}
-
-.envisionframe
-{
-	padding: 0 1em;
-}
-
-
-/*
-	Need to contain the module so it doesn't overflow. Every module will be contained in this class.
-*/
-div.ep_module
-{
-	overflow: auto;
-}
-
-/* ************************************* */
-/* Template Styles                       */
-/* ************************************* */
-
-.ep_cattemp
-{
-	font-family: arial, helvetica, sans-serif;
-	font-size: 1.1em;
-	font-weight: bold;
-}
-
-tr.ep_cattemp
-{
-	padding: 0 6px;
-}
-
-h3.ep_cattemp, h4.ep_cattemp
-{
-	overflow: hidden;
-	margin: -7px 0px -7px 0px;
-	height: 31px;
-	line-height: 31px;
-	font-size: 1.2em;
-	font-weight: bold;
-	padding: 0px 9px 0px 5px;
-}
-
-img.ep_tempblock
-{
-	padding: 10px 2px 0px 0px;
-	margin: 0 !important;
-	float: right !important;
-}
-
-h3.ep_cattemp img.icon
-{
-	margin: -2px 5px 0px 0px;
-	vertical-align: middle;
-}
-
-.ep_temp
-{
-	padding: 0px 10px 0px 10px;
-}
-
-/* ************************************* */
-/* Module-specific styles                  */
-/* ************************************* */
-/*
-	Shoutbox
-*/
-.shout_smileys, .shout_font_styles
-{
-	padding-top: 5px;
-	display: none;
-}
-
-.shout_smileys ul, .shout_font_styles ul
-{
-	display: inline;
-	list-style: none;
-}
-
-.shout_smiley_img, .shout_font_style_img
-{
+.primary_btn {
+	float: left;
+	clear: both;
+	padding: 6px 10px;
+	border-top-left-radius: 9px;
+	border-top-right-radius: 9px;
+	border-bottom-right-radius: 9px;
+	border-bottom-left-radius: 9px;
+	color: white;
+	box-shadow: black 0px 1px 4px -1px;
 	cursor: pointer;
-	float: left;
-	display: inline;
-	margin-right: 5px;
+	background-color: #6d6d6d;
 }
 
-/*
-	Calendar Module
-*/
-.ep_month_grid
-{
-	width: 170px;
-	text-align: center;
-	float: left;
-}
-.ep_month_grid div.cat_bar
-{
-	height: 25px;
-}
-.ep_month_grid h3.catbg
-{
-	height: 25px;
-	line-height: 27px;
-}
-.ep_month_grid table
-{
-	width: 170px;
+.ep_col > .cat_bar:not(:first-child) {
+	margin-top: 1em;
 }
 
-/* ************************************* */
-/* Module-listing styles                  */
-/* ************************************* */
-/*
-	Layer: 1
-*/
-.ep_list
-{
+.ep_col > .cat_bar > .catbg {
+	display: flex;
+}
+
+.ep_col > .cat_bar > .catbg .fugue {
+	align-self: center;
+}
+
+.ep_col > .cat_bar > .catbg a[href='#'] {
+	align-self: center;
+	margin-left: auto;
+}
+
+/* Module-specific styles
+------------------------------------------------------- */
+span.new_posts {
+	vertical-align: 1px;
+}
+
+.ep_module_user_cp h4 {
+	font-size: 1.1em;
+	line-height: 1.1;
+}
+
+.ep_module_user_cp > ul li:nth-child(1) {
+	background: url(../../../../ep_extra/module_images/bullet.png) no-repeat left center;
+	padding-left: 1.5em;
+}
+
+.ep_module_user_cp > ul li:nth-child(2) {
+	background: url(../../../../ep_extra/module_icons/clock.png) no-repeat left center;
+	margin-bottom: 0.15em;
+	padding-left: 1.5em;
+}
+
+.ep_module_stats li {
+	background: url(../../../../ep_extra/module_icons/chart_pie.png) no-repeat left center;
+	padding-left: 1.5em;
+}
+
+.ep_module_online ul ul {
+	padding-left: 1.5em;
+}
+
+.ep_module_user_cp ul,
+.ep_module_stats ul,
+.ep_module_online ul,
+.ep_module_staff ul,
+.ep_module_top_posters ul,
+.ep_module_new_members ul,
+.ep_module_sitemenu ul {
 	margin: 0;
 	padding: 0px;
 	line-height: 1.5em;
 	list-style-type: none;
 }
 
-.ep_paddingleft
-{
-	padding: 0px 0px 0px 5px;
+.ep_module_news .subbg img {
+	vertical-align: middle;
 }
 
-.ep_shout_name
-{
-	line-height: 21px;
+.ep_module_news article:not(:first-child) {
+	margin-top: 1em;
 }
 
-.ep_list_indent
-{
-	padding-left: 10px;
+.ep_module_user_cp .buttonlist ul {
+	display: grid;
+	grid-template: auto / 1fr 1fr;
+	gap: 1em 0;
 }
 
-/*
-	Layer: 2
-*/
-
-li.ep_list_above
-{
-	padding-top: 5px;
+.ep_module_user_cp .buttonlist,
+.ep_module_recent .buttonlist {
+	display: flex;
+	margin-top: 0.5em;
 }
 
-li.ep_list_below
-{
-	padding-bottom: 5px;
-	border-bottom: 1px dashed #AAA;
+.ep_module_recent .buttonlist ul {
+	margin-left: auto;
 }
 
-li.ep_list_cut
-{
-	border-bottom: 1px solid #DDD;
+.ep_module_calendar {
+	display: grid;
+	font-size: 0.9em;
+	grid: 2.2em / repeat(7, 2.2em);
+	justify-content: center;
+	line-height: 2.2em;
+	text-align: center;
 }
 
-.block_header
-{
-	height: 28px !important;
+.ep_module_calendar .catbg {
+	grid-column: 1 / 8;
 }
 
-img.ep_curveblock
-{
-	padding: 8px 2px 1px 0;
-	margin: 0 !important;
-	float: right !important;
+.ep_module_calendar .windowbg2 {
+	opacity: 0.5;
 }
 
-.hand
-{
+.ep_module_poll {
+	display: grid;
+	grid-template-columns: minmax(5em, 1fr);
+	line-height: 1.6;
+}
+
+.ep_module_poll input {
+	margin-top: 0.25em;
+}
+
+.ep_module_poll :not(div[class]) {
+	grid-column: 1 / 3;
+}
+
+.ep_module_staff ul[data-avatar] li,
+.ep_module_top_posters ul[data-avatar] li,
+.ep_module_new_members ul[data-avatar] li {
+	display: grid;
+	grid: auto / 40px 1fr;
+	gap: 0 1em;
+}
+
+.ep_module_staff li,
+.ep_module_top_posters li,
+.ep_module_new_members li {
+	padding: 0.5em 0;
+}
+
+.ep_module_staff img,
+.ep_module_top_posters img,
+.ep_module_new_members img {
+	grid-row: 1 / 3;
+	height: auto;
+	width: 40px;
+}
+
+.ep_module_staff p,
+.ep_module_top_posters p,
+.ep_module_new_members p {
+	grid-column: 2;
+	padding: 0 !important;
+	width: 100%;
+	overflow: hidden;
+}
+
+.ep_module_staff .largetext {
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 99%;
+	text-overflow: ellipsis;
+}
+
+.ep_module_sitemenu {
+	--spacing: 1.5rem;
+	--radius: 10px;
+}
+
+.ep_module_sitemenu li {
+	display: block;
+	position: relative;
+	padding: 0.25rem 0 0.25rem calc(2 * var(--spacing) - var(--radius) - 2px);
+}
+
+.ep_module_sitemenu ul ul {
+	margin-left: calc(var(--radius) - var(--spacing));
+}
+
+.ep_module_sitemenu ul li:not(:last-child) {
+	border-left: 2px solid #ddd;
+}
+
+.ep_module_sitemenu ul li::before {
+	content: '';
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: calc(var(--spacing) + 2px);
+	height: calc(var(--spacing) / 2);
+	border: solid #ddd;
+	border-width: 0 0 2px 0;
+}
+
+.ep_module_sitemenu ul li:last-child::before {
+	border-width: 0 0 2px 2px;
+}
+
+.ep_module_sitemenu summary {
+	display: block;
 	cursor: pointer;
 }
 
-.epspacer
-{
-	margin-top: 7px;
-}
-
-.blockframe
-{
-	padding: 1em;
-}
-
-/* **************************************** */
-/* Envision Portal Admin Styles				*/
-/* **************************************** */
-
-.module_page table
-{
-	border-spacing: 11px;
-	table-layout: fixed;
-	width: 100%;
-}
-
-optgroup option, .ep_edit_column
-{
-	padding-left: 10px;
-}
-
-#ep_icon
-{
-	vertical-align: top;
-}
-
-#ep_icon_holder
-{
-	margin: 10px 0 0 0;
-}
-
-/* ************************************* */
-/* Module-general styles                 */
-/* ************************************* */
-
-.ep_dash_top
-{
-	margin: 10px 0px -5px 0px;
-	border-top: 1px dashed #000000;
-}
-
-.ep_dashed
-{
-	border-bottom: 1px dotted #000000;
-}
-
-.ep_hello
-{
-	font-weight: bold;
-	font-size: 125%;
-	padding-top: 2px;
-	padding-bottom: 4px;
-}
-
-.ep_control_flow, .shoutbox_content
-{
-	max-height: 250px;
-	overflow: auto;
-}
-
-/* ************************************* */
-/* Module-specific styles              */
-/* ************************************* */
-
-.ep_news .ep_dashed, .ep_recent .ep_dashed
-{
-	margin: 0.5em 0;
-}
-
-.ep_news img
-{
-	float: left;
-	padding-right: 8px;
-}
-
-.ep_recent_icon
-{
-	float: left;
-	padding-right: 8px;
-}
-
-.ep_staff, .ep_newmem
-{
-	padding-top: 8px;
-	padding-left: 4px;
-}
-
-.ep_staff_avatar, .ep_newmem_avatar
-{
-	width: 45px;
-	height: 45px;
-	padding-right: 9px;
-}
-
-.ep_news_avatar, .ep_recent_avatar
-{
-	width: 45px;
-	height: 45px;
-}
-
-.calendar_table .information
-{
-	margin: 0;
-	padding: 0;
-	line-height: 1em;
-}
-
-.ep_cal_month
-{
-	padding: 5px;
-}
-
-#ep_menu
-{
-	width: 100%;
-}
-#ep_menu a
-{
-	margin: 0;
-	line-height: 1.7em;
-}
-#ep_menu li
-{
-	position: relative;
-}
-#ep_menu li ul
-{
-	position: absolute;
-	top: 0;
-	left: 75%;
-	width: 200px;
-	background: #FFFFFF;
-	border: 1px solid #AAA;
-}
-#ep_menu ul
-{
+.ep_module_sitemenu summary::marker,
+.ep_module_sitemenu summary::-webkit-details-marker {
 	display: none;
 }
-#ep_menu li:hover ul
-{
+
+.ep_module_sitemenu li::after,
+.ep_module_sitemenu summary::before {
+	content: '';
 	display: block;
+	position: absolute;
+	top: calc(var(--spacing) / 2 - var(--radius));
+	left: calc(var(--spacing) - var(--radius) - 1px);
+	width: calc(2 * var(--radius));
+	height: calc(2 * var(--radius));
+	border-radius: 50%;
+	background: #ddd;
 }
 
-/**********************
-	Site Menu Module
-**********************/
-div.epsitemenu
-{
-	width: 173px;
-	font-family: Arial, sans-serif;
-	font-size: 12px;
-	padding-bottom: 5px;
+.ep_module_sitemenu summary::before {
+	content: '+';
+	z-index: 1;
+	background: #696;
 	color: #fff;
-}
-
-div.epsitemenu div
-{
-	overflow: hidden;
-}
-
-div.epsitemenu div:first-child
-{
-}
-
-div.epsitemenu div.epsm_collapsed
-{
-	height: 25px;
-	width: 173px;
-}
-
-div.epsm_expanded
-{
-	width: 173px;
-}
-
-div.epsitemenu div span.subs
-{
-	display: block;
-	margin-top: -6px;
-	padding: 5px 25px;
-	color: white;
-	background: url(../../../envisionportal/module_images/sitemenu/expanded.png) no-repeat 10px center;
-	cursor: default;
-	border-bottom: 1px solid #ddd;
-}
-
-div.epsitemenu div.epsm_collapsed span.subs
-{
-	background-image: url(../../../envisionportal/module_images/sitemenu/collapsed.png);
-}
-
-div.epsitemenu div a
-{
-	text-decoration: none;
-	color: white;
-}
-
-div.epsitemenu div a.sm
-{
-	padding: 5px 10px;
-	background: #eee;
-	display: block;
-	border-bottom: 1px solid #ddd;
-	color: #090977;
-	text-decoration: none;
-}
-
-div.epsitemenu div a.eptitle_current
-{
-	text-decoration: none;
-	color: #b1b1ff;
-	font-weight: bold;
-}
-
-div.epsitemenu div a.epsm_current
-{
-	background : #c6cbe8;
-	text-decoration: none;
-}
-
-div.epsitemenu div span.no_subs
-{
-	line-height: 24px;
-	padding: 0px 5px 0px 15px;
-	color: white;
-}
-
-div.epsitemenu div a.sm:hover
-{
-	background : #869bd8 url(../../../envisionportal/module_images/sitemenu/linkarrow.png) no-repeat right center;
-	color: #fff;
-	text-decoration: none;
-}
-
-/* Site Menu Module CSS Finished */
-
-/* **************************************** */
-/* Classes for Drag & Drop					*/
-/* **************************************** */
-
-.DragBox
-{
-	width: 106px;
-	font-size: 10px;
-	padding: 0;
-}
-.ui-sortable-placeholder {border: 1px dotted black; visibility: visible !important;}
-.ui-sortable-placeholder * {visibility: hidden;}
-.disabled_module {float: left; margin-right: 10px;}
-.module_page
-{
-	width: 50%;
-}
-.module_holder
-{
-	padding-left: 1em;
-	padding-top: 1em;
-}
-.enabled .draggable_module
-{
-	width: 100%;
-	display: inline-block;
-}
-.disabled .draggable_module
-{
-	width: 10em;
-	display: inline-block;
-	margin-left: 5px;
-}
-#messages
-{
-	float: left;
-	width: 50%;
-}
-#action_user_defined2
-{
-	margin-bottom: 5px;
-}
-
-/* ************************************* */
-/* Credits styles                        */
-/* ************************************* */
-
-#ep_admin_section
-{
-	overflow: hidden;
-	margin: 1em 0;
-}
-#ep_admin_center .content
-{
-	padding: 1em;
-}
-
-#ep_live_news
-{
-	width: 64%;
-}
-#ep_live_news div.content
-{
-	padding: 0 0 0 1em;
-	font-size: 0.85em;
-}
-#ep_live_news div.content dl
-{
-	padding: 0.5em 0 0 0.5em;
-}
-
-#epVersionTable
-{
-	width: 34%;
-}
-#ep_version_details
-{
-	overflow: auto;
-	height: 9.5em;
-}
-#epAnnouncements
-{
-	height: 13.5em;
-	overflow: auto;
-}
-#epAnnouncements dt
-{
-	border-bottom: 1px dashed #000;
-}
-#epAnnouncements dd
-{
-	padding: 0;
-	margin: 0 0 1em 1.5em;
-}
-#ep_update_section
-{
-	margin: 0.5em 0 0;
-}
-
-.roundframe p
-{
-	padding:0.5em;
-}
-
-.roundframe dl, .roundframe dt, .roundframe p
-{
-	margin:0;
-}
-
-.inner
-{
-	border-top:1px solid #9999AA;
-	margin:0 1em 0 0;
-	padding:1em 1em 0 0;
-}
-
-#post_header dt
-{
-	clear: both;
-}
-/*Styles Specific to Manage Envision Modules Template*/
-#margin2
-{
-	margin-top: -2px;
-}
-.border-bottom
-{
-	border-bottom: 1px dotted;
-}
-.paddingleft10
-{
-	padding-left: 10px;
-}
-.margin-bot
-{
-	margin-bottom: 0;
-}
-.layout_width
-{
-	width: 295px;
-}
-.layout_width_max
-{
-	max-width: 300px;
-}
-.layout_style
-{
-	width: 300px;
-}
-.mod_user_action
-{
-	float: left;
-	margin-left: 5px;
-}
-.r-align
-{
-	text-align: right;
-}
-.c-align
-{
+	line-height: calc(2 * var(--radius) - 2px);
 	text-align: center;
 }
-.r-clear
-{
-	clear: right;
-}
-.display_none
-{
-	display: none;
-}
-.imgbox
-{
-	width: 12px;
-	height: 11px;
-}
-/*No wrapping*/
-.no_wrap
-{
-	white-space: nowrap;
-}
-/*width of 100% .... simples*/
-.full_width
-{
-	width: 100%;
-}
-.a_fifth
-{
-	width: 20%;
-}
-.three_quarters
-{
-	width: 75%;
-}
 
-.action_label
-{
-	text-transform: capitalize;
-	margin-left: 0.5em;
-}
-
-h3.ep_plain
-{
-	border-bottom: 1px solid #D8D2C2;
-	margin-bottom: 4px;
-}
-h3.ep_plain img.icon
-{
-	vertical-align: middle;
-	margin-top: -2pt;
-}
-.ep_main div.roundframe div.innerframe div[id]
-{
-	padding: 0.5em 4px;
-}
-
-#ep_plugins_list img.ep_plugins_image
-{
-	float: left;
-	margin-bottom: 1em;
-	margin-right: 1em;
-}
-#ep_plugins_list h4
-{
-	padding-top: 1em;
-}
-#ep_plugins_list div.options
-{
-	float: right;
-	padding-top: 0.5em;
+.ep_module_sitemenu details[open] > summary::before {
+	content: '−';
 }
