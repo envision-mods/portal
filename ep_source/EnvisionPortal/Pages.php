@@ -14,18 +14,9 @@ namespace EnvisionPortal;
 
 class Pages
 {
-	public static function main(): void
+	public static function fetch(string $call): ?Page
 	{
-		global $context, $modSettings, $smcFunc, $txt, $user_info;
-
-		if (!$modSettings['ep_portal_mode']) {
-			loadTemplate('ep_template/EnvisionPortal');
-		}
-
-		$call = isset($_GET['page']) ? $_GET['page'] : redirectexit();
-
-		// Put it in the session to prevent it from being logged when they refresh the page.
-		$_SESSION['last_page_id'] = $call;
+		global $smcFunc;
 
 		if (!is_numeric($call)) {
 			$query = 'slug = {string:page}';
@@ -34,7 +25,7 @@ class Pages
 		}
 
 		$request = $smcFunc['db_query']('', '
-			SELECT name, type, body, permissions, status, description
+			SELECT *
 			FROM {db_prefix}envision_pages
 			WHERE ' . $query . '
 			LIMIT 1',
@@ -44,35 +35,47 @@ class Pages
 		);
 
 		if ($smcFunc['db_num_rows']($request) == 0) {
-			fatal_lang_error('ep_pages_not_exist', false);
+			return null;
 		}
 
 		$row = $smcFunc['db_fetch_assoc']($request);
 
-		if (allowedTo('admin_forum') || array_intersect(
-				$user_info['groups'],
-				explode(',', $row['permissions']) != []
-			) && $row['status'] == 'active') {
-			$context['page_title'] = $row['name'];
+		return new Page(
+			(int) $row['id_page'],
+			$row['slug'],
+			$row['name'],
+			$row['type'],
+			$row['body'],
+			explode(',', $row['permissions']),
+			$row['status'],
+			$row['description'],
+			(int) $row['views']
+		);
+	}
 
-			if (!isset($_SESSION['viewed_page_' . $call])) {
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}envision_pages
-					SET views = views + 1
-					WHERE ' . $query,
-					[
-						'page' => $call,
-					]
-				);
+	public static function main(): void
+	{
+		global $context, $modSettings, $smcFunc;
 
-				$_SESSION['viewed_page_' . $call] = '1';
-			}
+		if (empty($modSettings['ep_portal_mode'])) {
+			loadTemplate('ep_template/EnvisionPortal');
+		}
 
-			$cn = strpos($row['type'], '\\') !== false ? $row['type'] : 'EnvisionPortal\PageModes\\' . $row['type'];
-			$obj = new $cn;
+		$call = $_GET['page'] ?? redirectexit();
+
+		// Put it in the session to prevent it from being logged when they refresh the page.
+		$_SESSION['last_page_id'] = $call;
+
+		$row = self::fetch($call);
+
+		if ($row === null) {
+			fatal_lang_error('ep_pages_not_exist', false);
+		}
+		if ($row->isAllowed()) {
+			$context['page_title'] = $row->getName();
 
 			$context['page_data'] = [
-				'body' => $obj->parse($row['body']),
+				'body' => $row->getBody(),
 			];
 			$context['sub_template'] = 'envision_pages';
 			$context['linktree'][] = [
@@ -83,17 +86,17 @@ class Pages
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="' . $context['forum_name'] . '">
 	<meta property="og:title" content="' . $context['page_title'] . '">
-	<meta property="og:description" content="' . $smcFunc['htmlspecialchars']($row['description']) . '">';
+	<meta property="og:description" content="' . $smcFunc['htmlspecialchars']($row->getDescription()) . '">';
 			} else {
-				$context['meta_description'] = $smcFunc['htmlspecialchars']($row['description']);
-				$this->setMetaProperty('type', 'website');
+				$context['meta_description'] = $smcFunc['htmlspecialchars']($row->getDescription());
+				self::setMetaProperty('type', 'website');
 			}
 		} else {
 			fatal_lang_error('ep_pages_no_access', false);
 		}
 	}
 
-	public function setMetaTag(string $key, string $value): void
+	public static function setMetaTag(string $key, string $value): void
 	{
 		global $context;
 
@@ -111,7 +114,7 @@ class Pages
 		}
 	}
 
-	public function setMetaProperty(string $key, string $value): void
+	public static function setMetaProperty(string $key, string $value): void
 	{
 		global $context;
 

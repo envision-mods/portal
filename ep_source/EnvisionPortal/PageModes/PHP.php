@@ -12,10 +12,10 @@ declare(strict_types=1);
 
 namespace EnvisionPortal\PageModes;
 
-use EnvisionPortal\PageMode;
+use EnvisionPortal\PageModeInterface;
 use ErrorException;
 
-class PHP implements PageMode
+class PHP implements PageModeInterface
 {
 	public function parse(string $body): string
 	{

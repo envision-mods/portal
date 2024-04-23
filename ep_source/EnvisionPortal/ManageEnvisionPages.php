@@ -14,7 +14,7 @@ namespace EnvisionPortal;
 
 class ManageEnvisionPages
 {
-	private PagesHelper $um;
+	private DataMapper $dataMapper;
 
 	public function __construct(string $sa)
 	{
@@ -37,7 +37,7 @@ class ManageEnvisionPages
 		];
 		$context['html_headers'] .= '
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/admin.js"></script>';
-		$this->um = new PagesHelper;
+		$this->dataMapper = new DataMapper;
 
 		$subActions = [
 			'manmenu' => 'ManageMenu',
@@ -65,8 +65,17 @@ class ManageEnvisionPages
 		} // Changing the status?
 		elseif (isset($_POST['save'])) {
 			checkSession();
-			$this->um->updatePage($_POST);
-			$this->um->rebuildMenu();
+			$entries = $this->dataMapper->fetchBy(
+				['id_page', 'name', 'type', 'slug', 'status', 'description']
+			);
+
+			foreach ($entries as $item) {
+				$status = !empty($updates['status'][$item['id_page']]) ? 'active' : 'inactive';
+
+				if ($status != $item['status']) {
+				}
+			}
+
 			redirectexit('action=admin;area=eppages');
 		}
 
@@ -77,17 +86,24 @@ class ManageEnvisionPages
 	{
 		global $context, $txt, $scripturl, $sourcedir;
 
+		$entries = $this->dataMapper->fetchBy(
+			['id_page', 'name', 'type', 'slug', 'status', 'description']
+		);
+
 		$listOptions = [
-			'id' => 'menu_list',
+			'id' => 'list',
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=admin;area=eppages;sa=manmenu',
 			'default_sort_col' => 'name',
-			'default_sort_dir' => 'description',
+			'default_sort_dir' => 'desc',
 			'get_items' => [
-				'function' => [$this->um, 'list_getMenu'],
+				'function' => [Util::class, 'process'],
+				'params' => [
+					$entries,
+				],
 			],
 			'get_count' => [
-				'function' => [$this->um, 'list_getNumPages'],
+				'function' => fn() => count($entries),
 			],
 			'no_items_label' => $txt['envision_pages_no_pages'],
 			'columns' => [
@@ -123,7 +139,7 @@ class ManageEnvisionPages
 						'class' => 'centertext',
 					],
 					'data' => [
-						'function' => fn(array $rowData): string => sprintf(
+						'function' => fn(Page $rowData): string => sprintf(
 							'<input type="checkbox" name="status[%1$s]" id="status_%1$s" value="%1$s"%2$s />',
 							$rowData['id_page'],
 							$rowData['status'] == 'inactive' ? '' : ' checked="checked"'
@@ -137,7 +153,7 @@ class ManageEnvisionPages
 				],
 				'actions' => [
 					'data' => [
-						'function' => fn(array $rowData): string => sprintf(
+						'function' => fn(Page $rowData): string => sprintf(
 							'
 								<a href="%s?page=%s" target="_blank" class="button_submit button">%s</a>
 								<a href="%1$s?action=admin;area=eppages;sa=editpage;in=%d" class="button_submit button">%s</a>',
@@ -193,12 +209,12 @@ class ManageEnvisionPages
 		require_once $sourcedir . '/Subs-List.php';
 		createList($listOptions);
 		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'menu_list';
+		$context['default_list'] = 'list';
 	}
 
 	private function getInput(): array
 	{
-		$member_groups = $this->um->listGroups([-3]);
+		$member_groups = Util::listGroups([-3]);
 		$args = [
 			'in' => FILTER_VALIDATE_INT,
 			'name' => FILTER_UNSAFE_RAW,
@@ -243,12 +259,19 @@ class ManageEnvisionPages
 
 		// Stop making numeric slugs!
 		if (is_numeric($data['slug'])) {
-			$post_errors['slug'] = 'envision_pages_numeric';
+			$post_errors[] = 'envision_pages_numeric';
 		}
 
 		// Let's make sure you're not trying to make a slug that's already taken.
-		if (!empty($this->um->checkPage($data['in'], $data['slug']))) {
-			$post_errors['slug'] = 'envision_pages_mysql';
+		$entries = $this->dataMapper->fetchBy(
+			['id_page'],
+			[
+				'slug' => $data['slug'],
+				'id' => $data['in'] ?: 0,
+			], [], ['slug = {string:slug}', 'id_page != {int:id}']
+		);
+		if ($entries != []) {
+			$post_errors[] = 'envision_pages_mysql';
 		}
 
 		return $post_errors;
@@ -275,8 +298,63 @@ class ManageEnvisionPages
 			$post_errors = $this->validateInput($data);
 
 			// I see you made it to the final stage, my young padawan.
-			if (empty($post_errors)) {
-				$this->um->savePage($data);
+			if ($post_errors === []) {
+				/*
+				 * Check specifically for four-byte characters.
+				 *
+				 * UTF-8 has single bytes (0-127), leading bytes (192-254) and continuation
+				 * bytes (128-191).  The leading byte precedes up to three continuation bytes.
+				 * The algorithm for UTF-8 always consumes bytes in the same order no matter
+				 * what CPU it is running on.
+				 *
+				 * Unicode code points  Encoding  Binary value
+				 * -------------------  --------  ------------
+				 *  U+000000-U+00007f   0xxxxxxx  0xxxxxxx
+				 *
+				 *  U+000080-U+0007ff   110yyyxx  00000yyy xxxxxxxx
+				 *                      10xxxxxx
+				 *
+				 *  U+000800-U+00ffff   1110yyyy  yyyyyyyy xxxxxxxx
+				 *                      10yyyyxx
+				 *                      10xxxxxx
+				 *
+				 *  U+010000-U+10ffff   11110zzz  000zzzzz yyyyyyyy xxxxxxxx
+				 *                      10zzyyyy
+				 *                      10yyyyxx
+				 *                      10xxxxxx
+				 */
+				foreach (['name', 'description', 'body'] as $el) {
+					$data[$el] = preg_replace_callback(
+						'/[\xF0-\xF4][\x80-\xbf]{3}/',
+						function ($m) {
+							$val = (ord($m[0][0]) & 0x07) << 18;
+							$val += (ord($m[0][1]) & 0x3F) << 12;
+							$val += (ord($m[0][2]) & 0x3F) << 6;
+							$val += ord($m[0][3]) & 0x3F;
+
+							return '&#' . $val . ';';
+						},
+						$data[$el]
+					);
+				}
+
+				$page = new Page(
+					(int)$data['in'],
+					$data['slug'],
+					$data['name'],
+					$data['type'],
+					$data['body'],
+					array_map('intval', array_filter(explode(',', $data['permissions']), 'is_string')),
+					$data['status'],
+					$data['description'],
+					0
+				);
+
+				if ($page->getId() == 0) {
+					$this->dataMapper->insert($page);
+				} else {
+					$this->dataMapper->update($page);
+				}
 				redirectexit('action=admin;area=eppages');
 			} else {
 				$context['page_title'] = $txt['envision_pages_edit_title'];
@@ -291,8 +369,8 @@ class ManageEnvisionPages
 					'type' => $data['type'],
 					'types' => $this->getTypes(),
 					'body' => $data['body'],
-					'permissions' => $this->um->listGroups(
-						array_filter($data['permissions'], 'strlen')
+					'permissions' => Util::listGroups(
+						array_filter($data['permissions'], 'is_string')
 					),
 					'status' => $data['status'],
 					'id' => $data['in'],
@@ -309,21 +387,26 @@ class ManageEnvisionPages
 	{
 		global $context, $txt;
 
-		$row = isset($_GET['in']) ? $this->um->fetchPage($_GET['in']) : [];
-		if (empty($row)) {
+		if (!isset($_GET['in'])) {
+			fatal_lang_error('no_access', false);
+		}
+
+		$entries = $this->dataMapper->fetchBy(['*'], ['id' => $_GET['in']], [], ['id_page = {int:id}']);
+		$row = $entrries[0] ?? [];
+		if ($row == []) {
 			fatal_lang_error('no_access', false);
 		}
 
 		$context['data'] = [
-			'id' => $row['id'],
-			'name' => $row['name'],
+			'id' => $row['id_page'],
+			'name' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row['name']),
 			'slug' => $row['slug'],
-			'description' => $row['description'],
 			'type' => $row['type'],
 			'types' => $this->getTypes(),
-			'permissions' => $this->um->listGroups($row['permissions']),
-			'body' => $row['body'],
+			'permissions' => Util::listGroups(explode(',', $row['permissions'])),
+			'body' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row['body']),
 			'status' => $row['status'],
+			'description' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row['description']),
 		];
 		$context['page_title'] = $txt['envision_pages_edit_title'];
 		$context['template_layers'][] = 'form';
@@ -341,7 +424,7 @@ class ManageEnvisionPages
 			'type' => 'HTML',
 			'types' => $this->getTypes(),
 			'status' => 'active',
-			'permissions' => $this->um->listGroups([-3]),
+			'permissions' => Util::listGroups([-3]),
 			'id' => 0,
 		];
 		$context['page_title'] = $txt['envision_pages_add_title'];
@@ -363,7 +446,7 @@ class ManageEnvisionPages
 						\FilesystemIterator::SKIP_DOTS
 					),
 					'EnvisionPortal\PageModes\\',
-					'EnvisionPortal\PageMode'
+					PageModeInterface::class
 				)
 			)
 		);

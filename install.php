@@ -317,7 +317,7 @@ $tables = [
 			[
 				'name' => 'type',
 				'type' => 'varchar',
-				'size' => 65,
+				'size' => 255,
 			],
 			[
 				'name' => 'description',
@@ -338,6 +338,27 @@ $tables = [
 				'type' => 'enum(\'active\',\'inactive\')',
 				'default' => 'active',
 			],
+			[
+				'name' => 'poster_name',
+				'type' => 'varchar',
+				'size' => 255,
+			],
+			[
+				'name' => 'id_member',
+				'type' => 'mediumint',
+				'size' => 8,
+				'unsigned' => true,
+			],
+			[
+				'name' => 'created_at',
+				'type' => 'timestamp',
+				'default' => '1970-01-01 00:00:01',
+			],
+			[
+				'name' => 'updated_at',
+				'type' => 'timestamp',
+				'default' => '1970-01-01 00:00:01',
+			],
 		],
 		'indexes' => [
 			[
@@ -347,6 +368,9 @@ $tables = [
 			[
 				'type' => 'unique',
 				'columns' => ['slug'],
+			],
+			[
+				'columns' => ['id_member'],
 			],
 		],
 		'default' => [
@@ -500,7 +524,6 @@ $tables = [
 			[
 				'name' => 'message',
 				'type' => 'text',
-				'null' => false,
 			],
 			[
 				'name' => 'poster_name',
@@ -508,16 +531,20 @@ $tables = [
 				'size' => 255,
 			],
 			[
-				'name' => 'poster_time',
-				'type' => 'int',
-				'size' => 10,
-				'unsigned' => true,
-			],
-			[
 				'name' => 'id_member',
 				'type' => 'mediumint',
 				'size' => 8,
 				'unsigned' => true,
+			],
+			[
+				'name' => 'created_at',
+				'type' => 'timestamp',
+				'default' => '1970-01-01 00:00:01',
+			],
+			[
+				'name' => 'updated_at',
+				'type' => 'timestamp',
+				'default' => '1970-01-01 00:00:01',
 			],
 			[
 				'name' => 'id_shoutbox',
@@ -531,9 +558,6 @@ $tables = [
 			[
 				'type' => 'primary',
 				'columns' => ['id_shout'],
-			],
-			[
-				'columns' => ['poster_time'],
 			],
 			[
 				'columns' => ['id_member'],

@@ -107,8 +107,14 @@
 			<add><![CDATA[if (!empty($modSettings['ep_portal_mode']) && allowedTo('ep_view'))
 	{
 		loadLanguage('ep_languages/EnvisionPortal');
-		$txt['who_index'] = $txt['ep_who_portal'];
-		$txt['whoall_forum'] = $txt['ep_who_forum'];
+		$txt['who_index'] = EnvisionPortal\Util::replaceVars(
+			$txt['ep_who_portal'],
+			['scripturl' => $scripturl, 'forum_name' => $context['forum_name_html_safe']]
+		);
+		$txt['whoall_forum'] = EnvisionPortal\Util::replaceVars(
+			$txt['ep_who_forum'],
+			['scripturl' => $scripturl, 'forum_name' => $context['forum_name_html_safe']]
+		);
 	}
 
 	]]></add>

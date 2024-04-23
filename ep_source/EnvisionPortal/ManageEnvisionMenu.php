@@ -215,7 +215,7 @@ class ManageEnvisionMenu
 
 	private function getInput(): array
 	{
-		$member_groups = $this->um->listGroups([-3]);
+		$member_groups = Util::listGroups([-3]);
 		$button_names = $this->um->getButtonNames();
 		$args = [
 			'in' => FILTER_VALIDATE_INT,
@@ -327,7 +327,7 @@ class ManageEnvisionMenu
 					'position' => $data['position'],
 					'link' => $data['link'],
 					'parent' => $data['parent'],
-					'permissions' => $this->um->listGroups(
+					'permissions' => Util::listGroups(
 						array_filter($data['permissions'], 'strlen')
 					),
 					'status' => $data['status'],
@@ -356,7 +356,7 @@ class ManageEnvisionMenu
 			'target' => $row['target'],
 			'type' => $row['type'],
 			'position' => $row['position'],
-			'permissions' => $this->um->listGroups($row['permissions']),
+			'permissions' => Util::listGroups($row['permissions']),
 			'link' => $row['link'],
 			'status' => $row['status'],
 			'parent' => $row['parent'],
@@ -377,7 +377,7 @@ class ManageEnvisionMenu
 			'type' => 'forum',
 			'position' => 'before',
 			'status' => 'active',
-			'permissions' => $this->um->listGroups([-3]),
+			'permissions' => Util::listGroups([-3]),
 			'parent' => 'home',
 			'id' => 0,
 		];

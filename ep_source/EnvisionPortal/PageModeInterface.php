@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
-interface PageMode
+interface PageModeInterface
 {
 	public function parse(string $body): string;
 

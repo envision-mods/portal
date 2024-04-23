@@ -17,20 +17,6 @@
 	}
 }
 
-.primary_btn {
-	float: left;
-	clear: both;
-	padding: 6px 10px;
-	border-top-left-radius: 9px;
-	border-top-right-radius: 9px;
-	border-bottom-right-radius: 9px;
-	border-bottom-left-radius: 9px;
-	color: white;
-	box-shadow: black 0px 1px 4px -1px;
-	cursor: pointer;
-	background-color: #6d6d6d;
-}
-
 .ep_col > .cat_bar:not(:first-child) {
 	margin-top: 1em;
 }
@@ -109,6 +95,8 @@ span.new_posts {
 .ep_module_user_cp .buttonlist,
 .ep_module_recent .buttonlist {
 	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25em 0.5em;
 	margin-top: 0.5em;
 }
 
@@ -121,10 +109,19 @@ span.new_posts {
 	font-size: 0.9em;
 	grid: 2.2em / repeat(7, 2.2em);
 	justify-content: center;
-	line-height: 2.2em;
 	text-align: center;
 }
 
+.ep_module_calendar:has(.title_bar) {
+	padding-inline: 0;
+}
+
+.ep_module_calendar > .titlebg,
+.ep_module_calendar span {
+	line-height: 2.2em;
+}
+
+.ep_module_calendar .title_bar,
 .ep_module_calendar .catbg {
 	grid-column: 1 / 8;
 }
@@ -224,6 +221,7 @@ span.new_posts {
 .ep_module_sitemenu summary {
 	display: block;
 	cursor: pointer;
+	padding: 0;
 }
 
 .ep_module_sitemenu summary::marker,

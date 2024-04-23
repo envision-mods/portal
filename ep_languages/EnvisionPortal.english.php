@@ -5,9 +5,9 @@
 $txt['forum'] = 'Forum';
 $txt['ep_'] = 'Envision Portal';
 $txt['ep_core_modules'] = 'Collapse or expand this module';
-$txt['ep_who_forum'] = 'Viewing the forum index of <a href="' . $scripturl . '?action=forum">' . $context['forum_name'] . '</a>.';
-$txt['ep_who_portal'] = 'Viewing the portal index of <a href="' . $scripturl . '">' . $context['forum_name'] . '</a>.';
-$txt['ep_who_page'] = 'Viewing the page &quot;<a href="' . $scripturl . '?page=%1$s">%2$s</a>&quot;.';
+$txt['ep_who_forum'] = 'Viewing the forum index of <a href="{scripturl}?action=forum">{forum_name}</a>.';
+$txt['ep_who_portal'] = 'Viewing the portal index of <a href="{scripturl}">{forum_name}</a>.';
+$txt['ep_who_page'] = 'Viewing the page &quot;<a href="{scripturl}?page={page}">{page_name}</a>&quot;.';
 $txt['simplesef_debug'] = 'Enable debug mode';
 $txt['simplesef_debug_desc'] = 'This option will enable debugging on your board.  This does not output any specific information to the screen, but will rapidly fill up your error log with debugging statements from SimpleSEF.  This should really only be used if the author requests it when seeking support';
 $txt['portal_created_full'] = 'Envision Portal added %.3f seconds and %d queries to the above totals.';

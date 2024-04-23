@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
-	<id>EnvisionPortal:EnvisionPortal</id>
+	<id>envision-mods:portal</id>
 	<name>Envision Portal</name>
 	<version>1.0</version>
 	<type>modification</type>
 
-	<install for="2.0 - 2.0.99">
+	<install for="2.1.*">
 		<code type="inline"><![CDATA[<?php
 define('REQUIRED_PHP_VERSION', '7.4');
 if (version_compare(PHP_VERSION, REQUIRED_PHP_VERSION, '<'))
@@ -18,20 +18,74 @@ if (version_compare(PHP_VERSION, REQUIRED_PHP_VERSION, '<'))
 		),
 		false
 	);
-add_integration_function('integrate_pre_include', '$sourcedir/ep_source/Subs-EnvisionPortal.php');
-add_integration_function('integrate_pre_load', 'envision_integrate_pre_load');
-add_integration_function('integrate_load_theme', 'envision_integrate_load_theme');
-add_integration_function('integrate_actions', 'envision_integrate_actions');
-add_integration_function('integrate_menu_buttons', 'add_ep_menu_buttons');
-add_integration_function('integrate_menu_buttons', 'EnvisionPortal\Menu::main');
-add_integration_function('integrate_admin_areas', 'add_ep_admin_areas');
-add_integration_function('integrate_buffer', 'envisionBuffer');
-add_integration_function('integrate_whos_online', 'envision_whos_online');
-add_integration_function('integrate_core_features', 'envision_integrate_core_features');
-add_integration_function('integrate_load_permissions', 'envision_integrate_load_permissions');
 ?>]]></code>
 		<readme parsebbc="true">install.txt</readme>
-		<modification>install.xml</modification>
+		<hook hook="integrate_actions" function="EnvisionPortal\Integration::actions" />
+		<hook hook="integrate_admin_areas" function="EnvisionPortal\Integration::admin_areas" />
+		<hook hook="integrate_autoload" function="EnvisionPortal\Integration::autoload" file="$sourcedir/ep_source/EnvisionPortal/Integration.php" />
+		<hook hook="integrate_buffer" function="EnvisionPortal\Integration::buffer" />
+		<hook hook="integrate_default_action" function="EnvisionPortal\Integration::default_action" />
+		<hook hook="integrate_fallback_action" function="EnvisionPortal\Integration::fallback_action" />
+		<hook hook="integrate_load_theme" function="EnvisionPortal\Integration::load_theme" />
+		<hook hook="integrate_load_permissions" function="EnvisionPortal\Integration::load_permissions" />
+		<hook hook="integrate_pre_log_stats" function="EnvisionPortal\Integration::pre_log_stats" />
+		<hook hook="integrate_menu_buttons" function="EnvisionPortal\Integration::buttons" />
+		<hook hook="integrate_menu_buttons" function="EnvisionPortal\Menu::main" />
+		<hook hook="integrate_current_action" function="EnvisionPortal\Integration::fixCurrentAction" />
+		<hook hook="integrate_redirect" function="EnvisionPortal\Integration::redirect" />
+		<hook hook="integrate_modifylanguages" function="EnvisionPortal\Integration::modifylanguages" />
+		<hook hook="who_allowed" function="EnvisionPortal\Integration::who_allowed" />
+		<hook hook="integrate_whos_online" function="EnvisionPortal\Integration::whos_online" />
+		<database>install.php</database>
+		<modification>install21.xml</modification>
+		<require-dir name="ep_extra" destination="$boarddir" />
+		<require-dir name="ep_source" destination="$sourcedir" />
+		<require-dir name="ep_css" destination="$themedir/css" />
+		<require-dir name="ep_languages" destination="$languagedir" />
+		<require-dir name="ep_scripts" destination="$themedir/scripts" />
+		<require-dir name="ep_template" destination="$themedir" />
+		<require-dir name="ep_images" destination="$themedir/images" />
+		<redirect url="?action=admin;area=epmodules" />
+	</install>
+	<uninstall for="2.1.*">
+		<readme parsebbc="true">uninstall.txt</readme>
+		<modification reverse="true">install21.xml</modification>
+		<database>uninstall.php</database>
+		<remove-dir name="$sourcedir/ep_source" />
+		<remove-dir name="$themedir/ep_template" />
+		<remove-dir name="$imagesdir/ep_images" />
+		<remove-dir name="$languagedir/ep_language" />
+		<remove-dir name="$themedir/css/ep_css" />
+		<remove-dir name="$themedir/scripts/ep_scripts" />
+		<remove-dir name="$boarddir/ep_extra" />
+	</uninstall>
+
+	<install for="2.0.*">
+		<code type="inline"><![CDATA[<?php
+define('REQUIRED_PHP_VERSION', '7.4');
+if (version_compare(PHP_VERSION, REQUIRED_PHP_VERSION, '<'))
+	fatal_error(
+		sprintf(
+			'This mod requires a minimum of PHP %s in order to function. (You are currently running PHP %s)',
+			REQUIRED_PHP_VERSION,
+			PHP_VERSION
+		),
+		false
+	);
+add_integration_function('integrate_pre_include', '$sourcedir/ep_source/EnvisionPortal/Integration.php');
+add_integration_function('integrate_pre_load', 'EnvisionPortal\Integration::pre_load');
+add_integration_function('integrate_load_theme', 'EnvisionPortal\Integration::load_theme');
+add_integration_function('integrate_actions', 'EnvisionPortal\Integration::actions');
+add_integration_function('integrate_menu_buttons', 'EnvisionPortal\Integration::menu_buttons');
+add_integration_function('integrate_menu_buttons', 'EnvisionPortal\Menu::main');
+add_integration_function('integrate_admin_areas', 'EnvisionPortal\Integration::admin_areas');
+add_integration_function('integrate_buffer', 'EnvisionPortal\Integration::buffer');
+add_integration_function('integrate_whos_online', 'EnvisionPortal\Integration::whos_online');
+add_integration_function('integrate_redirect', 'EnvisionPortal\Integration::redirect');
+add_integration_function('integrate_load_permissions', 'EnvisionPortal\Integration::load_permissions');
+?>]]></code>
+		<readme parsebbc="true">install.txt</readme>
+		<modification>install20.xml</modification>
 		<database>install.php</database>
 		<require-dir name="ep_extra" destination="$boarddir" />
 		<require-dir name="ep_source" destination="$sourcedir" />
@@ -40,24 +94,24 @@ add_integration_function('integrate_load_permissions', 'envision_integrate_load_
 		<require-dir name="ep_scripts" destination="$themedir/scripts" />
 		<require-dir name="ep_template" destination="$themedir" />
 		<require-dir name="ep_images" destination="$themedir/images" />
-		<redirect url="?action=admin;area=corefeatures#js_feature_ep" />
+		<redirect url="?action=admin;area=epmodules" />
 	</install>
-	<uninstall for="2.0 - 2.0.99">
+	<uninstall for="2.0.*">
 		<readme parsebbc="true">uninstall.txt</readme>
-		<modification reverse="true">install.xml</modification>
+		<modification reverse="true">install20.xml</modification>
 		<database>uninstall.php</database>
 		<code type="inline"><![CDATA[<?php
-remove_integration_function('integrate_pre_include', '$sourcedir/ep_source/Subs-EnvisionPortal.php');
-remove_integration_function('integrate_pre_load', 'envision_integrate_pre_load');
-remove_integration_function('integrate_load_theme', 'envision_integrate_load_theme');
-remove_integration_function('integrate_actions', 'envision_integrate_actions');
-remove_integration_function('integrate_menu_buttons', 'add_ep_menu_buttons');
+remove_integration_function('integrate_pre_include', '$sourcedir/ep_source/EnvisionPortal/Integration.php');
+remove_integration_function('integrate_pre_load', 'EnvisionPortal\Integration::pre_load');
+remove_integration_function('integrate_load_theme', 'EnvisionPortal\Integration::load_theme');
+remove_integration_function('integrate_actions', 'EnvisionPortal\Integration::actions');
+remove_integration_function('integrate_menu_buttons', 'EnvisionPortal\Integration::menu_buttons');
 remove_integration_function('integrate_menu_buttons', 'EnvisionPortal\Menu::main');
-remove_integration_function('integrate_admin_areas', 'add_ep_admin_areas');
-remove_integration_function('integrate_buffer', 'envisionBuffer');
-remove_integration_function('integrate_whos_online', 'envision_whos_online');
-remove_integration_function('integrate_core_features', 'envision_integrate_core_features');
-remove_integration_function('integrate_load_permissions', 'envision_integrate_load_permissions');
+remove_integration_function('integrate_admin_areas', 'EnvisionPortal\Integration::admin_areas');
+remove_integration_function('integrate_buffer', 'EnvisionPortal\Integration::buffer');
+remove_integration_function('integrate_whos_online', 'EnvisionPortal\Integration::whos_online');
+remove_integration_function('integrate_redirect', 'EnvisionPortal\Integration::redirect');
+remove_integration_function('integrate_load_permissions', 'EnvisionPortal\Integration::load_permissions');
 ?>]]></code>
 		<remove-dir name="$sourcedir/ep_source" />
 		<remove-dir name="$themedir/ep_template" />

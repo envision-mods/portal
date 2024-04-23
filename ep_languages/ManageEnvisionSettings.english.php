@@ -52,35 +52,28 @@ $txt['ep_credits_contribute'] = 'Do you like Envision Portal? <a href="http://en
  ***********************************/
 // Title
 $txt['ep_admin_config_general'] = 'General Settings';
+$txt['ep_admin_config_general_optional'] = 'These settings only work if the portal is enabled.';
 
 // Settings titles
-$txt['ep_collapse_modules'] = 'Enable collapsible modules';
-$txt['ep_color_members'] = 'Color members with member group color';
-$txt['ep_inline_copyright'] = 'Inline copyright display';
+$txt['ep_portal_mode'] = 'Enable portal';
+$txt['ep_portal_mode_subtext'] = 'Does not affect the operation of pages nor menus.';
+$txt['ep_pages_mode'] = 'Enable pages';
+$txt['ep_pages_title'] = 'Pages';
+$txt['ep_pages_subtext'] = 'Pages will still work even if the portal is disabled.';
+$txt['ep_view_permissions'] = 'View portal ermission';
+$txt['ep_view_permissions_subtext'] = 'Limit the member groups that can see the portal with all its layouts and modules.  Neither pages nor menus are affected by this setting.';
 
-/***********************************
- * Module Settings Tab
- ***********************************/
-// Title
-$txt['ep_admin_config_modulesettings'] = 'Module Settings';
-
-// Description
-$txt['ep_admin_config_modulesettings_desc'] = 'Settings that apply to all your modules.';
+$txt['ep_admin_config_modules'] = 'Modules';
 
 // Module settings
+$txt['ep_collapse_modules'] = 'Enable collapsible modules';
+
+// Need a DeLorean for these.
 $txt['ep_module_display_style'] = 'Module display style';
 $txt['ep_module_display_style_modular'] = 'Modular style';
 $txt['ep_module_display_style_blocks'] = 'Block style';
 $txt['ep_module_enable_animations'] = 'Enable module animations';
 $txt['ep_module_animation_speed'] = 'Module animation speed';
-$txt['ep_animation_speed_veryslow'] = 'Very slow';
-$txt['ep_animation_speed_slow'] = 'Slow';
-$txt['ep_animation_speed_normal'] = 'Normal';
-$txt['ep_animation_speed_fast'] = 'Fast';
-$txt['ep_animation_speed_veryfast'] = 'Very fast';
-$txt['ep_disable_custommod_icons'] = 'Do not install custom module icons';
-$txt['ep_enable_custommod_icons'] = 'Do not uninstall custom module icons';
-$txt['ep_icon_directory'] = 'Modules icon directory';
 
 // Logs
 $txt['ep_no_logs'] = 'Nothing has been logged yet.';

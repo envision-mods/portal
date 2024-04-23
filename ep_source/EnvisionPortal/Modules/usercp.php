@@ -54,10 +54,7 @@ class UserCP implements ModuleInterface
 
 			// What does the user want the time formatted as?
 			$s = strpos($user_info['time_format'], '%S') === false ? '' : ':%S';
-			if (strpos($user_info['time_format'], '%H') === false && strpos(
-					$user_info['time_format'],
-					'%T'
-				) === false) {
+			if (preg_match('/%[[HT]/', $user_info['time_format']) === 0) {
 				$h = strpos($user_info['time_format'], '%l') === false ? '%I' : '%l';
 				$time_fmt = $h . ':%M' . $s . ' %p';
 			} else {

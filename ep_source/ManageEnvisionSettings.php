@@ -80,7 +80,6 @@ function Configuration()
 	$subActions = [
 		'epinfo' => 'EnvisionPortalInfo',
 		'epgeneral' => 'ModifyEnvisionGeneral',
-		'epmodulesettings' => 'ModifyEnvisionModuleSettings',
 		'logs' => 'EnvisionLogs',
 	];
 
@@ -97,9 +96,6 @@ function Configuration()
 			],
 			'epgeneral' => [
 				'description' => $txt['ep_admin_config_general_desc'],
-			],
-			'epmodulesettings' => [
-				'description' => $txt['ep_admin_config_modulesettings_desc'],
 			],
 		],
 	];
@@ -247,9 +243,18 @@ function ModifyEnvisionGeneral($return_config = false)
 	global $context, $txt, $scripturl, $modSettings, $settings;
 
 	$config_vars = [
-		['check', 'ep_collapse_modules', 'help' => 'ep_collapse_modules_help'],
-		['check', 'ep_color_members', 'help' => 'ep_color_members_help'],
-		['check', 'ep_inline_copyright', 'help' => 'ep_inline_copyright_help'],
+		['check', 'ep_portal_mode', 'subtext' => $txt['ep_portal_mode_subtext']],
+		$txt['ep_pages_title'],
+		['check', 'ep_pages_mode', 'subtext' => $txt['ep_pages_subtext']],
+		['callback', 'ep_admin_config'],
+		[
+			'permissions',
+			'ep_view',
+			'text_label' => $txt['ep_view_permissions'],
+			'subtext' => $txt['ep_view_permissions_subtext']
+		],
+		$txt['ep_admin_config_modules'],
+		['check', 'ep_collapse_modules'],
 	];
 
 	if ($return_config) {
@@ -284,99 +289,14 @@ function ModifyEnvisionGeneral($return_config = false)
 	// ]]></script>';
 }
 
-/**
- * Loads the master module settings for Envision Portal so the admin can change them. uUses the sub template
- * show_settings in Admin.template.php to display them.
- *
- * @param bool $return_config Determines whether or not to return the config array.
- *
- * @return void|array The $config_vars if $return_config is true.
- * @since 1.0
- */
-function ModifyEnvisionModuleSettings($return_config = false)
+function template_callback_ep_admin_config(): void
 {
-	global $txt, $boarddir, $scripturl, $context, $modSettings, $smcFunc, $settings, $sc;
+	global $txt;
 
-	$config_vars = [
-		[
-			'select',
-			'ep_module_display_style',
-			[&$txt['ep_module_display_style_blocks'], &$txt['ep_module_display_style_modular']],
-			'help' => 'ep_module_display_style_help',
-		],
-		'',
-		['check', 'ep_module_enable_animations', 'help' => 'ep_module_enable_animationshelp'],
-		[
-			'select',
-			'ep_module_animation_speed',
-			[
-				&$txt['ep_animation_speed_veryslow'],
-				&$txt['ep_animation_speed_slow'],
-				&$txt['ep_animation_speed_normal'],
-				&$txt['ep_animation_speed_fast'],
-				&$txt['ep_animation_speed_veryfast'],
-			],
-			'help' => 'ep_module_animation_speed_help',
-		],
-		['check', 'ep_disable_custommod_icons', 'help' => 'ep_disable_custommod_icons_help'],
-		['check', 'ep_enable_custommod_icons', 'help' => 'ep_enable_custommod_icons_help'],
-		['text', 'ep_icon_directory', 'size' => 40, 'help' => 'ep_icon_directory_help'],
-	];
-
-	if ($return_config) {
-		return $config_vars;
-	}
-
-	// Saving?
-	if (isset($_GET['save'])) {
-		checkSession();
-
-		// No slashes to the left.
-		if ($smcFunc['substr']($_POST['ep_icon_directory'], 0, 1) == '/') {
-			$_POST['ep_icon_directory'] = $smcFunc['substr'](
-				$_POST['ep_icon_directory'],
-				1,
-				$smcFunc['strlen']($_POST['ep_icon_directory']) - 1
-			);
-		}
-
-		// No slashes to the right.
-		if ($smcFunc['substr']($_POST['ep_icon_directory'], -1, 1) == '/') {
-			$_POST['ep_icon_directory'] = $smcFunc['substr'](
-				$_POST['ep_icon_directory'],
-				0,
-				$smcFunc['strlen']($_POST['ep_icon_directory']) - 2
-			);
-		}
-
-		// If not a valid directory, load up the previous directory they had defined!
-		if (!is_dir($boarddir . '/' . $_POST['ep_icon_directory'])) {
-			$_POST['ep_icon_directory'] = $modSettings['ep_icon_directory'];
-		}
-
-
-		saveDBSettings($config_vars);
-
-		writeLog();
-		redirectexit('action=admin;area=epconfig;sa=epmodulesettings');
-	}
-
-	$context['post_url'] = $scripturl . '?action=admin;area=epconfig;save;sa=epmodulesettings';
-	$context['settings_title'] = $txt['ep_admin_config_modulesettings'];
-
-	prepareDBSettingContext($config_vars);
-
-	$context['force_form_onsubmit'] = 'epc_FormSendingHandler.send(); return false;';
-
-	$context['insert_after_template'] .= '
-	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/ep_modify_modules.js"></script>
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var epc_FormSendingHandler = new epc_Form({
-			sUrl: \'' . $context['post_url'] . ';xml\' .
-			sSessionVar: ' . JavaScriptEscape($context['session_var']) . ' .
-			sSessionId: ' . JavaScriptEscape($context['session_id']) . '
-		});
-	// ]]></script>';
+	echo '
+									</dl>
+									<div class=descbox>', $txt['ep_admin_config_general_optional'], '</div>
+									<dl class=settings>';
 }
 
 function EnvisionLogs()

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+	<id>EnvisionPortal:EnvisionPortal</id>
+	<version>1.0 DEV</version>
+
+	<file name="$boarddir/index.php">
+		<operation>
+			<search position="after"><![CDATA[	// Otherwise, it was set - so let's go to that action.]]></search>
+			<add><![CDATA[	EnvisionPortal\Integration::setActions(array_keys($actionArray));
+
+]]></add>
+		</operation>
+	</file>
+
+	<file name="$sourcedir/Logging.php">
+		<operation>
+			<search position="before"><![CDATA[$topic || $board]]></search>
+			<add><![CDATA[ || isset($_GET['page'])]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[// Don't update for every page - this isn't wholly accurate but who cares.]]></search>
+			<add><![CDATA[
+		if (isset($_GET['page'], $_SESSION['last_page_id']) && $_SESSION['last_page_id'] == $_GET['page']) {
+			$force = false;
+		}
+]]></add>
+		</operation>
+	</file>
+
+</modification>

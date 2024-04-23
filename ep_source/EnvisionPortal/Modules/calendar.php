@@ -28,7 +28,7 @@ class calendar implements ModuleInterface
 		$today = getdate(forum_time());
 
 		$ret = '
-				<div class="catbg"><a href="' . $scripturl . '?action=calendar;year=' . $today['year'] . ';month=' . $today['mon'] . '">' . $txt['months_titles'][$today['mon']] . ' ' . $today['year'] . '</a></div>';
+				<div class="' . (defined('SMF_VERSION') ? 'title_bar' : 'catbg') . '"><a' . (defined('SMF_VERSION') ? ' class="titlebg"' : '') . ' href="' . $scripturl . '?action=calendar;year=' . $today['year'] . ';month=' . $today['mon'] . '">' . $txt['months_titles'][$today['mon']] . ' ' . $today['year'] . '</a></div>';
 
 		for ($i = 0; $i < 7; $i++) {
 			$ret .= '
@@ -41,9 +41,9 @@ class calendar implements ModuleInterface
 		}
 
 		for ($i = 0; $i < 42; $i++) {
-			$class = 'windowbg';
+			$class = defined('SMF_VERSION') ? 'bg even' : 'windowbg';
 			if ($dates[$i]['mon'] != $today['mon'] || $dates[$i]['year'] != $today['year']) {
-				$class = 'windowbg2';
+				$class = defined('SMF_VERSION') ? 'bg odd' : 'windowbg2';
 			} elseif ($dates[$i]['yday'] == $today['yday'] && $dates[$i]['year'] == $today['year']) {
 				$class = 'calendar_today';
 			}

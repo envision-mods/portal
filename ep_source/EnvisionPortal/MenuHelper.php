@@ -15,64 +15,6 @@ namespace EnvisionPortal;
 class MenuHelper
 {
 	/**
-	 * Gets all membergroups and filters them according to the parameters.
-	 *
-	 * @param int[] $checked    list of all id_groups to be checked (have a mark in the checkbox).
-	 *                          Default is an empty array.
-	 * @param bool  $inherited  whether or not to filter out the inherited groups. Default is false.
-	 *
-	 * @return array all the membergroups filtered according to the parameters; empty array if something went wrong.
-	 */
-	public function listGroups(array $checked = [], $inherited = false)
-	{
-		global $modSettings, $smcFunc, $sourcedir, $txt;
-
-		loadLanguage('ManageBoards');
-		$groups = [
-			-1 => [
-				'name' => $txt['parent_guests_only'],
-				'checked' => in_array(-1, $checked) || in_array(-3, $checked),
-				'is_post_group' => false,
-			],
-			0 => [
-				'name' => $txt['parent_members_only'],
-				'checked' => in_array(0, $checked) || in_array(-3, $checked),
-				'is_post_group' => false,
-			],
-		];
-		$where = ['id_group NOT IN (1, 3)'];
-
-		if (!$inherited) {
-			$where[] = 'id_parent = {int:not_inherited}';
-
-			if (empty($modSettings['permission_enable_postgroups'])) {
-				$where[] = 'min_posts = {int:min_posts}';
-			}
-		}
-		$request = $smcFunc['db_query']('', '
-			SELECT
-				id_group, group_name, min_posts
-			FROM {db_prefix}membergroups
-			WHERE ' . implode("\n\t\t\t\tAND ", $where),
-			[
-				'not_inherited' => -2,
-				'min_posts' => -1,
-			]
-		);
-
-		while ([$id, $name, $min_posts] = $smcFunc['db_fetch_row']($request)) {
-			$groups[$id] = [
-				'name' => trim($name),
-				'checked' => in_array($id, $checked) || in_array(-3, $checked),
-				'is_post_group' => $min_posts != -1,
-			];
-		}
-		$smcFunc['db_free_result']($request);
-
-		return $groups;
-	}
-
-	/**
 	 * Loads all buttons from the db
 	 *
 	 * @return string[]

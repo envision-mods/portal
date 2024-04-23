@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace EnvisionPortal\PageModes;
 
-use EnvisionPortal\PageMode;
+use EnvisionPortal\PageModeInterface;
 
 require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 
@@ -24,7 +24,7 @@ use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
 use League\CommonMark\MarkdownConverter;
 use SimonVomEyser\CommonMarkExtension\LazyImageExtension;
 
-class Markdown implements PageMode
+class Markdown implements PageModeInterface
 {
 	public function parse(string $body): string
 	{

@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace EnvisionPortal\PageModes;
 
-use EnvisionPortal\PageMode;
+use EnvisionPortal\PageModeInterface;
 
-class HTML implements PageMode
+class HTML implements PageModeInterface
 {
 	public function parse(string $body): string
 	{

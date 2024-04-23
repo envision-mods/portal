@@ -3,15 +3,6 @@
 
 global $helptxt;
 
-$helptxt['ep_collapse_modules_help'] = 'Sets ability collapse of the modules.';
-$helptxt['ep_color_members_help'] = 'Enable/Disable showing of nicknames color based on membergroups color.';
-$helptxt['ep_inline_copyright_help'] = 'Option to display the copyright on the same line as SMF\'s';
-$helptxt['ep_module_display_style_help'] = 'Sets the current display for all modules appearance within Envision Portal.';
-$helptxt['ep_module_enable_animationshelp'] = 'Enable or Disable module animations when expanding and collapsing a module.';
-$helptxt['ep_module_animation_speed_help'] = 'Sets how fast the modules throughout Envision Portal will expand and collapse.  Note:  Module animations must be enabled for this to take effect.  The default is set at Normal.';
-$helptxt['ep_icon_directory_help'] = 'The filepath for your icon directory is already relative to your SMF Root directory. Sets the directory from which to obtain all categories for Envision Module Icons. Categories are folders within the directory that you specify in here. After changing this folder path, you should update each of your enabled Modules with the correct icon you want for them by modifying the modules themselves. No need to input a backslash at the front or at the end of the filepath.';
-$helptxt['ep_disable_custommod_icons_help'] = 'Sets whether or not to install all icons associated with Envision Modules that you install via Modules - Add Modules section.';
-$helptxt['ep_enable_custommod_icons_help'] = 'Sets whether or not to uninstall all icons associated with Envision Modules when you Delete a Module via Modules - Add Modules section.  If unchecked, all module icons that are associated with modules, once deleted, will not be available for other modules as well.';
 $helptxt['ep_layout_name'] = 'This is the name of your layout.  Layout Names are unique on a per group basis.  If the name already exists within this group, you will need to come up with a different Layout Name.';
 $helptxt['ep_layout_actions'] = 'Type in the action, non-action, or url that you would like this layout to be associated with.  Non-actions are defined within brackets, such as <code>[topic]</code>, and [board]</code>.
 <ul>

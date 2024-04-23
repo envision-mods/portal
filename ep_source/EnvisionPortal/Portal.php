@@ -290,7 +290,7 @@ class Portal
 		global $context, $txt;
 
 		// A mobile device doesn't require a portal...
-		if (WIRELESS) {
+		if (defined('WIRELESS') && WIRELESS) {
 			redirectexit('action=forum');
 		}
 
