@@ -2,11 +2,13 @@
 
 namespace EnvisionPortal\Modules;
 
+use EnvisionPortal\ModuleInterface;
+
 /**
  * @package EnvisionPortal
  * @since   1.0
  */
-class poll implements ModuleInterface
+class Poll implements ModuleInterface
 {
 	private array $boards_can;
 

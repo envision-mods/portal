@@ -94,7 +94,7 @@ function ManageEnvisionModules()
 					FilesystemIterator::SKIP_DOTS
 				),
 				'EnvisionPortal\Modules\\',
-				'EnvisionPortal\Modules\ModuleInterface'
+				'EnvisionPortal\ModuleInterface'
 			)
 		)
 	);

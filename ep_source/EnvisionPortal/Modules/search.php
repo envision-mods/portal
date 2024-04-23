@@ -2,11 +2,13 @@
 
 namespace EnvisionPortal\Modules;
 
+use EnvisionPortal\ModuleInterface;
+
 /**
  * @package EnvisionPortal
  * @since   1.0
  */
-class search implements ModuleInterface
+class Search implements ModuleInterface
 {
 	private $fields;
 

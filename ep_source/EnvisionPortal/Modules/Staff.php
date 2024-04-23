@@ -2,6 +2,8 @@
 
 namespace EnvisionPortal\Modules;
 
+use EnvisionPortal\ModuleInterface;
+use EnvisionPortal\ModuleTrait;
 use EnvisionPortal\SharedMemberDataInterface;
 
 class Staff implements ModuleInterface, SharedMemberDataInterface

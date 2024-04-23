@@ -1,6 +1,6 @@
 <?php
 
-namespace EnvisionPortal\Modules;
+namespace EnvisionPortal;
 
 /**
  * @package EnvisionPortal

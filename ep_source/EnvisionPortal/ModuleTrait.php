@@ -1,6 +1,6 @@
 <?php
 
-namespace EnvisionPortal\Modules;
+namespace EnvisionPortal;
 
 /**
  * @package EnvisionPortal
@@ -8,7 +8,7 @@ namespace EnvisionPortal\Modules;
  */
 trait ModuleTrait
 {
-	public function error($type = 'error', $error_type = 'general', $log_error = false)
+	public function error($type = 'error', $error_type = 'general', $log_error = false): string
 	{
 		global $txt;
 

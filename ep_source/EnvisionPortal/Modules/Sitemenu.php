@@ -2,13 +2,15 @@
 
 namespace EnvisionPortal\Modules;
 
+use EnvisionPortal\ModuleInterface;
+
 class Sitemenu implements ModuleInterface
 {
 	private array $menu;
 
 	public function __invoke(array $fields)
 	{
-		global $context, $smcFunc, $txt, $modSettings, $user_info, $settings;
+		global $context;
 
 		switch ($fields['menu'] ?? '') {
 			default:

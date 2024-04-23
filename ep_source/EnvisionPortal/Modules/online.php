@@ -2,6 +2,8 @@
 
 namespace EnvisionPortal\Modules;
 
+use EnvisionPortal\ModuleInterface;
+
 /**
  * @package EnvisionPortal
  * @since   1.0

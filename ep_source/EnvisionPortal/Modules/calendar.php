@@ -2,11 +2,13 @@
 
 namespace EnvisionPortal\Modules;
 
+use EnvisionPortal\ModuleInterface;
+
 /**
  * @package EnvisionPortal
  * @since   1.0
  */
-class calendar implements ModuleInterface
+class Calendar implements ModuleInterface
 {
 	private $fields;
 	private bool $daysaslink;

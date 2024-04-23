@@ -2,6 +2,9 @@
 
 namespace EnvisionPortal\Modules;
 
+use EnvisionPortal\ModuleInterface;
+use EnvisionPortal\ModuleTrait;
+
 class ThemeSelect implements ModuleInterface
 {
 	use ModuleTrait;
