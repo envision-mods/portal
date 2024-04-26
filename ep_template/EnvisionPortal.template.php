@@ -12,12 +12,12 @@ function template_portal_above(bool $from_below = false)
 	foreach ($context['ep_cols'] as $col) {
 		printf(
 			'
-			<div class="ep_%s" style="--col: %d / %d; --row: %d / %d;">',
+			<div class="ep_%s" style="--area: %d / %d / span %d / span %d;"1>',
 			$col['is_smf'] ? 'smf' : 'col',
-			$col['y'] + 1,
-			$col['colspan'] + $col['y'] + 1,
-			$col['x'] + 1,
-			$col['rowspan'] + $col['x'] + 1
+			$col['x'],
+			$col['y'],
+			$col['rowspan'],
+			$col['colspan'],
 		);
 
 		if ($col['is_smf']) {
@@ -49,11 +49,11 @@ function template_portal_below()
 		} elseif ($below_smf) {
 			printf(
 				'
-			<div class="ep_col" style="--col: %d / %d; --row: %d / %d;">',
-				$col['y'] + 1,
-				$col['colspan'] + $col['y'] + 1,
-				$col['x'] + 1,
-				$col['rowspan'] + $col['x'] + 1
+			<div class="ep_col" style="--area: %d / %d / span %d / span %d;">',
+			$col['x'],
+			$col['y'],
+			$col['rowspan'],
+			$col['colspan'],
 			);
 
 			if ($col['modules'] != []) {
@@ -71,9 +71,11 @@ function template_portal_below()
 		<link rel="stylesheet" type="text/css" href="', $context['module_icon_url'], '/fugue-sprite.css" />
 		<script type="text/javascript" src="' . $GLOBALS['settings']['default_theme_url'] . '/scripts/ep_scripts/envisionportal.js"></script>
 		<script>
-			initModuleToggles(', $context['user']['is_guest'] ? 'true' : 'false', ', ', JavaScriptEscape(
-		$context['session_id']
-	), ', ', JavaScriptEscape($context['session_var']), ');
+			initModuleToggles(
+				', $context['user']['is_guest'] ? 'true' : 'false', ',
+				', JavaScriptEscape($context['session_id']), ',
+				', JavaScriptEscape($context['session_var']), '
+			);
 		</script>';
 }
 
@@ -94,7 +96,7 @@ function template_module_column($column)
 		printf(
 			'
 			<span class="upperframe"><span></span></span>
-			<div class="ep_module_%s roundframe">%s</div>
+			<div class="ep_module_%s roundframe noup">%s</div>
 			<span class="lowerframe"><span></span></span>',
 			$module['type'],
 			$module['class']
@@ -113,7 +115,7 @@ function template_envision_pages()
 						</h3>
 					</div>
 					<span class="upperframe"><span></span></span>
-						<div class="roundframe">
+						<div class="roundframe noup">
 							', $context['page_data']['body'], '
 						</div>
 					<span class="lowerframe"><span></span></span>

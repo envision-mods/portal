@@ -154,21 +154,19 @@ $tables = [
 			],
 			'values' => [
 				// landing page
-				[1, 1, 0, 0, 0, 3, 'active', 0],
-				[2, 1, 1, 0, 0, 0, 'active', 0],
-				[3, 1, 1, 0, 1, 0, 'active', 0],
-				[4, 1, 1, 0, 2, 0, 'active', 0],
-				[5, 1, 2, 0, 0, 3, 'inactive', 0],
-				// boards
-				[6, 2, 0, 0, 0, 0, 'active', 0],
-				[7, 2, 0, 0, 1, 2, 'active', 1],
-				// demo page
-				[8, 3, 0, 0, 0, 3, 'active', 0],
-				[9, 3, 1, 1, 0, 0, 'active', 0],
-				[10, 3, 1, 0, 1, 0, 'active', 1],
-				[11, 3, 2, 0, 1, 0, 'active', 0],
-				[12, 3, 1, 1, 2, 0, 'active', 0],
-				[13, 3, 3, 0, 0, 3, 'inactive', 0],
+				[1, 1, 1, 1, 1, 3, 'active', 0],
+				[2, 1, 2, 1, 1, 1, 'active', 0],
+				[3, 1, 2, 1, 2, 1, 'active', 0],
+				[4, 1, 2, 1, 3, 1, 'active', 0],
+				[5, 1, 3, 1, 1, 3, 'active', 1],
+				[6, 2, 1, 1, 1, 1, 'active', 0],
+				[7, 2, 1, 1, 2, 3, 'active', 1],
+				[8, 3, 1, 1, 1, 3, 'active', 0],
+				[9, 3, 2, 2, 1, 1, 'active', 0],
+				[10, 3, 2, 1, 2, 2, 'active', 1],
+				[11, 3, 3, 1, 2, 2, 'active', 0],
+				[12, 3, 2, 2, 4, 1, 'active', 0],
+				[13, 3, 1, 1, 4, 1, 'active', 0];
 			],
 			'keys' => ['id_layout_position', 'id_layout'],
 		],
@@ -684,3 +682,14 @@ updateSettings([
 	'ep_icon_directory' => 'ep_extra/module_icons',
 	'ep_image_directory' => 'ep_extra/module_images',
 ]);
+
+function toBits(int $x_pos, int $rowspan, int $y_pos, int $colspan):  int
+{
+	$area = 0;
+	$area |= ($x_pos & 0x7) << 9;
+	$area |= ($rowspan & 0x7) << 6;
+	$area |= ($y_pos & 0x7) << 3;
+	$area |= ($colspan & 0x7);
+
+	return $area;
+}

@@ -78,8 +78,7 @@
 	}
 
 	#layout-grid fieldset {
-		grid-column: var(--col);
-		grid-row: var(--row);
+		grid-area: var(--area);
 		justify-content: center;
 		align-content: center;
 		min-height: 5em;

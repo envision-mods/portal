@@ -6,8 +6,7 @@
 	}
 
 	#ep_main > div {
-		grid-column: var(--col);
-		grid-row: var(--row);
+		grid-area: var(--area);
 	}
 }
 

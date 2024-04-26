@@ -118,22 +118,18 @@ function template_show_layout()
 			<div id="ep_main">';
 
 	foreach ($context['ep_cols'] as $col) {
-		printf(
-			$col['is_smf'] ? '
-				<div style="grid-column: %d / %d; grid-row: %d / %d">
-					<div class="cat_bar"><h3 class="catbg centertext">%7$s</h3></div>
-						<span class="upperframe"><span></span></span>
-						<div class="roundframe">' : '
-				<div style="grid-column: %d / %d; grid-row: %d / %d">
-					<div class="cat_bar"><h3 class="catbg centertext">
+		printf('
+				<div style="--area: %d / %d / span %d / span %d">
+					<div class="cat_bar"><h3 class="catbg centertext">' .
+			($col['is_smf'] ? '%8$s</h3></div>' : '
 						<label><input type="checkbox" name="enabled[%d]"%s>%s</label>
-					</h3></div>
+					</h3></div>') . '
 						<span class="upperframe"><span></span></span>
-						<div class="roundframe" data-id="%4$d">',
-			$col['y'] + 1,
-			$col['colspan'] + $col['y'] + 1,
-			$col['x'] + 1,
-			$col['rowspan'] + $col['x'] + 1,
+						<div class="roundframe noup" data-id="%5$d">',
+			$col['x'],
+			$col['y'],
+			$col['rowspan'],
+			$col['colspan'],
 			$col['id'],
 			$col['enabled'] ? ' checked' : '',
 			$txt['ep_admin_modules_manage_col_section'],
@@ -451,6 +447,7 @@ function template_edit_layout()
 	global $context, $scripturl, $txt;
 
 	echo '
+			<input type="hidden" name="in" value="', $context['selected_layout'], '" />
 			<div class="settings-grid">
 				<p>', $txt['ep_layout_name'], '</p>
 				<input type="text" name="name" value="', $_POST['name'] ?? $context['layout_name'] ?? '', '" />
@@ -462,11 +459,11 @@ function template_edit_layout()
 	foreach ($context['ep_cols'] as $i => $col) {
 		printf(
 			'
-						<fieldset style="--col: %d / %d; --row: %d / %d;" class="windowbg largetext">%d</fieldset>',
-			$col['y'] + 1,
-			$col['colspan'] + $col['y'] + 1,
-			$col['x'] + 1,
-			$col['rowspan'] + $col['x'] + 1,
+						<fieldset style="--area: %d / %d / span %d / span %d;" class="windowbg largetext">%d</fieldset>',
+			$col['x'],
+			$col['y'],
+			$col['rowspan'],
+			$col['colspan'],
 			$col['id'],
 		);
 	}
@@ -492,11 +489,11 @@ function template_edit_layout()
 			$txt['ep_column'],
 			$_POST['col'][$col['id']] ?? $col['y'],
 			$txt['ep_colspan'],
-			$_POST['colspan'][$col['id']] ?? $col['colspan'] + $col['y'],
+			$_POST['colspan'][$col['id']] ?? $col['colspan'],
 			$txt['ep_row'],
 			$_POST['row'][$col['id']] ?? $col['x'],
 			$txt['ep_rowspan'],
-			$_POST['rowspan'][$col['id']] ?? $col['rowspan'] + $col['x'],
+			$_POST['rowspan'][$col['id']] ?? $col['rowspan'],
 			$col['enabled'] ? ' checked' : '',
 			$txt['enabled'],
 			$col['is_smf'] ? ' checked' : '',
@@ -506,6 +503,7 @@ function template_edit_layout()
 
 		if (!$col['is_smf'] && isset($col['modules']) && $col['modules'] != []) {
 			echo '<ul>';
+
 			foreach ($col['modules'] as $module) {
 				echo '
 						<li>
