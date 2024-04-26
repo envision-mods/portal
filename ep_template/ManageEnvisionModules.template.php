@@ -75,21 +75,6 @@ function template_manage_modules()
 	global $txt, $context, $scripturl;
 
 	echo '
-		<div class="righttext">
-			<form action="', $scripturl, '?action=admin;area=epmodules" method="post" accept-charset="', $context['character_set'], '">
-				<select name="in">';
-
-	foreach ($context['layout_list'] as $id_layout => $layout_name) {
-		echo '
-					<option value="', $id_layout, '"', $context['selected_layout'] == $id_layout ? ' selected' : '', '>', $layout_name, '</option>';
-	}
-
-	echo '
-				</select>
-				<input type="submit" value="', $txt['admin_search_go'], '" class="button_submit" />
-			</form>
-		</div>
-		<br class="clear" />
 		<form action="', $scripturl . '?action=admin;area=epmodules;sa=epsavemodules" method="post" accept-charset="', $context['character_set'], '">
 			<div id="module_page">';
 
@@ -120,6 +105,7 @@ function template_manage_modules()
 				<div class="padding righttext">
 					<input type="submit" name="save" id="save" value="', $txt['save'], '" class="button_submit" />
 				</div>
+				<input type="hidden" name="in" value="', $context['selected_layout'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</form>';
 }
@@ -253,83 +239,6 @@ function template_add_modules()
 					<span class="botslice"><span></span></span>
 				</div></div>';
 }
-
-function template_basic_layout()
-{
-	global $txt, $context, $scripturl, $settings;
-
-	echo '
-				<dt>
-					<a id="setting_layoutname" href="', $scripturl, '?action=helpadmin;help=ep_layout_name" onclick="return reqWin(this.href);" class="help">
-						<img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" />
-					</a>
-					<span', (isset($context['layout_error']['no_layout_name']) || isset($context['layout_error']['layout_exists']) ? ' class="error"' : ''), '>
-						', $txt['ep_layout_name'], ':
-					</span>
-				</dt>
-				<dd>
-					<input type="text" name="layout_name" ', (!empty($context['layout_name']) ? 'value="' . $context['layout_name'] . '" ' : ''), 'class="input_text layout_style" />
-				</dd>
-				<dt>
-					<a id="setting_actions" href="', $scripturl, '?action=helpadmin;help=ep_layout_actions" onclick="return reqWin(this.href);" class="help">
-						<img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" />
-					</a>
-					<span>
-						<strong>', $txt['ep_action_type'], '</strong><br />
-						<input type="radio" onclick="swap_action(this); return true;" name="action_choice" id="action_choice_smf_actions" value="smf_actions" checked="checked" class="input_radio" />
-						<label for="action_choice_smf_actions">' . $txt['select_smf_actions'] . '</label><br />', '
-						<input type="radio" onclick="swap_action(this); return true;" name="action_choice" id="action_choice_user_defined" value="user_defined" class="input_radio" />
-						<label for="action_choice_user_defined">' . $txt['select_user_defined_actions'] . '</label>
-					</span>
-				</dt>
-				<dd>
-				<div class="floatleft" id="action_smf_actions">
-					<select id="actions" name="epLayout_smf_actions" class="layout_style_max;" onfocus="selectRadioByName(document.forms.epFlayouts.action_choice, \'smf_actions\');">';
-
-	foreach ($context['available_actions'] as $action) {
-		echo '
-							<option value="', $action, '">', $action, '</option>';
-	}
-
-	echo '
-					</select>
-				</div>
-				<div id="action_user_defined2" class="smalltext">', $txt['select_user_defined_actions_desc'], '</div>
-				<div class="floatleft" id="action_user_defined">
-					<input id="udefine" type="text" name="epLayout_user_defined" size="34" value="" onfocus="selectRadioByName(document.forms.epFlayouts.action_choice, \'user_defined\');" class="input_text" />
-				</div>
-				<div class="ep_leftpadding floatleft">
-					<input type="button" value="', $txt['ep_add_action'], '" onclick="javascript:addAction();" class="button_submit smalltext" />
-				</div>
-				<script type="text/javascript"><!-- // --><![CDATA[
-					// This is shown by default.
-					document.getElementById("action_smf_actions").style.display = "";
-					document.getElementById("action_user_defined").style.display = "none";
-					document.getElementById("action_user_defined2").style.display = "none";
-					document.getElementById("action_choice_smf_actions").checked = true;
-				// ]]></script>
-				</dd>
-				<dt>
-					<span>
-						<a id="setting_curr_actions" href="', $scripturl, '?action=helpadmin;help=ep_layout_curr_actions" onclick="return reqWin(this.href);" class="help">
-							<img src="', $settings['images_url'], '/helptopics.gif" alt="', $txt['help'], '" border="0" />
-						</a>', $txt['layout_actions'], '
-					</span>
-				</dt>
-				<dd>
-					<div id="actions_list" class="layout_list', (isset($context['layout_error']['no_actions']) ? ' layout_error' : ''), ' layout_style plainbox">';
-
-	foreach ($context['current_actions'] as $cur_action) {
-		echo '
-						<div><input id="envision_action', $cur_action, '" name="layout_actions[]" type="checkbox" value="', $cur_action, '" checked="checked" /><label for="envision_action', $cur_action, '" class="action_label">', $cur_action, '</label></div>';
-	}
-
-	echo '
-					</div><br />
-					<input type="button" value="', $txt['ep_remove_actions'], '" onclick="javascript:removeActions();" class="button_submit smalltext" />
-				</dd>';
-}
-
 
 function template_form_above(): void
 {

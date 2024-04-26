@@ -56,6 +56,7 @@ function ManageEnvisionModules()
 
 	$context['page_title'] = $txt['ep_admin_title_manage_modules'];
 	$context['in_url'] = $scripturl . '?action=admin;area=epmodules;sa=epmanlayout';
+	$context['template_layers'][] = 'select_layout';
 	$context['sub_template'] = 'manage_modules';
 
 	$request = $smcFunc['db_query'](
@@ -191,7 +192,7 @@ function SaveEnvisionModules()
 		);
 	}
 
-	redirectexit('action=admin;area=epmodules');
+	redirectexit('action=admin;area=epmodules;in=' . $_POST['in']);
 }
 
 function ModifyModule()
