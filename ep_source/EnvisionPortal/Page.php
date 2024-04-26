@@ -93,28 +93,6 @@ class Page implements EntityInterface, \ArrayAccess
 	}
 
 	/**
-	 * @return array
-	 */
-	public function getColumnInfo(): array
-	{
-		global $user_info;
-
-		return [
-			'name' => ['?string-255', $this->name],
-			'slug' => ['?string-65', $this->slug],
-			'type' => ['?string-65', $this->type],
-			'description' => ['?string-255', $this->description],
-			'status' => ['?string-255', $this->status],
-			'body' => ['?string', $this->body],
-			'permissions' => ['?string-255', implode(',', $this->permissions)],
-			'poster_name' => ['?string', $user_info['name']],
-			'id_member' => ['int', $user_info['id']],
-			'created_at' => ['raw', 'NOW()'],
-			'updated_at' => ['raw', 'NOW()'],
-		];
-	}
-
-	/**
 	 * @return ?string
 	 */
 	public function getDescription(): ?string

@@ -1,60 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * @package   Envision Portal
+ * @version   2.0.2
+ * @author    John Rayes <live627@gmail.com>
+ * @copyright Copyright (c) 2014, John Rayes
+ * @license   http://opensource.org/licenses/MIT MIT
+ */
+
 namespace EnvisionPortal;
 
 class DataMapper implements DataMapperInterface
 {
-	private array $column_info;
-
-	public function getIdInfo(): string
-	{
-		return 'id_page';
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getColumnsToInsert(): array
-	{
-		return [
-			'name',
-			'slug',
-			'type',
-			'body',
-			'status',
-			'permissions',
-			'poster_name',
-			'id_member',
-			'created_at',
-			'description',
-		];
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getColumnsToUpdate(): array
-	{
-		return [
-			'name',
-			'slug',
-			'type',
-			'body',
-			'status',
-			'permissions',
-			'description',
-			'updated_at',
-		];
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getTableName(): string
-	{
-		return '{db_prefix}envision_pages';
-	}
-
 	public function fetchBy(
 		array $selects,
 		array $params = [],
@@ -65,7 +24,7 @@ class DataMapper implements DataMapperInterface
 		int $limit = null,
 		int $offset = null
 	): array {
-		$entries = DatabaseHelper::fetchBy($selects, $this->getTableName(), $params, $joins, $where, $order, $group, $limit, $offset);
+		$entries = DatabaseHelper::fetchBy($selects, '{db_prefix}envision_pages', $params, $joins, $where, $order, $group, $limit, $offset);
 		$pages = [];
 
 		foreach ($entries as $entry) {
@@ -87,14 +46,34 @@ class DataMapper implements DataMapperInterface
 
 	public function insert(EntityInterface $entity): void
 	{
-		$this->column_info = $entity->getColumnInfo();
-		DatabaseHelper::insert($this);
+		global $user_info;
+
+		DatabaseHelper::insert('{db_prefix}envision_pages', [
+			'name' => ['string-255', $entity->name],
+			'slug' => ['string-65', $entity->slug],
+			'type' => ['string-65', $entity->type],
+			'description' => ['string-255', $entity->description],
+			'status' => ['string-255', $entity->status],
+			'body' => ['string', $entity->body],
+			'permissions' => ['string-255', implode(',', $entity->permissions)],
+			'poster_name' => ['string', $user_info['name']],
+			'id_member' => ['int', $user_info['id']],
+			'created_at' => ['raw', 'NOW()'],
+		]);
 	}
 
 	public function update(EntityInterface $entity): void
 	{
-		$this->column_info = $entity->getColumnInfo();
-		DatabaseHelper::update($this);
+		DatabaseHelper::update('{db_prefix}envision_pages', [
+			'name' => ['string-255', $entity->name],
+			'slug' => ['string-65', $entity->slug],
+			'type' => ['string-65', $entity->type],
+			'description' => ['string-255', $entity->description],
+			'status' => ['string-255', $entity->status],
+			'body' => ['string', $entity->body],
+			'permissions' => ['string-255', implode(',', $entity->permissions)],
+			'updated_at' => ['raw', 'NOW()'],
+		],'id_page', $entity->getId());
 	}
 
 	public function delete(EntityInterface $entity): void
@@ -104,30 +83,20 @@ class DataMapper implements DataMapperInterface
 
 	public function deleteMany(array $ids): void
 	{
-		DatabaseHelper::deleteMany($this, $ids);
+		DatabaseHelper::deleteMany('{db_prefix}envision_pages', 'id_page', $ids);
 	}
 
 	public function deleteAll(EntityInterface $entity): void
 	{
-		DatabaseHelper::deleteAll($this);
+		DatabaseHelper::deleteAll('{db_prefix}envision_pages');
 	}
 
-	public function incrementViews(): void
+	public function incrementViews(EntityInterface $entity): void
 	{
-		global $smcFunc;
+		if (!isset($_SESSION['viewed_page_' . $entity->getId()])) {
+			DatabaseHelper::increment('{db_prefix}envision_pages', 'views', 'id_page', $entity->getId());
 
-		if (!isset($_SESSION['viewed_page_' . $this->id])) {
-			DatabaseHelper::increment($this, 'views', $entity->getId());
-
-			$_SESSION['viewed_page_' . $this->id] = '1';
+			$_SESSION['viewed_page_' . $entity->getId()] = '1';
 		}
-	}
-
-	/**
-	 * @see EntityInterface::getColumnInfo()
-	 */
-	public function getColumnInfo(): array
-	{
-		return $this->column_info;
 	}
 }

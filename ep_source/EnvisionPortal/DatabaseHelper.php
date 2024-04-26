@@ -1,5 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * @package   Envision Portal
+ * @version   2.0.2
+ * @author    John Rayes <live627@gmail.com>
+ * @copyright Copyright (c) 2014, John Rayes
+ * @license   http://opensource.org/licenses/MIT MIT
+ */
+
 namespace EnvisionPortal;
 
 class DatabaseHelper
@@ -9,9 +19,9 @@ class DatabaseHelper
 	 *
 	 * @param array  $selects Table columns to select.
 	 * @param array  $params  Parameters to substitute into query text.
-	 * @param string $from    FROM clause. Default: '{db_prefix}attachments AS a'
+	 * @param string $from    FROM clause.
 	 * @param array  $joins   Zero or more *complete* JOIN clauses.
-	 *                        E.g.: 'LEFT JOIN {db_prefix}messages AS m ON (a.id_msg = m.id_msg)'
+	 *                        E.g.: 'LEFT JOIN messages AS m ON (a.id_msg = m.id_msg)'
 	 * @param array  $where   Zero or more conditions for the WHERE clause.
 	 *                        Conditions will be placed in parentheses and concatenated with AND.
 	 *                        If this is left empty, no WHERE clause will be used.
@@ -40,11 +50,11 @@ class DatabaseHelper
 			'',
 			'
 			SELECT ' . implode(', ', $selects) . '
-			FROM ' . implode("\n\t\t\t\t\t", array_merge([$from], $joins)) . ($where === [] ? '' : '
+			FROM ' . implode("\n\t\t\t\t", array_merge([$from], $joins)) . ($where === [] ? '' : '
 			WHERE (' . implode(') AND (', $where) . ')') . ($order === [] ? '' : '
 			ORDER BY ' . implode(', ', $order)) . ($limit !== null ? '
 			LIMIT ' . $limit : '') . ($offset !== null ? '
-			offset ' . $offset : ''),
+			OFFSET ' . $offset : ''),
 			$params,
 		);
 
@@ -55,93 +65,95 @@ class DatabaseHelper
 		return $pages;
 	}
 
-	public static function insert(DataMapperInterface $dataMapper): void
+	public static function insert(string $table_name, array $columns): void
 	{
 		global $smcFunc;
 
 		$sql = '';
 		$where_params = [];
 		$coluumn_params = [];
-		$columns = $dataMapper->getColumnsToInsert();
-		foreach ($dataMapper->getColumnInfo() as $column => [$type, $data]) {
-			if (isset($columns[$column])) {
-				$column_params[$column] = $type;
-				$where_params[] = $data;
-			}
+
+		foreach ($columns as $column => [$type, $data]) {
+			$column_params[$column] = $type;
+			$where_params[] = $data;
 		}
 
-		$smcFunc['db_insert'](
-			'insert',
-			'{db_prefix}' . $dataMapper->getTableName(),
-			$coluumn_params,
-			$where_params,
-			[]
-		);
+		$smcFunc['db_insert']('insert', $table_name, $coluumn_params, $where_params, []);
 	}
 
-	public static function update(DataMapperInterface $dataMapper): void
+	public static function update(string $table_name, array $columns, string $col, int $id): void
 	{
 		global $smcFunc;
 
 		$sql = '';
-		$where_params = [];
-		$columns = $dataMapper->getColumnsToUpdate();
-		foreach ($dataMapper->getColumnInfo() as $column => [$type, $data]) {
-			if (isset($columns[$column])) {
-				$sql .= $column . ' = {' . $type . ':' . $column . '}';
-				$where_params[$column] = $data;
-			}
+		$where_params = ['id' => $id, 'col' => $col];
+
+		foreach ($columns as $column => [$type, $data]) {
+		// Are we restricting the length?
+		if (strpos($type, 'string-') !== false)
+			$sql .= $column . ' = ' . sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . ') ', $column);
+		else
+			$sql .= $column . ' = {' . $type . ':' . $column . '} ';
+			$where_params[$column] = $data;
 		}
 
 		$smcFunc['db_query'](
 			'',
 			'
-				UPDATE {db_prefix}' . $dataMapper->getTableName() . '
-				SET ' . $sql . '
-				WHERE {identifier:col} = {int:id}',
-			$where_params + [
-				'id' => $dataMapper->getId(),
-				'col' => $dataMapper->getIdInfo(),
-			]
+			UPDATE ' . $table_name . '
+			SET ' . $sql . '
+			WHERE {identifier:col} = {int:id}',
+			$where_params
 		);
 	}
 
-	public static function deleteMany(DataMapperInterface $dataMapper, array $ids): void
+	public static function delete(string $table_name, string $col, int $id): void
 	{
 		global $smcFunc;
 
 		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}' . $dataMapper->getTableName() . '
+			DELETE FROM ' . $table_name . '
+			WHERE {identifier:col} = {int:id}',
+			[
+				'id' => $id,
+				'col' => $col,
+			]
+		);
+	}
+
+	public static function deleteMany(string $table_name, string $col, array $ids): void
+	{
+		global $smcFunc;
+
+		$smcFunc['db_query']('', '
+			DELETE FROM ' . $table_name . '
 			WHERE {identifier:col} IN ({array_int:ids})',
 			[
 				'ids' => $ids,
-				'col' => $dataMapper->getIdInfo(),
+				'col' => $col,
 			]
 		);
 	}
 
-	public static function deleteAll(DataMapperInterface $dataMapper): void
+	public static function deleteAll(string $table_name): void
 	{
 		global $smcFunc;
 
-		$smcFunc['db_query'](
-			'',
-			'TRUNCATE {db_prefix}' . $dataMapper->getTableName()
-		);
+		$smcFunc['db_query']('', 'TRUNCATE ' . $table_name);
 	}
 
-	public static function increment(DataMapperInterface $dataMapper, string $col, int $id): void
+	public static function increment(string $table_name, string $increment_col, string $where_col, int $id): void
 	{
 		global $smcFunc;
 
 		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}}' . $dataMapper->getTableName() . '
+			UPDATE ' . $table_name . '
 			SET {identifier:col} = {identifier:col} + 1
 			WHERE {identifier:where_col} = {int:id}',
 			[
-				'ids' => $id,
-				'where_col' => $dataMapper->getIdInfo(),
-				'col' => $col,
+				'id' => $id,
+				'where_col' => $where_col,
+				'col' => $increment_col,
 			]
 		);
 	}

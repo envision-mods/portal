@@ -4,23 +4,6 @@ namespace EnvisionPortal;
 
 interface DataMapperInterface
 {
-	public function getIdInfo(): string;
-
-	/**
-	 * @return array
-	 */
-	public function getColumnsToInsert(): array;
-
-	/**
-	 * @return array
-	 */
-	public function getColumnsToUpdate(): array;
-
-	/**
-	 * @return string
-	 */
-	public function getTableName(): string;
-
 	/**
 	 * Generator that runs queries about attachment data and yields the result rows.
 	 *
@@ -60,9 +43,4 @@ interface DataMapperInterface
 	public function deleteMany(array $ids): void;
 
 	public function deleteAll(EntityInterface $entity): void;
-
-	/**
-	 * @return array
-	 */
-	public function getColumnInfo(): array;
 }
