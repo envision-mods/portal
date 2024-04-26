@@ -538,28 +538,31 @@ function makeSortables() {
 	});
 
 	for (const div of el.firstElementChild.children) {
-		for (const c of div.children[2].children) {
-			const icon = document.createElement('span');
-			icon.className = 'glyphicon glyphicon-move my-handle';
-			c.ariaHidden = "true";
-			c.prepend(icon);
-		}
+		// Skip if SMF colum.
+		if (div.children[0].children[0].children.length) {
+			for (const c of div.children[2].children) {
+				const icon = document.createElement('span');
+				icon.className = 'glyphicon glyphicon-move my-handle';
+				c.ariaHidden = "true";
+				c.prepend(icon);
+			}
 
-		new Sortable(div.children[2], {
-			group: 'shared',
-			handle: ".my-handle",
-			onAdd(evt) {
-				if (evt.item.lastElementChild.tagName != 'INPUT') {
-					var oHidden = document.createElement("input");
-					oHidden.type = "hidden";
-					oHidden.value = evt.item.dataset.id;
-					oHidden.name = 'modules[' + evt.to.dataset.id + '][]';
-					evt.item.appendChild(oHidden);
-				}
-			},
-			onRemove(evt) {
-				evt.item.lastElementChild.name = 'modules[' + evt.to.dataset.id + '][]';
-			},
-		});
+			new Sortable(div.children[2], {
+				group: 'shared',
+				handle: ".my-handle",
+				onAdd(evt) {
+					if (evt.item.lastElementChild.tagName != 'INPUT') {
+						var oHidden = document.createElement("input");
+						oHidden.type = "hidden";
+						oHidden.value = evt.item.dataset.id;
+						oHidden.name = 'modules[' + evt.to.dataset.id + '][]';
+						evt.item.appendChild(oHidden);
+					}
+				},
+				onRemove(evt) {
+					evt.item.lastElementChild.name = 'modules[' + evt.to.dataset.id + '][]';
+				},
+			});
+		}
 	}
 }
