@@ -146,8 +146,8 @@ function SaveEnvisionModules()
 
 	foreach ($_POST['modules'] as $id_layout_position => $col) {
 		foreach ($col as $position => $id_position) {
-			if (is_numeric($id_position)) // Saving a module that was merely moved.
-			{
+			if (is_numeric($id_position)) {
+				// Saving a module that was merely moved.
 				$smcFunc['db_query']('', '
 					UPDATE {db_prefix}ep_module_positions
 					SET
@@ -160,8 +160,8 @@ function SaveEnvisionModules()
 						'position' => $position,
 					]
 				);
-			} else // Insert a new row for a module added from the list on the right.
-			{
+			} else {
+				// Insert a new row for a module added from the list on the right.
 				$smcFunc['db_insert']('insert',
 					'{db_prefix}ep_module_positions',
 					[
@@ -432,9 +432,10 @@ function AddEnvisionLayout()
 		'xmlhttp',
 	];
 
-	for ($i = 0, $n = count($context['smf_actions']); $i < $n; $i++) {
-		if (!in_array($context['smf_actions'][$i], $exceptions) && $context['smf_actions'][$i][-1] !== '2') {
-			$context['available_actions'][$context['smf_actions'][$i]] = false;
+	$smf_actions = EnvisionPortal\Integration::getActions();
+	for ($i = 0, $n = count($smf_actions); $i < $n; $i++) {
+		if (!in_array($smf_actions[$i], $exceptions) && $smf_actions[$i][-1] !== '2') {
+			$context['available_actions'][$smf_actions[$i]] = false;
 		}
 	}
 
@@ -496,6 +497,8 @@ function AddEnvisionLayout2()
 
 	$all_removed = true;
 	foreach ($_POST['ep_cols'] as $i => $col) {
+		$all_removed = $all_removed && in_array($col['id'], $_POST['remove']);
+
 		if (isset($col['remove'])) {
 			continue;
 		}
@@ -514,8 +517,6 @@ function AddEnvisionLayout2()
 			'status' => !empty($col['enabled']) ? 'active' : 'inactive',
 			'is_smf' => $_POST['smf'] == $i,
 		];
-
-		$all_removed = $all_removed && in_array($col['id'], $_POST['remove']);
 	}
 
 	if ($all_removed) {
@@ -725,9 +726,10 @@ function EditEnvisionLayout()
 		'xmlhttp',
 	];
 
-	for ($i = 0, $n = count($context['smf_actions']); $i < $n; $i++) {
-		if (!in_array($context['smf_actions'][$i], $exceptions) && $context['smf_actions'][$i][-1] !== '2') {
-			$context['available_actions'][$context['smf_actions'][$i]] = false;
+	$smf_actions = EnvisionPortal\Integration::getActions();
+	for ($i = 0, $n = count($smf_actions); $i < $n; $i++) {
+		if (!in_array($smf_actions[$i], $exceptions) && $smf_actions[$i][-1] !== '2') {
+			$context['available_actions'][$smf_actions[$i]] = false;
 		}
 	}
 
@@ -773,11 +775,11 @@ function EditEnvisionLayout2()
 {
 	global $context, $txt, $smcFunc, $sourcedir;
 
-	if (preg_match('/^[0-9]+$/', $_GET['in']) !== 1) {
+	if (preg_match('/^[0-9]+$/', $_POST['in']) !== 1) {
 		fatal_lang_error('no_access', false);
 	}
 
-	$context['selected_layout'] = (int)$_REQUEST['in'];
+	$layout = (int)$_POST['in'];
 	$context['ep_cols'] = EnvisionPortal\Portal::getLoadedLayoutFromId($layout);
 
 	if ($context['ep_cols'] === null) {
@@ -815,7 +817,7 @@ function EditEnvisionLayout2()
 
 	$all_removed = true;
 	foreach ($context['ep_cols'] as $col) {
-		foreach (['col', 'colspan', 'row', 'rowspan'] as $data) {
+		foreach (['col', 'colspan', 'row', 'rowspan'] as $type) {
 			if (!isset($_POST[$type][$col['id']]) || !preg_match('/^[0-9]+$/', $_POST[$type][$col['id']])) {
 				$errors[] = ['section_error', [$txt['ep_' . $type], $col['id']]];
 			}
@@ -827,11 +829,11 @@ function EditEnvisionLayout2()
 			'rowspan' => (int)$_POST['rowspan'][$col['id']],
 			'y_pos' => (int)$_POST['col'][$col['id']],
 			'colspan' => (int)$_POST['colspan'][$col['id']],
-			'status' => !empty($_POST['status'][$col['id']]) ? 'active' : 'inactive',
-			'is_smf' => (int)$_POST['smf'] == $col['id'],
+			'status' => !empty($_POST['enabled'][$col['id']]) ? 'active' : 'inactive',
+			'is_smf' => (int)($_POST['smf'] == $col['id']),
 		];
 
-		$all_removed = $all_removed && in_array($col['id'], $_POST['remove']);
+		$all_removed = $all_removed && in_array($col['id'], $_POST['remove'] ?? []);
 	}
 
 	if (in_array($_POST['smf'], $context['ep_cols'])) {

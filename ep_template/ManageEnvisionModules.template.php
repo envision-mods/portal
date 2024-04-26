@@ -103,11 +103,11 @@ function template_manage_modules()
 							</h3>
 						</div>
 						<span class="upperframe"><span></span></span>
-						<div class="roundframe" id="disabled_module_container">';
+						<div class="roundframe noup" id="disabled_module_container">';
 
 	foreach ($context['modules'] as $module) {
 		echo '
-							<div class="plainbox centertext" data-id="' . $module . '">
+							<div class="' . (defined('SMF_VERSION') ? 'descbox' : 'plainbox') . ' centertext" data-id="' . $module . '">
 								', $txt['ep_modules'][$module]['title'], '
 							</div>';
 	}
@@ -157,7 +157,7 @@ function template_show_layout()
 		if (!$col['is_smf'] && $col['modules'] != []) {
 			foreach ($col['modules'] as $module) {
 				echo '
-						<div class="plainbox centertext">
+						<div class="' . (defined('SMF_VERSION') ? 'descbox' : 'plainbox') . ' centertext">
 							' . $module['module_title'] . ' [<a href="' . $scripturl . '?action=admin;area=epmodules;sa=modify;in=' . $module['id'] . '">' . $txt['modify'] . '</a>]
 							<input type="hidden" name="modules[' . $col['id'] . '][]" value="' . $module['id'] . '" />
 						</div>';

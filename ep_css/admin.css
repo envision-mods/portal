@@ -12,11 +12,13 @@
 	grid-template-columns: 1fr 1fr;
 }
 
-#module_page .plainbox:not(:last-child) {
+#module_page .plainbox:not(:last-child),
+#module_page .descbox:not(:last-child) {
 	margin: 0 0 1em;
 }
 
-#module_page .plainbox:last-child {
+#module_page .plainbox:last-child,
+#module_page .descbox:last-child {
 	margin: 0;
 }
 
