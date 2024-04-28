@@ -431,7 +431,7 @@ class Integration
 		return $data;
 	}
 
-	function buffer($buffer)
+	public static function buffer($buffer)
 	{
 		global $txt, $context;
 
