@@ -1,7 +1,9 @@
-## Table of Contents
+## 📚 DataMapper Interface
 
-1. [Introduction](#introduction)
-2. [Methods](#methods)
+### 🔗 Table of Contents
+
+- [Introduction](#-introduction)
+- [Methods](#-methods)
     - [fetchBy](#fetchby)
     - [insert](#insert)
     - [update](#update)
@@ -9,11 +11,13 @@
     - [deleteMany](#deletemany)
     - [deleteAll](#deleteall)
 
-## Introduction
+### 📝 Introduction
 
-The `DataMapperInterface` defines the interface for data mappers that are responsible for mapping entities to and from a database.
+`DataMapperInterface` is a contract that defines a set of methods for interacting with a database.
+It provides a common interface for accessing and manipulating data in a database-agnostic manner.
+This interface is used by the `EntityMapper` class to perform CRUD operations on entities.
 
-## Methods
+### 🧰 Methods
 
 ### fetchBy
 
