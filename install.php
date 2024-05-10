@@ -166,7 +166,7 @@ $tables = [
 				[10, 3, 2, 1, 2, 2, 'active', 1],
 				[11, 3, 3, 1, 2, 2, 'active', 0],
 				[12, 3, 2, 2, 4, 1, 'active', 0],
-				[13, 3, 1, 1, 4, 1, 'active', 0];
+				[13, 3, 1, 1, 4, 1, 'active', 0],
 			],
 			'keys' => ['id_layout_position', 'id_layout'],
 		],
