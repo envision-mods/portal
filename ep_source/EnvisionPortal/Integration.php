@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
+/**
+ * @internal
+ */
 class Integration
 {
 	private static bool $isPortalPage = false;

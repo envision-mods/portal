@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
+/**
+ * @internal
+ */
 class ManageEnvisionPages
 {
 	private DataMapper $dataMapper;
