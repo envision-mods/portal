@@ -2,3 +2,7 @@
 .idea/
 
 ep_source/vendor/
+
+.phpdoc/
+
+*.phar
