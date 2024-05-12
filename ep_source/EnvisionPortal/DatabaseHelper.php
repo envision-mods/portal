@@ -12,6 +12,12 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
+/**
+ * Provides a set of utility methods for working with the database.
+ *
+ * These methods can be used to simplify common database operations, such as
+ * fetching data, inserting new rows, updating existing rows, and deleting rows.
+ */
 class DatabaseHelper
 {
 	/**

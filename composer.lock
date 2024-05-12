@@ -4,53 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "383cea5868def239eb704f697b11e664",
+    "content-hash": "e558613995776c9973495dce8f766e47",
     "packages": [],
     "packages-dev": [
-        {
-            "name": "automattic/phpdoc-markdown",
-            "version": "1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Automattic/phpdoc-markdown.git",
-                "reference": "1a5ff1933ab9219837a3e5a3b3f1feb303ad1a49"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/phpdoc-markdown/zipball/1a5ff1933ab9219837a3e5a3b3f1feb303ad1a49",
-                "reference": "1a5ff1933ab9219837a3e5a3b3f1feb303ad1a49",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpdocumentor/phpdocumentor": "^3.0"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Automattic",
-                    "homepage": "https://automattic.com"
-                }
-            ],
-            "description": "phpDocumentor v3 template that generates Markdown documentation for Github.",
-            "homepage": "https://github.com/automattic/phpdoc-markdown",
-            "keywords": [
-                "documentation",
-                "github",
-                "markdown",
-                "phpDocumentor",
-                "phpdoc",
-                "template"
-            ],
-            "support": {
-                "issues": "https://github.com/Automattic/phpdoc-markdown/issues",
-                "source": "https://github.com/Automattic/phpdoc-markdown/tree/1.0.4"
-            },
-            "time": "2023-02-02T19:00:28+00:00"
-        },
         {
             "name": "saggre/phpdocumentor-markdown",
             "version": "0.1.4",

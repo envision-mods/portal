@@ -14,6 +14,9 @@ namespace EnvisionPortal;
 
 class DataMapper implements DataMapperInterface
 {
+	/**
+	 * @uses DatabaseHelper::fetchBy
+	 */
 	public function fetchBy(
 		array $selects,
 		array $params = [],
@@ -44,6 +47,9 @@ class DataMapper implements DataMapperInterface
 		return $pages;
 	}
 
+	/**
+	 * @uses DatabaseHelper::insert
+	 */
 	public function insert(EntityInterface $entity): void
 	{
 		global $user_info;
@@ -62,6 +68,9 @@ class DataMapper implements DataMapperInterface
 		]);
 	}
 
+	/**
+	 * @uses DatabaseHelper::update
+	 */
 	public function update(EntityInterface $entity): void
 	{
 		DatabaseHelper::update('{db_prefix}envision_pages', [
@@ -81,16 +90,29 @@ class DataMapper implements DataMapperInterface
 		$this->deleteMany([$entity->getId()]);
 	}
 
+	/**
+	 * @uses DatabaseHelper::deleteMany
+	 */
 	public function deleteMany(array $ids): void
 	{
 		DatabaseHelper::deleteMany('{db_prefix}envision_pages', 'id_page', $ids);
 	}
 
+	/**
+	 * @uses DatabaseHelper::deleteAll()
+	 */
 	public function deleteAll(EntityInterface $entity): void
 	{
 		DatabaseHelper::deleteAll('{db_prefix}envision_pages');
 	}
 
+	/**
+	 * Increment the view count for a page if not already viewed in the current session.
+	 *
+	 * @uses DatabaseHelper::increment
+	 *
+	 * @param EntityInterface $entity
+	 */
 	public function incrementViews(EntityInterface $entity): void
 	{
 		if (!isset($_SESSION['viewed_page_' . $entity->getId()])) {

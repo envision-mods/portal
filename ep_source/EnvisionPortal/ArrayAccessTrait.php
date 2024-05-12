@@ -12,13 +12,21 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
+/**
+ * Provides a uniform interface for accessing and modifying the properties
+ * of an object as if it were an array.
+ *
+ * Exposing an object as an array is necessary when interacting with SMF, such
+ * as when using createList() to operate on an array of {@link EntityInterface} objects.
+ */
 trait ArrayAccessTrait
 {
 	/**
-	 * Whether the given offset exists.
+	 * Check whether the given offset exists.
 	 *
-	 * @param  mixed $offset
-	 * @return bool
+	 * @param mixed $offset The offset to check.
+	 *
+	 * @return bool True if the offset exists, false otherwise.
 	 */
 	public function offsetExists($offset): bool
 	{
@@ -26,10 +34,11 @@ trait ArrayAccessTrait
 	}
 
 	/**
-	 * Fetch the offset if it exists othwerwise return NULL.
+	 * Retrieve the value of the given offset.
 	 *
-	 * @param  mixed $offset
-	 * @return mixed
+	 * @param mixed $offset The offset to retrieve.
+	 *
+	 * @return mixed|null The value of the offset, or null if it does not exist.
 	 */
 	#[\ReturnTypeWillChange]
 	public function offsetGet($offset)
@@ -38,9 +47,10 @@ trait ArrayAccessTrait
 	}
 
 	/**
-	 * Assign the offset.
+	 * Set the value of the given offset.
 	 *
-	 * @param  mixed $offset
+	 * @param mixed $offset The offset to set.
+	 * @param mixed $value  The value to assign to the offset.
 	 */
 	public function offsetSet($offset, $value): void
 	{
@@ -48,7 +58,9 @@ trait ArrayAccessTrait
 	}
 
 	/**
-	 * Unset the offset.
+	 * Unset the given offset.
+	 *
+	 * @param mixed $offset The offset to unset.
 	 *
 	 * @param  mixed $offset
 	 */

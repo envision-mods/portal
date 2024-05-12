@@ -12,13 +12,30 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
+/**
+ * Utility class providing various helper functions.
+ */
 class Util
 {
+	/**
+	 * Convert a camelCase string to snake_case.
+	 *
+	 * @param string $string The input string in camelCase format.
+	 *
+	 * @return string The converted string in snake_case format.
+	 */
 	public static function decamelize(string $string): string
 	{
 		return strtolower(preg_replace('/(?<=[a-z0-9])[A-Z]|(?<=[A-Z])[A-Z](?=[a-z])/', '_$0', $string));
 	}
 
+	/**
+	 * Convert a snake_case string to camelCase.
+	 *
+	 * @param string $string The input string in snake_case format.
+	 *
+	 * @return string The converted string in camelCase format.
+	 */
 	public static function camelize(string $string): string
 	{
 		return preg_replace_callback(
@@ -30,6 +47,13 @@ class Util
 		);
 	}
 
+	/**
+	 * Find classes implementing a specified interface.
+	 *
+	 * @param string $interface The fully qualified interface name.
+	 *
+	 * @return \Generator A generator yielding the found class names.
+	 */
 	public static function find_integrated_classes(string $interface): \Generator
 	{
 		if (count($results = call_integration_hook('integrate_envisionportal_classlist')) > 0) {
@@ -44,17 +68,20 @@ class Util
 	}
 
 	/**
+	 * Apply a callback to each element of the iterable.
+	 *
 	 * Similar to array_map, but maps key-value pairs (tuples).
 	 *
 	 * Applies the callback to the elements of the given iterable.
 	 * Original values (and keys) are lost during transformation!
 	 *
-	 * @param callable $callback This must return a list with two
-	 *                           elements; the first one becomes the key
-	 *                           and the second one becomes the value.
-	 * @param iterable $iterator An iterable to run through $callback.
+	 * The callback must return a list (array) with two elements; the
+	 * first one becomes the key and the second one becomes the value.
 	 *
-	 * @return Generator
+	 * @param callable $callback The callback function to apply.
+	 * @param iterable $iterator The iterable to apply the callback to.
+	 *
+	 * @return \Generator A generator yielding the results of applying the callback.
 	 */
 	public static function map(callable $callback, iterable $iterator): \Generator
 	{
@@ -63,6 +90,15 @@ class Util
 		}
 	}
 
+	/**
+	 * Find classes in a specified namespace implementing a specified interface.
+	 *
+	 * @param \FilesystemIterator $iterator  The iterator for the namespace.
+	 * @param string              $ns        The namespace of the classes to search.
+	 * @param string              $interface The fully qualified interface name.
+	 *
+	 * @return \Generator A generator yielding the found class names.
+	 */
 	public static function find_classes(\FilesystemIterator $iterator, string $ns, string $interface): \Generator
 	{
 		foreach ($iterator as $file_info) {
@@ -79,17 +115,18 @@ class Util
 	}
 
 	/**
-	 * Replaces placeholders from a string with the provided variables.
+	 * Replace placeholders in a string with provided variables.
 	 *
 	 * Example:
-	 * "The book {title} was written by {author_name}" becomes "The book Harry Potter was written by J.K. Rowling"
+	 * "The book {title} was written by {author_name}" becomes
+	 * "The book Harry Potter was written by J.K. Rowling"
 	 *
-	 * @param string $template A template with variables placeholders {$variable}.
-	 * @param array $variables A key => value store of variable names and values.
+	 * @param string $template  The template string with placeholders.
+	 * @param array  $variables The key-value store of variables and values.
 	 *
-	 * @return string
+	 * @return string The processed template string.
 	 */
-	public static function replaceVars(string $template, array $array): string
+	public static function replaceVars(string $template, array $variables): string
 	{
 		return preg_replace_callback(
 			'~{{1,2}\s*?([a-zA-Z0-9\-_.]+)\s*?}{1,2}~',
@@ -97,14 +134,14 @@ class Util
 			$template
 		);
 	}
+
 	/**
-	 * Gets all membergroups and filters them according to the parameters.
+	 * Get a list of membergroups based on specified criteria.
 	 *
-	 * @param int[] $checked    list of all id_groups to be checked (have a mark in the checkbox).
-	 *                          Default is an empty array.
-	 * @param bool  $inherited  Whether to filter out the inherited groups. Default is false.
+	 * @param int[] $checked   List of group IDs to be marked.
+	 * @param bool  $inherited Whether to filter out inherited groups.
 	 *
-	 * @return array All the membergroups filtered according to the parameters; empty array if something went wrong.
+	 * @return array The list of membergroups filtered according to the criteria.
 	 */
 	public function listGroups(array $checked = [], bool $inherited = false): array
 	{
@@ -156,13 +193,14 @@ class Util
 	}
 
 	/**
-	 * @param int    $start          The item to start with.
-	 * @param int    $items_per_page How many items to show per page.
-	 * @param string $sort           A string indicating how to sort results.
-	 * @param array  $list           Array of arrays or objects implementing
-	 *                               ArrayAccess to sort and slice.
+	 * Process a list of items, sorting and slicing as needed.
 	 *
-	 * @return array An array of info.
+	 * @param int    $start          The index to start slicing from.
+	 * @param int    $items_per_page The number of items per page.
+	 * @param string $sort           The sorting criteria.
+	 * @param array  $list           The list of items to process.
+	 *
+	 * @return array The processed list of items.
 	 */
 	public static function process(int $start, int $items_per_page, string $sort, array $list): array
 	{

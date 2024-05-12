@@ -1,6 +1,5 @@
 {
     "require-dev": {
-        "saggre/phpdocumentor-markdown": "^0.1.4",
-        "automattic/phpdoc-markdown": "^1.0"
+        "saggre/phpdocumentor-markdown": "^0.1.4"
     }
 }

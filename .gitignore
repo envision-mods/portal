@@ -6,3 +6,5 @@ ep_source/vendor/
 .phpdoc/
 
 *.phar
+
+vendor/

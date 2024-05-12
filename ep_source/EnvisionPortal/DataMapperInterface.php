@@ -12,10 +12,25 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
+/**
+ * Defines a set of methods for interacting with a database.  It
+ * provides a common interface for accessing and manipulating data
+ * in a database-agnostic manner.
+ *
+ * A DataMapper class is responsible for managing the interaction between
+ * the PHP application and the database.  It provides a set of methods for
+ * fetching, inserting, updating, and deleting entities from the database.
+ *
+ * The purpose of a DataMapper class is to:
+ *
+ * - Provide a consistent and efficient way to access the database;
+ * - Reduce the amount of boilerplate code required to perform database operations;
+ * - Make it easier to maintain the application's database schema.
+ */
 interface DataMapperInterface
 {
 	/**
-	 * Fetches data from the database based on specified criteria.
+	 * Fetches entities from the database based on specified criteria.
 	 *
 	 * @param array  $selects Table columns to select.
 	 * @param array  $params  Parameters to substitute into query text.
@@ -46,35 +61,35 @@ interface DataMapperInterface
 	): array;
 
 	/**
-	 * Inserts a new record into the database.
+	 * Inserts a new entity into the database.
 	 *
 	 * @param EntityInterface $entity The entity to insert.
 	 */
 	public function insert(EntityInterface $entity): void;
 
 	/**
-	 * Updates an existing record in the database.
+	 * Updates an existing entity in the database.
 	 *
 	 * @param EntityInterface $entity The entity to update.
 	 */
 	public function update(EntityInterface $entity): void;
 
 	/**
-	 * Deletes a record from the database.
+	 * Deletes a entity from the database.
 	 *
 	 * @param EntityInterface $entity The entity to delete.
 	 */
 	public function delete(EntityInterface $entity): void;
 
 	/**
-	 * Deletes multiple records from the database.
+	 * Deletes multiple entities from the database.
 	 *
-	 * @param array $ids Array of IDs of the records to delete.
+	 * @param array $ids Array of IDs of the entities to delete.
 	 */
 	public function deleteMany(array $ids): void;
 
 	/**
-	 * Deletes all records from the database.
+	 * Deletes all entities from the database.
 	 */
 	public function deleteAll(): void;
 

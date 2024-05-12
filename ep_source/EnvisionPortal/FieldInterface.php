@@ -12,50 +12,62 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
+/**
+ * Interface for representing a field in a form.
+ */
 interface FieldInterface
 {
 	/**
-	 * @param array  $field
-	 * @param string $value
-	 * @param string $type
+	 * FieldInterface constructor.
+	 *
+	 * @param array  $field An array representing the field properties.
+	 * @param string $value The current value of the field.
+	 * @param string $type  The type of the field.
 	 */
 	public function __construct(array $field, string $value, string $type);
 
 	/**
-	 * Output the HTML control for this field.
+	 * Convert the field to its HTML representation.
 	 *
-	 * @return string
+	 * @return string The HTML representation of the field.
 	 */
 	public function __toString(): string;
 }
 
+/**
+ * Interface for cacheable fields, allowing fetching and storing data.
+ */
 interface CacheableFieldInterface extends FieldInterface
 {
 	/**
-	 * Fetch data from the database to "cache", or store in memory.  This is
-	 * useful when multiple fields of the same type are loaded and a static
-	 * (unchanging) query is used to fetch data.
+	 * Fetch data from the database to "cache", or store in memory.
 	 *
-	 * @return array
+	 * This is useful when multiple fields of the same type are loaded
+	 * and a static (unchanging) query is used to fetch data.
+	 *
+	 * @return array The fetched data.
 	 */
 	public function fetchData(): array;
 
 	/**
-	 * Grab shared data from another field of the same type.
+	 * Store shared data from another field of the same type.
 	 *
 	 * @param array $data Data from another field of the same type.
 	 */
 	public function setData(array $data): void;
 }
 
+/**
+ * Interface for fields that need to transform data before saving.es/MIT
+ */
 interface UpdateFieldInterface extends FieldInterface
 {
 	/**
-	 * Transform data right before it is saved.
+	 * Transform data before it is saved.
 	 *
-	 * @param $val ?string Value from POST.
+	 * @param string|null $val The value from POST.
 	 *
-	 * @return string Value to save to the database.
+	 * @return string The value to save to the database.
 	 */
 	public function beforeSave(?string $val): string;
 }
