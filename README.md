@@ -3,13 +3,13 @@
 Envision Portal is a modification (mod) designed specifically for Simple Machines Forum (SMF), providing enhanced functionality akin to popular portal mods like Simple Portal or Tiny Portal. With Envision Portal, administrators can elevate their SMF forums by incorporating dynamic portal features, fostering community engagement, and streamlining navigation for users.
 
 - **Current Version:** 1.0
-- *Compatibility:** SMF 2.0.x, SMF 2.1.x
-- **Official Site:** [Envision Portal](https://mods.live627.com)
+- **Compatibility:** SMF 2.0.x, SMF 2.1.x
+- **Official Site:** [Envision Portal](https://portal.live627.com)
 
 ### General overview of features
 
 #### Homepage
-- Standard Homepage that can be disabled at any time and managed with the layout manager.
+- Standard Homepage that can be managed with the layout manager.
 - This customizable page serves as the central hub/landing page for your community.
 - Add modules to this layout to display essential information, such as recent posts, announcements, and other relevant content to welcome and engage users.
 
@@ -19,12 +19,12 @@ Envision Portal is a modification (mod) designed specifically for Simple Machine
 - Ability to specify where layouts are shown, including areas added by other SMF mods.
 
 #### Modules
-- Populate layouts with modules (blocks or widgets in other systems) such as recent topics, user statistics, polls, shoutboxes, and more.
+- Populate layouts with modules (blocks or widgets in other systems) such as recent topics, user statistics, polls, and more.
+  - [See a list of all included moddules here](https://envision-mods.github.io/docs/module-list.html)
 - Drag & drop modules within sections of a layout to organize them and change their order.
 
 #### Envision Menu
-- Includes its own Menu Manager for adding & removing menu items from the SMF menu.
-- Integrates with Envision Pages to create menu buttons for your Envision Pages.
+- Includes its own Menu Manager for adding menu items to the SMF menu.
 
 #### Envision Pages
 - Built-in page manager that handles BBC, HTML, Liquid, Markdown, and PHP output.
