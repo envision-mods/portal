@@ -300,10 +300,9 @@ class Integration
 
 	public static function who_allowed(array &$allowedActions)
 	{
-		global $settings, $txt;
+		global $txt;
 
 		if (self::$isActive) {
-			loadLanguage('ep_languages/EnvisionPortal');
 			$txt['who_index'] = Util::replaceVars(
 				$txt['ep_who_portal'],
 				['scripturl' => '%s', 'forum_name' => '%s']
@@ -319,7 +318,10 @@ class Integration
 	{
 		global $context, $scripturl, $txt;
 
-		loadLanguage('ep_languages/EnvisionPortal');
+		if (!self::$isActive) {
+			loadLanguage('ep_languages/EnvisionPortal');
+		}
+
 		$envisionportal = [
 			'title' => $txt['ep_'],
 			'areas' => [
