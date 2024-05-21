@@ -10,7 +10,9 @@ class TopPosters implements ModuleInterface, SharedMemberDataInterface
 {
 	use ModuleTrait;
 
-	private $groups = [];
+	private array $groups = [];
+	private array $members_list;
+	private int $list_type;
 
 	public function __invoke(array $fields)
 	{
