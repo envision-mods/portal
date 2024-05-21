@@ -325,14 +325,11 @@ class Integration
 			'areas' => [
 				'epconfig' => [
 					'label' => $txt['ep_admin_config'],
-					'file' => 'ep_source/ManageEnvisionSettings.php',
-					'function' => 'Configuration',
+					'function' => 'EnvisionPortal\ManageEnvisionSettings::call',
 					'icon' => 'epconfiguration',
 					'subsections' => [
 						'epinfo' => [$txt['ep_admin_information'], ''],
 						'epgeneral' => [$txt['ep_admin_general'], ''],
-						'epmodulesettings' => [$txt['ep_admin_module_settings'], ''],
-						'logs' => [$txt['ep_admin_log'], ''],
 					],
 				],
 				'epmodules' => [

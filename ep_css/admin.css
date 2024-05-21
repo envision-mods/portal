@@ -173,17 +173,12 @@
 }
 
 #ep_admin_section {
-	overflow: hidden;
-	margin: 1em 0;
+	display: grid;
+	align-items: start;
+	gap: 1em;
+	grid: auto / 2fr 1fr;
 }
 
-#ep_admin_center .content {
-	padding: 1em;
-}
-
-#ep_live_news {
-	width: 64%;
-}
 
 #ep_live_news div.content {
 	padding: 0 0 0 1em;
@@ -192,15 +187,6 @@
 
 #ep_live_news div.content dl {
 	padding: 0.5em 0 0 0.5em;
-}
-
-#epVersionTable {
-	width: 34%;
-}
-
-#ep_version_details {
-	overflow: auto;
-	height: 9.5em;
 }
 
 #epAnnouncements {
@@ -215,8 +201,4 @@
 #epAnnouncements dd {
 	padding: 0;
 	margin: 0 0 1em 1.5em;
-}
-
-#ep_update_section {
-	margin: 0.5em 0 0;
 }

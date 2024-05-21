@@ -1,46 +1,22 @@
 <?php
-// Version 1.0; ManageEnvisionSettings
 
 /**
- * This file handles showing Envision Portal's settings.
- *
- * @package template
- * @since   1.0
+ * @package   Envision Portal
+ * @version   3.0.0
+ * @author    John Rayes <live627@gmail.com>
+ * @copyright Copyright (c) 2014, John Rayes
+ * @license   http://opensource.org/licenses/MIT MIT
  */
 
-function template_ep_admin_log()
-{
-	echo '
-	<div id="admincenter">';
+declare(strict_types=1);
 
-	loadSubTemplate('show_list');
-
-	echo '
-	</div>';
-}
-
-/**
- * Renders the general imformation page.
- *
- * This function handles output of data populated by {@link EnvisionPortalInfo()}:
- * - upgraded Envision version advisory
- * - latest news from envisionportal.net
- * - basic version check
- * - list of current forum admins
- * - credits
- *
- * @see   EnvisionPortalInfo()
- * @since 1.0
- */
 function template_portal_info()
 {
 	global $context, $txt, $portal_ver, $forum_version;
 
 	echo '
-	<div id="admincenter">
-		<div id="ep_update_section"></div>
-		<div id="ep_admin_section">
-			<div id="ep_live_news" class="floatleft">
+		<section id="ep_admin_section">
+			<section>
 				<div class="cat_bar">
 					<h3 class="catbg">
 						', $txt['ep_admin_config_latest_news'], '
@@ -51,10 +27,10 @@ function template_portal_info()
 					<div class="content">
 						<div id="epAnnouncements">', $txt['ep_admin_config_unable_news'], '</div>
 					</div>
-				<span class="botslice"><span></span></span>
+					<span class="botslice"><span></span></span>
 				</div>
-			</div>
-			<div id="epVersionTable" class="floatright">
+			</section>
+			<section>
 				<div class="cat_bar">
 					<h3 class="catbg">
 						', $txt['ep_admin_config_support_info'], '
@@ -68,30 +44,19 @@ function template_portal_info()
 							', $txt['ep_admin_config_installed_version'], ':
 							<em id="ep_installed_version" class="no_wrap">', $portal_ver, '</em><br />
 							', $txt['ep_admin_config_latest_version'], ':
-							<em id="ep_latest_version" class="no_wrap">??</em><br />
-							<br />
-							<strong>', $txt['administrators'], ':</strong>
-							', implode(', ', $context['administrators']);
-
-	// If we have lots of admins... don't show them all.
-	if (!empty($context['more_admins_link'])) {
-		echo '
-							(', $context['more_admins_link'], ')';
-	}
-
-	echo '
+							<em id="ep_latest_version" class="no_wrap">??</em>
 						</div>
 					</div>
 					<span class="botslice"><span></span></span>
 				</div>
-			</div>
-		</div>
+			</section>
+		</section>
 		<div class="cat_bar">
 			<h3 class="catbg"><span class="left"></span>
 				', $txt['ep_credits'], '
 			</h3>
 		</div>
-		<div class="windowbg2">
+		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">';
 
@@ -144,16 +109,18 @@ function template_portal_info()
 	}
 	echo '
 				<hr />
-				<p>', $txt['ep_credits_contribute'], '</p>
+				<p>', $txt['ep_credits_contribute'], ' <b><a href="https://github.com/envision-mods/portal">', $txt['ep_credits_contribute_github'], '</a></b></p>
 			</div>
 			<span class="botslice"><span></span></span>
-		</div>
-	</div>
-	<br class="clear" />';
-
-	$context['insert_after_template'] .= '<script type="text/javascript" src="http://news.envisionportal.net/news.js?v=' . urlencode(
-			$portal_ver
-		) . ';smf_version=' . urlencode($forum_version) . '"></script>';
+		</div>';
 }
 
-?>
+function template_callback_ep_admin_config(): void
+{
+	global $txt;
+
+	echo '
+									</dl>
+									<div class=' . (defined('SMF_VERSION') ? 'descbox' : 'plainbox') . ' centertext">', $txt['ep_admin_config_general_optional'], '</div>
+									<dl class=settings>';
+}
