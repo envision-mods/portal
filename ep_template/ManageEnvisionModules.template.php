@@ -401,7 +401,7 @@ function template_delete_layout(): void
 	foreach ($context['layouts'] as $id => $name) {
 		echo '
 								<label>
-									<input type="checkbox" name="layouts[]" value="', $id, '"', $context['selected_layout'] == $id_layout ? ' checked' : '', ' />', $name, '
+									<input type="checkbox" name="layouts[]" value="', $id, '"', $context['selected_layout'] == $id ? ' checked' : '', ' />', $name, '
 								</label>
 								<br>';
 	}
