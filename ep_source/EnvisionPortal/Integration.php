@@ -450,7 +450,7 @@ class Integration
 			'/\/\/www.simplemachines.org" title="Simple Machines" target="_blank" (:?rel="noopener|class="new_win)">Simple Machines<\/a>/',
 		];
 		$replace_array = [
-			'$0 | <a class="new_win" href="https://envisionportal.net/" target="_blank">Envision Portal 1.0.0 &copy; 2011&ndash;2023 Envision Portal Team</a>',
+			'$0 | <a class="new_win" href="https://portal.live627.com/" target="_blank">Envision Portal ' . Portal::VERSION . ' &copy; ' . Portal::COPYRIGHT_YEAR . ' Envision Portal Team</a>',
 		];
 
 		if ($context['show_load_time'] && isset($context['ep_time'], $context['ep_qc'])) {

@@ -14,6 +14,9 @@ namespace EnvisionPortal;
 
 class Portal
 {
+	const VERSION = '1.0.0';
+	const COPYRIGHT_YEAR = '2024';
+
 	/**
 	 * @return bool whether this is an attachment, avatar, toggle of editor buttons, theme option, XML feed, popup, etc.
 	 */
