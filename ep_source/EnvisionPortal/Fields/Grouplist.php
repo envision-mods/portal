@@ -20,12 +20,14 @@ class Grouplist implements CacheableFieldInterface, UpdateFieldInterface
 	private array $field;
 	private string $key;
 	private string $type;
+	private bool $has_order;
 
 	public function __construct(array $field, string $key, string $type)
 	{
 		$this->field = $field;
 		$this->key = $key;
 		$this->type = $type;
+		$this->has_order = !empty($field['order']);
 	}
 
 	public function fetchData(): array
@@ -90,7 +92,7 @@ class Grouplist implements CacheableFieldInterface, UpdateFieldInterface
 	{
 		$ret = '';
 		if (is_array($val)) {
-			if (!empty($this->field['order']) && isset($_POST[$this->key . 'order']) && is_array(
+			if ($this->has_order && isset($_POST[$this->key . 'order']) && is_array(
 					$_POST[$this->key . 'order']
 				)) {
 				$ret = implode(',', $_POST[$this->key . 'order']) . ';';
@@ -115,7 +117,7 @@ class Grouplist implements CacheableFieldInterface, UpdateFieldInterface
 		$ret = '
 					<fieldset class="group_perms';
 
-		if (!empty($this->field['order'])) {
+		if ($this->has_order) {
 			$ret .= ' ordered-checklist" data-up="' . $txt['checks_order_up'] . '" data-down="' . $txt['checks_order_down'];
 		}
 
@@ -132,7 +134,7 @@ class Grouplist implements CacheableFieldInterface, UpdateFieldInterface
 				) || in_array(-3, $checked) ? ' checked' : '') . ' />
 								<span' . ($group['is_post_group'] ? ' style="border-bottom: 1px dotted;" title="' . $txt['mboards_groups_post_group'] . '"' : '') . '>' . $group['name'] . '</span>';
 
-			if (!empty($this->field['order'])) {
+			if ($this->has_order) {
 				$ret .= '
 								<input type="hidden" name="' . $this->key . 'order[]" value="' . $i . '" />';
 			}

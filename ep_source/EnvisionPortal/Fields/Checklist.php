@@ -19,14 +19,16 @@ class Checklist implements UpdateFieldInterface
 	private array $field;
 	private string $key;
 	private string $type;
+	private bool $has_order;
 
 	public function __construct(array $field, string $key, string $type)
 	{
+		global $txt;
+
 		$this->field = $field;
 		$this->key = $key;
 		$this->type = $type;
-		global $txt;
-
+		$this->has_order = !empty($field['order']);
 		$this->options = [];
 		$order = [];
 
@@ -37,17 +39,19 @@ class Checklist implements UpdateFieldInterface
 		} else {
 			$checked = explode(',', $this->field['value']);
 		}
+		if (!isset($field['options_names'])) {
+			$field['options_names'] = [];
+		}
 
-		$can_order = count($order) == count($this->options);
-		for ($i = 0, $n = count($field['options']); $i < $n; $i++) {
-			if ($order != []) {
+		foreach ($field['options'] as $i => $name) {
+			if (isset($order[$i])) {
 				$this->options[$order[$i]] = [
-					'name' => $txt['ep_modules'][$this->type][$this->key][$field['options'][$order[$i]]],
+					'name' => $field['options_names'][$order[$i]] ?? $txt['ep_modules'][$this->type][$this->key][$field['options'][$order[$i]]],
 					'checked' => in_array($order[$i], $checked),
 				];
 			} else {
-				$this->options[] = [
-					'name' => $txt['ep_modules'][$this->type][$this->key][$field['options'][$i]],
+				$this->options[$i] = [
+					'name' => $field['options_names'][$i] ?? $txt['ep_modules'][$this->type][$this->key][$field['options'][$i]],
 					'checked' => in_array($i, $checked),
 				];
 			}
@@ -58,7 +62,7 @@ class Checklist implements UpdateFieldInterface
 	{
 		$ret = '';
 		if ($val !== null && is_array($val)) {
-			if (!empty($this->field['order']) && isset($_POST[$this->key . 'order']) && is_array(
+			if ($this->has_order && isset($_POST[$this->key . 'order']) && is_array(
 					$_POST[$this->key . 'order']
 				)) {
 				$ret = implode(',', $_POST[$this->key . 'order']) . ';';
@@ -77,7 +81,7 @@ class Checklist implements UpdateFieldInterface
 		$ret = '
 							<fieldset data-c=" ' . $txt['check_all'] . '"';
 
-		if (!empty($this->field['order'])) {
+		if ($this->has_order) {
 			$ret .= ' class="ordered-checklist" data-up="' . $txt['checks_order_up'] . '" data-down="' . $txt['checks_order_down'] . '"';
 		}
 
@@ -87,9 +91,9 @@ class Checklist implements UpdateFieldInterface
 			$ret .= '
 							<li><label>
 								<input type="checkbox" class="input_check" name="' . $this->key . '[]" value="' . $i . '" ' . ($group['checked'] ? 'checked' : '') . ' />
-								' . (isset($this->field['option_names'], $this->field['option_names'][$i]) ? $this->field['option_names'][$i] : $txt['ep_modules'][$this->type][$this->key][$this->field['options'][$i]]);
+								' . $group['name'];
 
-			if (!empty($this->field['order'])) {
+			if ($this->has_order) {
 				$ret .= '
 								<input type="hidden" name="' . $this->key . 'order[]" value="' . $i . '" />';
 			}
