@@ -38,8 +38,7 @@ class Poll implements ModuleInterface
 			'',
 			'
 			SELECT
-				id_poll, question, voting_locked, hide_results, max_votes, guest_vote,
-				expire_time != 0 AND expire_time < ' . time() . ' AS is_expired, id_board
+				id_topic
 			FROM {db_prefix}topics
 				JOIN {db_prefix}polls AS p USING (id_poll)
 			WHERE
@@ -53,6 +52,24 @@ class Poll implements ModuleInterface
 		if ($smcFunc['db_num_rows']($request) == 0) {
 			return null;
 		}
+
+		[$topic] = $smcFunc['db_fetch_row']($request);
+		$smcFunc['db_free_result']($request);
+
+		$request = $smcFunc['db_query'](
+			'',
+			'
+			SELECT
+				id_poll, question, voting_locked, hide_results, max_votes, guest_vote,
+				expire_time != 0 AND expire_time < ' . time() . ' AS is_expired, id_board
+			FROM {db_prefix}topics
+				JOIN {db_prefix}polls AS p USING (id_poll)
+			WHERE
+				id_topic = {int:current_topic}',
+			[
+				'current_topic' => $topic,
+			]
+		);
 
 		$row = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);

@@ -17,8 +17,6 @@ class Recent implements ModuleInterface
 	 * Fetches the topics and their respective boards, ignoring those that the
 	 * user cannot see or wants to ignore. Returns an empty array if none are found.
 	 *
-	 * @access private
-	 *
 	 * @param int   $num_recent     Maximum number of topics to show. Default is 8.
 	 * @param bool  $ignore         Whether to honor ignored boards. Default is true.
 	 * @param array $exclude_boards Boards to exclude as array values. Default is null.
@@ -57,6 +55,7 @@ class Recent implements ModuleInterface
 			$where_params['include_boards'] = $include_boards;
 		}
 
+		$boards = [];
 		$request = $smcFunc['db_query'](
 			'',
 			'
@@ -64,7 +63,6 @@ class Recent implements ModuleInterface
 			FROM {db_prefix}boards
 			ORDER BY board_order'
 		);
-		$boards = [];
 		while (list ($id_board, $name) = $smcFunc['db_fetch_row']($request)) {
 			$boards[$id_board] = $name;
 		}
@@ -93,10 +91,15 @@ class Recent implements ModuleInterface
 			return null;
 		}
 
+		$id_last_msgs = [];
+		$id_first_msgs = [];
 		$topic_list = [];
+		$board_list = [];
 		$topics = [];
+
 		while (list ($id_topic, $id_board, $replies, $views) = $smcFunc['db_fetch_row']($request)) {
 			$topic_list[] = $id_topic;
+			$board_list[$id_board] = $id_board;
 			$topics[$id_topic] = [
 				'board_link' => '<a href="' . $scripturl . '?board=' . $id_board . '.0">' . $boards[$id_board] . '</a>',
 				'replies' => $replies,
@@ -107,7 +110,7 @@ class Recent implements ModuleInterface
 
 		$request = $smcFunc['db_query']('', '
 			SELECT
-				t.id_topic, ml.poster_time, mf.subject, ml.id_member, ml.id_msg,
+				t.id_topic, id_last_msg, id_first_msg, ml.poster_time, mf.subject, ml.id_member, ml.id_msg,
 				COALESCE(mem.real_name, ml.poster_name) AS poster_name
 			FROM {db_prefix}topics AS t
 				JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
@@ -141,6 +144,8 @@ class Recent implements ModuleInterface
 				}
 			}
 
+			$id_last_msgs[] = $row['id_last_msg'];
+			$id_first_msgs[] = $row['id_first_msg'];
 			censorText($row['subject']);
 			$topics[$row['id_topic']] += [
 				'poster_link' => empty($row['id_member']) ? $row['poster_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>',
@@ -160,12 +165,15 @@ class Recent implements ModuleInterface
 					LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = m.id_topic AND lt.id_member = {int:current_member})
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = m.id_board AND lmr.id_member = {int:current_member})
 				WHERE
-					m.id_topic IN ({array_int:topic_list})
+					m.id_msg >= {int:min_msg} AND m.id_msg <= {int:max_msg}
+					AND m.id_topic IN ({array_int:topic_list})
 					AND m.id_msg > COALESCE(lt.id_msg, lmr.id_msg, 0)
 					AND approved = 1
 				GROUP BY m.id_topic',
 				[
 					'current_member' => $user_info['id'],
+					'min_msg' => min($id_first_msgs),
+					'max_msg' => max($id_last_msgs),
 					'topic_list' => $topic_list,
 				]
 			);
