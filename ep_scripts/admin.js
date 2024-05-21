@@ -396,19 +396,23 @@ function makeUpDownLinks(f) {
 					el.textContent = '[ ' + ul.parentNode.dataset.up + ' ]';
 					el.href = "#";
 					el.addEventListener("click", function (event) {
-						if (this.previousElementSibling)
-							ul.insertBefore(this, this.previousElementSibling);
-						event.stopPropagation();
+						var wrapper = this.parentElement;
+
+						if (wrapper.previousElementSibling)
+							wrapper.parentNode.insertBefore(wrapper, wrapper.previousElementSibling);
+
 						event.preventDefault();
-					}.bind(l));
+					});
 					a.textContent = '[ ' + ul.parentNode.dataset.down + ' ]';
 					a.href = "#";
 					a.addEventListener("click", function (event) {
-						if (this.nextElementSibling)
-							ul.insertBefore(this.nextElementSibling, this);
-						event.stopPropagation();
+						var wrapper = this.parentElement;
+
+						if (wrapper.nextElementSibling)
+							wrapper.parentNode.insertBefore(wrapper.nextElementSibling, wrapper);
+
 						event.preventDefault();
-					}.bind(l));
+					});
 					l.append(el, a);
 				}
 }
