@@ -143,7 +143,7 @@ class Util
 	 *
 	 * @return array The list of membergroups filtered according to the criteria.
 	 */
-	public function listGroups(array $checked = [], bool $inherited = false): array
+	public static function listGroups(array $checked = [], bool $inherited = false): array
 	{
 		global $modSettings, $smcFunc, $txt;
 
