@@ -395,7 +395,7 @@ class ManageEnvisionPages
 		}
 
 		$entries = $this->dataMapper->fetchBy(['*'], ['id' => $_GET['in']], [], ['id_page = {int:id}']);
-		$row = $entrries[0] ?? [];
+		$row = $entries[0] ?? [];
 		if ($row == []) {
 			fatal_lang_error('no_access', false);
 		}

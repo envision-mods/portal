@@ -20,7 +20,7 @@ Envision Portal is a modification (mod) designed specifically for Simple Machine
 
 #### Modules
 - Populate layouts with modules (blocks or widgets in other systems) such as recent topics, user statistics, polls, and more.
-  - [See a list of all included moddules here](https://envision-mods.github.io/docs/module-list.html)
+  - [See a list of all included modules here](https://envision-mods.github.io/docs/module-list.html)
 - Drag & drop modules within sections of a layout to organize them and change their order.
 
 #### Envision Menu
