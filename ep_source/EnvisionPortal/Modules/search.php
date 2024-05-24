@@ -29,7 +29,7 @@ class Search implements ModuleInterface
 								<select name="searchtype" style="margin: 5px 5px 0 0;">
 									<option value="1" selected="selected">' . $txt['ep_match_all_words'] . '</option>
 									<option value="2">' . $txt['ep_match_any_words'] . '</option>
-								</select><input style="margin-top: 5px;" name="submit" value="' . $txt['search'] . '" type="submit" class="button_submit" />
+								</select><input style="margin-top: 5px;" name="submit" value="' . $txt['search'] . '" type="submit" class="' . (defined('SMF_VERSION') ? 'button' :  'button_submit') . '" />
 								</form>
 							</div>';
 

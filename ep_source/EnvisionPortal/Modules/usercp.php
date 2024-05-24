@@ -110,7 +110,7 @@ class UserCP implements ModuleInterface
 								</td>
 							</tr>
 							<tr>
-								<td class="righttext" colspan="2"><input type="submit" value="' . $txt['login'] . '" class="button_submit" /></td>
+								<td class="righttext" colspan="2"><input type="submit" value="' . $txt['login'] . '" class="' . (defined('SMF_VERSION') ? 'button' :  'button_submit') . '" /></td>
 							</tr>
 						</table>
 					</form>

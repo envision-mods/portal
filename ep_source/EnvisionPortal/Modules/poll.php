@@ -211,7 +211,7 @@ class Poll implements ModuleInterface
 			}
 
 			$ret .= '
-				<input type="submit" value="' . $txt['poll_vote'] . '" class="button_submit" />
+				<input type="submit" value="' . $txt['poll_vote'] . '" class="' . (defined('SMF_VERSION') ? 'button' :  'button_submit') . '" />
 				<input type="hidden" name="poll" value="' . $this->pollinfo['id'] . '" />
 				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 			</form>';

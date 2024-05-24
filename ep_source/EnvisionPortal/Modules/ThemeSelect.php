@@ -89,10 +89,17 @@ class ThemeSelect implements ModuleInterface
 				include($theme_data['theme_dir'] . '/languages/Settings.' . $language . '.php');
 			}
 
-			$this->available_themes[$id_theme]['thumbnail_href'] = strtr(
-				$txt['theme_thumbnail_href'] ?? $theme_data['images_url'] . '/thumbnail.gif',
-				[$settings['images_url'] => $theme_data['images_url']]
-			);
+			if (!defined('SMF_VERSION')) {
+				$this->available_themes[$id_theme]['thumbnail_href'] = strtr(
+					$txt['theme_thumbnail_href'] ?? $theme_data['images_url'] . '/thumbnail.gif',
+					[$settings['images_url'] => $theme_data['images_url']]
+				);
+			} else {
+				$this->available_themes[$id_theme]['thumbnail_href'] = sprintf(
+					$txt['theme_thumbnail_href'] ?? '%s/thumbnail.png',
+					$theme_data['images_url']
+				);
+			}
 			$this->available_themes[$id_theme]['description'] = $txt['theme_description'] ?? '';
 
 			if ($smcFunc['strlen']($theme_data['name']) > 18) {
@@ -125,7 +132,7 @@ class ThemeSelect implements ModuleInterface
 			$ret .= '
 										</select>
 									</p>
-									<p><input type="submit" value="' . $txt['ep_update'] . '" class="button_submit" /></p>
+									<p><input type="submit" value="' . $txt['ep_update'] . '" class="' . (defined('SMF_VERSION') ? 'button' :  'button_submit') . '" /></p>
 								</form>
 							</div>';
 		}
