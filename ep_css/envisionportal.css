@@ -39,6 +39,23 @@ span.new_posts {
 	vertical-align: 1px;
 }
 
+.ep_module_user_cp form {
+	max-width: 324px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-block: 6px;
+}
+.ep_module_user_cp div {
+	margin-block: 4px;
+}
+.ep_module_user_cp input[id],
+.ep_module_user_cp select {
+	width: 160px;
+}
+.ep_module_user_cp label {
+	width: 160px;
+}
 .ep_module_user_cp h4 {
 	font-size: 1.1em;
 	line-height: 1.1;

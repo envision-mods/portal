@@ -84,37 +84,31 @@ class UserCP implements ModuleInterface
 			$_SESSION['login_url'] = $this->getUrl();
 
 			$ret = '
-					' . $txt['hello_guest'] . ' <strong>' . $txt['guest'] . '</strong>.<br />
-					' . $txt['login_or_register'] . '<br />
-					<br />
-					<form action="' . $scripturl . '?action=login2" method="post">
-						<table border="0" cellspacing="2" cellpadding="0" class="table">
-							<tr>
-								<td class="lefttext"><label for="user">' . $txt['ep_login_user'] . ':</label>&nbsp;</td>
-								<td class="lefttext"><input type="text" name="user" id="user" size="10" /></td>
-							</tr>
-							<tr>
-								<td class="lefttext"><label for="passwrd">' . $txt['password'] . ':</label>&nbsp;</td>
-								<td class="lefttext"><input type="password" name="passwrd" id="passwrd" size="10" /></td>
-							</tr>
-							<tr>
-								<td class="lefttext"><label for="cookielength">' . $txt['ep_length'] . '</label>&nbsp;</td>
-								<td>
-								<select name="cookielength" id="cookielength">
-									<option value="60">' . $txt['one_hour'] . '</option>
-									<option value="1440">' . $txt['one_day'] . '</option>
-									<option value="10080">' . $txt['one_week'] . '</option>
-									<option value="302400">' . $txt['one_month'] . '</option>
-									<option value="-1" selected="selected">' . $txt['forever'] . '</option>
-								</select>
-								</td>
-							</tr>
-							<tr>
-								<td class="righttext" colspan="2"><input type="submit" value="' . $txt['login'] . '" class="' . (defined('SMF_VERSION') ? 'button' :  'button_submit') . '" /></td>
-							</tr>
-						</table>
-					</form>
-					' . $txt['welcome_guest_activate'] . '';
+				<h4>' . $txt['hello_guest'] . ' ' . $txt['guest'] . '</h4>
+				<form action="' . $scripturl . '?action=login2" method="post">
+					<label for="user">' . $txt['ep_login_user'] . ':</label>
+					<input type="text" name="user" id="user" size="10" />
+					<label for="passwrd">' . $txt['password'] . ':</label>
+					<input type="password" name="passwrd" id="passwrd" size="10" />
+					<label for="cookielength">' . $txt['ep_length'] . '</label>
+					<select name="cookielength" id="cookielength">
+						<option value="60">' . $txt['one_hour'] . '</option>
+						<option value="1440">' . $txt['one_day'] . '</option>
+						<option value="10080">' . $txt['one_week'] . '</option>
+						<option value="302400">' . $txt['one_month'] . '</option>
+						<option value="-1" selected="selected">' . $txt['forever'] . '</option>
+					</select>
+					<div class="centertext"><input type="submit" value="' . $txt['login'] . '" class="' . (defined('SMF_VERSION') ? 'button' :  'button_submit') . '" /></div>
+					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
+
+			if (defined('SMF_VERSION')) {
+				$ret .= '
+					<input type="hidden" name="' . $context['login_token_var'] . '" value="' . $context['login_token'] . '">';
+			}
+
+			$ret .= '
+				</form>
+				' . $txt['welcome_guest_activate'] . '';
 		}
 
 		return $ret;
