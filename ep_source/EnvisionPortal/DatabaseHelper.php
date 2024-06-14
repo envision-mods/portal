@@ -116,8 +116,8 @@ class DatabaseHelper
 				$sql .= $column . ' = ' . sprintf('SUBSTRING({string:%1$s}, 1, ' . substr($type, 7) . ') ', $column);
 			} else {
 				$sql .= $column . ' = {' . $type . ':' . $column . '} ';
-				$where_params[$column] = $data;
 			}
+			$where_params[$column] = $data;
 		}
 
 		$smcFunc['db_query'](

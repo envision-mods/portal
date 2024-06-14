@@ -121,6 +121,6 @@ function template_callback_ep_admin_config(): void
 
 	echo '
 									</dl>
-									<div class=' . (defined('SMF_VERSION') ? 'descbox' : 'plainbox') . ' centertext">', $txt['ep_admin_config_general_optional'], '</div>
+									<div class=descbox>', $txt['ep_admin_config_general_optional'], '</div>
 									<dl class=settings>';
 }

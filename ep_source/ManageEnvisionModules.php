@@ -266,6 +266,10 @@ function ModifyModule2()
 			continue;
 		}
 
+		if (isset($field['preload']) && is_callable($field['preload'])) {
+			$field = call_user_func($field['preload'], $field);
+		}
+
 		$cn = 'EnvisionPortal\Fields\\' . EnvisionPortal\Util::camelize($field['type']);
 		$obj = new $cn($field, $key, '');
 
@@ -858,12 +862,12 @@ function EditEnvisionLayout2()
 
 		require_once($sourcedir . '/ep_source/Subs-EnvisionLayouts.php');
 		editLayout(
-			$context['selected_layout'],
+			$layout,
 			$layout_name,
 			$layout_actions,
 			$layout_positions,
-			$_POST['smf'],
-			$_POST['remove']
+			(int)$_POST['smf'],
+			$_POST['remove'] ?? []
 		);
 
 		if (!isset($_REQUEST['xml'])) {
