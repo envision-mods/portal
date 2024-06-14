@@ -2,16 +2,17 @@
 
 namespace EnvisionPortal\Modules;
 
-use EnvisionPortal\ModuleInterface;
-use EnvisionPortal\ModuleTrait;
+use EnvisionPortal\{ModuleInterface, ModuleTrait, SharedPermissionsInterface};
 
 /**
  * @package EnvisionPortal
  * @since   1.0
  */
-class News implements ModuleInterface
+class News implements ModuleInterface, SharedPermissionsInterface
 {
 	use ModuleTrait;
+
+	private array $boards_can;
 
 	/**
 	 * Cuts a string up until a given number of words.
@@ -40,15 +41,26 @@ class News implements ModuleInterface
 	}
 
 	private $posts = [];
+	private $fields;
 
 	public function __invoke(array $fields)
 	{
+		$this->fields = $fields;
+	}
+
+	public function fetchPermissionNames(): array
+	{
+		return ['post_reply_own', 'post_reply_any', 'moderate_board'];
+	}
+
+	public function setSharedPermissions(array $boards_can): void
+	{
 		global $context, $scripturl, $settings, $smcFunc, $modSettings, $user_info;
 
-		$board = $fields['board'] ?? 1;
-		$limit = $fields['limit'] ?? 5;
+		$board = $this->fields['board'] ?? 1;
+		$limit = $this->fields['limit'] ?? 5;
 
-		// Adjust the query. This isn't defined for SMF 2.0.
+		// Adjust the query.  This constant isn't defined for SMF 2.0.
 		if (!defined('SMF_VERSION')) {
 			$request = $smcFunc['db_query']('', '
 				SELECT
@@ -85,7 +97,7 @@ class News implements ModuleInterface
 		}
 
 		if ($smcFunc['db_num_rows']($request) == 0) {
-			return null;
+			return;
 		}
 
 		$topic_list = [];
@@ -98,19 +110,10 @@ class News implements ModuleInterface
 		}
 		$smcFunc['db_free_result']($request);
 
-		if (!defined('SMF_VERSION')) {
-			$boards_can = [
-				'post_reply_any' => boardsAllowedTo('post_reply_any'),
-				'post_reply_own' => boardsAllowedTo('post_reply_own'),
-				'moderate_board' => boardsAllowedTo('moderate_board'),
-			];
-		} else {
-			$boards_can = boardsAllowedTo(['post_reply_own', 'post_reply_any', 'moderate_board'], true, false);
-		}
-
-		$can_reply_own = $boards_can['post_reply_own'] === [0] || in_array($board, $boards_can['post_reply_own']);
-		$can_reply_any = $boards_can['post_reply_any'] === [0] || in_array($board, $boards_can['post_reply_any']);
-		$can_moderate = $boards_can['moderate_board'] === [0] || in_array($board, $boards_can['moderate_board']);
+		$this->boards_can = $boards_can;
+		$can_reply_own = $this->boards_can['post_reply_own'] === [0] || in_array($board, $this->boards_can['post_reply_own']);
+		$can_reply_any = $this->boards_can['post_reply_any'] === [0] || in_array($board, $this->boards_can['post_reply_any']);
+		$can_moderate = $this->boards_can['moderate_board'] === [0] || in_array($board, $this->boards_can['moderate_board']);
 
 		$request = $smcFunc['db_query']('', '
 			SELECT

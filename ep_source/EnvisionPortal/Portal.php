@@ -401,10 +401,23 @@ class Portal
 	{
 		foreach ($data['layout'] as $id_layout_position => $row) {
 			foreach ($row['modules'] as $module_position => $module) {
+				$time = hrtime(true);
 				$data['layout'][$id_layout_position]['modules'][$module_position] = $this->process_module(
 					$data['modules'],
 					$module
 				);
+				$data['layout'][$id_layout_position]['modules'][$module_position]['time'] = (hrtime(true) - $time) / 1e6;
+			}
+		}
+
+		if ($this->sharedModuleData['permissions'] != []) {
+			if (!defined('SMF_VERSION')) {
+				$boards_can = [];
+				foreach ($this->sharedModuleData['permissions'] as $permission_name) {
+					$boards_can[$permission_name] = boardsAllowedTo($permission_name);
+				}
+			} else {
+				$boards_can = boardsAllowedTo($this->sharedModuleData['permissions'], true, false);
 			}
 		}
 
@@ -416,10 +429,23 @@ class Portal
 			loadMemberContext($id_member);
 		}
 
+		foreach ($data['layout'] as $id_layout_position => $row) {
+			foreach ($row['modules'] as $module_position => $module) {
+				$time = hrtime(true);
+				if ($module['class'] instanceof SharedPermissionsInterface) {
+					$module['class']->setSharedPermissions($boards_can);
+				}
+				$data['layout'][$id_layout_position]['modules'][$module_position]['time'] += (hrtime(true) - $time) / 1e6;
+			}
+		}
+
 		return $data['layout'];
 	}
 
-	private array $sharedModuleData = ['member_ids' => []];
+	private array $sharedModuleData = [
+		'member_ids' => [],
+		'permissions' => [],
+	];
 
 	private function process_module(array $module_fields, array $data)
 	{
@@ -433,6 +459,13 @@ class Portal
 
 		foreach ($data['class']->getDefaultProperties() as $key => $field) {
 			$fields[$key] = $module_fields[$data['id']][$key] ?? $field['value'];
+		}
+
+		if ($data['class'] instanceof SharedPermissionsInterface) {
+			$this->sharedModuleData['permissions'] = array_merge(
+				$this->sharedModuleData['permissions'],
+				$data['class']->fetchPermissionNames()
+			);
 		}
 
 		$data['class']($fields);

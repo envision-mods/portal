@@ -2,13 +2,13 @@
 
 namespace EnvisionPortal\Modules;
 
-use EnvisionPortal\ModuleInterface;
+use EnvisionPortal\{ModuleInterface, SharedPermissionsInterface};
 
 /**
  * @package EnvisionPortal
  * @since   1.0
  */
-class Poll implements ModuleInterface
+class Poll implements ModuleInterface, SharedPermissionsInterface
 {
 	private array $boards_can;
 
@@ -38,11 +38,13 @@ class Poll implements ModuleInterface
 			'',
 			'
 			SELECT
-				id_topic
+				id_poll, question, voting_locked, hide_results, max_votes, guest_vote,
+				expire_time != 0 AND expire_time < ' . time() . ' AS is_expired, id_board
 			FROM {db_prefix}topics
 				JOIN {db_prefix}polls AS p USING (id_poll)
 			WHERE
-				' . implode("\n\t\t\t\tAND ", $where) . '
+				id_poll != 0
+				AND ' . implode("\n\t\t\t\tAND ", $where) . '
 			ORDER BY id_poll DESC
 			LIMIT 1',
 			$where_params
@@ -52,24 +54,6 @@ class Poll implements ModuleInterface
 		if ($smcFunc['db_num_rows']($request) == 0) {
 			return null;
 		}
-
-		[$topic] = $smcFunc['db_fetch_row']($request);
-		$smcFunc['db_free_result']($request);
-
-		$request = $smcFunc['db_query'](
-			'',
-			'
-			SELECT
-				id_poll, question, voting_locked, hide_results, max_votes, guest_vote,
-				expire_time != 0 AND expire_time < ' . time() . ' AS is_expired, id_board
-			FROM {db_prefix}topics
-				JOIN {db_prefix}polls AS p USING (id_poll)
-			WHERE
-				id_topic = {int:current_topic}',
-			[
-				'current_topic' => $topic,
-			]
-		);
 
 		$row = $smcFunc['db_fetch_assoc']($request);
 		$smcFunc['db_free_result']($request);
@@ -94,13 +78,12 @@ class Poll implements ModuleInterface
 		$smcFunc['db_free_result']($request);
 
 		$request = $smcFunc['db_query']('', '
-			SELECT COUNT(DISTINCT id_member) AS total
+			SELECT COUNT(DISTINCT id_member)
 			FROM {db_prefix}log_polls
 			WHERE id_poll = {int:id_poll}
-				AND id_member != {int:not_guest}',
+				AND id_member != 0',
 			[
 				'id_poll' => $row['id_poll'],
-				'not_guest' => 0,
 			]
 		);
 		[$row['total_voters']] = $smcFunc['db_fetch_row']($request);
@@ -110,28 +93,30 @@ class Poll implements ModuleInterface
 	}
 
 	private $pollinfo;
+	private $fields;
 
 	public function __invoke(array $fields)
 	{
+		$this->fields = $fields;
+	}
+
+	public function fetchPermissionNames(): array
+	{
+		return ['poll_view', 'poll_vote', 'moderate_board'];
+	}
+
+	public function setSharedPermissions(array $boards_can): void
+	{
+		$this->boards_can = $boards_can;
+
 		global $user_info;
 
-		if (!defined('SMF_VERSION')) {
-			$this->boards_can = [
-				'poll_view' => boardsAllowedTo('poll_view'),
-				'poll_vote' => boardsAllowedTo('poll_vote'),
-				'moderate_board' => boardsAllowedTo('moderate_board'),
-			];
-		} else {
-			$this->boards_can = boardsAllowedTo(['poll_view', 'poll_vote', 'moderate_board'], true, false);
-		}
-
-		$topic = $fields['topic'] ?? 1;
-		$options = $fields['options'] ?? 'recent';
+		$topic = $this->fields['topic'] ?? 1;
+		$options = $this->fields['options'] ?? 'recent';
+		$opt = ['{raw:qsb}'];
 
 		if ($options == 'def') {
-			$opt = ['id_topic = {int:current_topic}', '{raw:qsb}'];
-		} elseif ($options == 'recent') {
-			$opt = ['voting_locked = 0', '{raw:qsb}'];
+			$opt = ['id_topic = {int:current_topic}'];
 		}
 
 		$row = $this->fetchPoll($opt, [
@@ -186,6 +171,11 @@ class Poll implements ModuleInterface
 				// 3. you can see them after you voted (hide_results == 1), or
 				// 4. you've waited long enough for the poll to expire. (whether hide_results is 1 or 2.)
 				'allow_view_results' => $can_moderate || $row['hide_results'] == 0 || ($row['hide_results'] == 1 && $row['has_voted']) || $row['is_expired'],
+			];
+		} else {
+			$this->pollinfo = [
+				'allow_vote' => false,
+				'allow_view_results' => false,
 			];
 		}
 	}
