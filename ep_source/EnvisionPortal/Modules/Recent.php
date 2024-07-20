@@ -2,8 +2,7 @@
 
 namespace EnvisionPortal\Modules;
 
-use EnvisionPortal\ModuleInterface;
-use EnvisionPortal\ModuleTrait;
+use EnvisionPortal\{ModuleInterface, ModuleTrait};
 
 /**
  * @package EnvisionPortal
@@ -15,14 +14,14 @@ class Recent implements ModuleInterface
 
 	/**
 	 * Fetches the topics and their respective boards, ignoring those that the
-	 * user cannot see or wants to ignore. Returns an empty array if none are found.
+	 * user cannot see or wants to ignore.  Returns an empty array if none are found.
 	 *
-	 * @param int   $num_recent     Maximum number of topics to show. Default is 8.
-	 * @param bool  $ignore         Whether to honor ignored boards. Default is true.
-	 * @param array $exclude_boards Boards to exclude as array values. Default is null.
-	 * @param array $include_boards Boards to include as array values. Do note that, if
+	 * @param int   $num_recent     Maximum number of topics to show.  Default is 8.
+	 * @param bool  $ignore         Whether to honor ignored boards.  Default is true.
+	 * @param array $exclude_boards Boards to exclude as array values.  Default is null.
+	 * @param array $include_boards Boards to include as array values.  Do note that, if
 	 *                              specifiied, posts coming only from these boards
-	 *                              will be counted. Default is null.
+	 *                              will be counted.  Default is null.
 	 *
 	 * @return array
 	 * @since  1.0
