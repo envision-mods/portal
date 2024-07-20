@@ -2,8 +2,7 @@
 
 namespace EnvisionPortal\Modules;
 
-use EnvisionPortal\ModuleInterface;
-use EnvisionPortal\ModuleTrait;
+use EnvisionPortal\{ModuleInterface, ModuleTrait};
 
 /**
  * @package EnvisionPortal
