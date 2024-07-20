@@ -20,8 +20,6 @@ class News implements ModuleInterface, SharedPermissionsInterface
 	 * - Doesn't slice words. It CAN interrupt a sentence, however...
 	 * - Preserves all whitespace characters.
 	 *
-	 * @access private
-	 *
 	 * @param string $str The text string to split
 	 * @param int    $limit Maximum number of words to show. Default is 70.
 	 * @param string $rep What to append if $string contains more words than specified by 4max. Default is three dots.
