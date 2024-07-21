@@ -435,7 +435,7 @@ class Integration
 
 	public static function buffer($buffer)
 	{
-		global $txt, $context;
+		global $txt, $context, $db_show_debug;
 
 		/*
 		 * Fix the category links across the board, even in mods and themes
@@ -454,6 +454,40 @@ class Integration
 		$replace_array = [
 			'$0 | <a class="new_win" href="https://portal.live627.com/" target="_blank">Envision Portal ' . Portal::VERSION . ' &copy; ' . Portal::COPYRIGHT_YEAR . ' Envision Portal Team</a>',
 		];
+
+		if (isset($db_show_debug) && $db_show_debug === true && isset($context['ep_cols'])) {
+			$ret = '
+	<div id="ep_debug">';
+
+			foreach ($context['ep_cols'] as $col) {
+				$ret .= sprintf(
+					'
+		<div style="--area: %d / %d / span %d / span %d;">',
+					$col['x'],
+					$col['y'],
+					$col['rowspan'],
+					$col['colspan'],
+				);
+
+				if ($col['modules'] != []) {
+					foreach ($col['modules'] as $module) {
+						$ret .= '
+			<div class="' . (defined('SMF_VERSION') ? 'descbox' : 'plainbox') . ' centertext">
+				<b>' . $module['module_title'] . '</b><br>' . $module['time'] . ' ms
+			</div>';
+					}
+				}
+
+				$ret .= '
+		</div>';
+			}
+
+		$ret .= '
+	</div>';
+
+			$search_array[] = '/	<a href="[^?]+\?action=viewquery" target="_blank" rel="noopener">/';
+			$replace_array[] = $ret . '$0';
+		}
 
 		if ($context['show_load_time'] && isset($context['ep_time'], $context['ep_qc'])) {
 			if (isset($txt['page_created_full'])) {
