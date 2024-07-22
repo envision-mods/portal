@@ -36,6 +36,7 @@ if (version_compare(PHP_VERSION, REQUIRED_PHP_VERSION, '<'))
 		<hook hook="integrate_modifylanguages" function="EnvisionPortal\Integration::modifylanguages" />
 		<hook hook="who_allowed" function="EnvisionPortal\Integration::who_allowed" />
 		<hook hook="integrate_whos_online" function="EnvisionPortal\Integration::whos_online" />
+		<hook hook="integrate_fix_url" function="EnvisionPortal\Integration::fix_url" />
 		<database>install.php</database>
 		<modification>install21.xml</modification>
 		<require-dir name="ep_extra" destination="$boarddir" />
