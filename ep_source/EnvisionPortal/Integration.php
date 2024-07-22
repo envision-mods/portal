@@ -89,10 +89,11 @@ class Integration
 	 */
 	public static function fallback_action()
 	{
-		global $sourcedir;
+		global $context, $scripturl, $sourcedir;
 
 		if (self::$isActive) {
 			Portal::fromAction('forum');
+			$context['canonical_url'] = $scripturl . '?action=forum';
 		}
 		require_once $sourcedir . '/BoardIndex.php';
 
