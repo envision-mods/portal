@@ -450,7 +450,7 @@ class Integration
 		return $data;
 	}
 
-	 static function fix_url(&$val)
+	public static function fix_url(&$val)
 	{
 		global $context, $modSettings, $scripturl;
 
@@ -555,5 +555,11 @@ class Integration
 		}
 
 		return isset($_REQUEST['xml']) ? $buffer : preg_replace($search_array, $replace_array, $buffer);
+	}
+
+	public static function admin_search(array &$language_files, array $include_files, array &$settings_search): void
+	{
+		$language_files[] = 'ep_languages/ManageEnvisionSettings';
+		$settings_search[] = [__NAMESPACE__ . '\\ManageEnvisionSettings::getConfigVars', 'area=epconfig;sa=epgeneral'];
 	}
 }
