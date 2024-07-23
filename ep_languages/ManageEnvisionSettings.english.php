@@ -42,7 +42,7 @@ $txt['ep_credits_fugue_message'] = 'Yusuke Kamiyamane for his <a href="http://p.
 $txt['ep_credits_anyone'] = '<em>And for anyone we may have missed, thank you!</em>';
 $txt['ep_credits_all_friends'] = 'All of the Envision Portal Friends';
 $txt['ep_credits_contribute'] = 'Do you like Envision Portal?';
-$txt['ep_credits_contribute_github'] = 'Contribute to the project on GitHub!</a>';
+$txt['ep_credits_contribute_github'] = 'Contribute to the project on GitHub!';
 
 /***********************************
  * General Settings Tab
@@ -57,7 +57,7 @@ $txt['ep_portal_mode_subtext'] = 'Does not affect the operation of pages nor men
 $txt['ep_pages_mode'] = 'Enable pages';
 $txt['ep_pages_title'] = 'Pages';
 $txt['ep_pages_subtext'] = 'Pages will still work even if the portal is disabled.';
-$txt['ep_view_permissions'] = 'View portal ermission';
+$txt['ep_view_permissions'] = 'View portal permission';
 $txt['ep_view_permissions_subtext'] = 'Limit the member groups that can see the portal with all its layouts and modules.  Neither pages nor menus are affected by this setting.';
 
 $txt['ep_admin_config_modules'] = 'Modules';
