@@ -25,17 +25,10 @@ class ManageEnvisionSettings implements ActionInterface, ProvidesSubActionInterf
 		global $context, $txt;
 
 		isAllowedTo('admin_forum');
+		loadLanguage('ep_languages/ManageEnvisionSettings');
 
-		loadLanguage('ep_languages/EnvisionHelp+ManageSettings+ep_languages/ManageEnvisionSettings');
-
-		if (isset($_REQUEST['xml'])) {
-			$context['template_layers'] = [];
-		}
-
-		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => &$txt['ep_admin_config'],
-			'help' => $txt['ep_admin_config_help'],
 			'description' => $txt['ep_admin_config_desc'],
 			'tabs' => [
 				'epinfo' => [
