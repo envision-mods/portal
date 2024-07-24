@@ -20,7 +20,6 @@ function Modules()
 
 	$context[$context['admin_menu_name']]['tab_data'] = [
 		'title' => $txt['ep_admin_modules'],
-		'help' => $txt['ep_admin_modules_help'],
 		'description' => $txt['ep_admin_modules_desc'],
 		'tabs' => [
 			'epmanmodules' => [
