@@ -77,6 +77,12 @@
 		grid-gap: 1em;
 	}
 
+	/* Hack to undo a SMF style  */
+	#admin_content #layout-grid fieldset.windowbg {
+		margin: 0;
+		padding: 6px;
+	}
+
 	#layout-grid fieldset {
 		grid-area: var(--area);
 		justify-content: center;

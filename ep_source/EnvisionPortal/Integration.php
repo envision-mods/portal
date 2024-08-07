@@ -387,7 +387,7 @@ class Integration
 					'label' => $txt['ep_admin_pages'],
 					'function' => function (): void {
 						loadLanguage('ep_languages/ManageEnvisionPages');
-						loadTemplate('ep_template/ManageEnvisionPages');
+						loadTemplate('ep_template/ManageEnvisionPages', 'ep_css/admin');
 						new ManageEnvisionPages($_GET['sa'] ?? '');
 					},
 					'icon' => 'eppages',
@@ -400,7 +400,7 @@ class Integration
 					'label' => $txt['ep_admin_menu'],
 					'function' => function (): void {
 						loadLanguage('ep_languages/ManageEnvisionMenu');
-						loadTemplate('ep_template/ManageEnvisionMenu');
+						loadTemplate('ep_template/ManageEnvisionMenu', 'ep_css/admin');
 						new ManageEnvisionMenu($_GET['sa'] ?? '');
 					},
 					'icon' => 'epmenu',

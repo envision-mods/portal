@@ -158,8 +158,8 @@ class ManageEnvisionPages
 					'data' => [
 						'function' => fn(Page $rowData): string => sprintf(
 							'
-								<a href="%s?page=%s" target="_blank" class="button_submit button">%s</a>
-								<a href="%1$s?action=admin;area=eppages;sa=editpage;in=%d" class="button_submit button">%s</a>',
+								<a href="%s?page=%s" target="_blank" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '">%s</a>
+								<a href="%1$s?action=admin;area=eppages;sa=editpage;in=%d" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '">%s</a>',
 							$scripturl,
 							$rowData['slug'],
 							$txt['envision_pages_view'],
@@ -193,10 +193,10 @@ class ManageEnvisionPages
 					'position' => 'below_table_data',
 					'value' => sprintf(
 						'
-						<input type="submit" name="removePages" value="%s" onclick="return confirm(\'%s\');" class="button_submit button" />
-						<input type="submit" name="removeAll" value="%s" onclick="return confirm(\'%s\');" class="button_submit button" />
-						<a href="%s?action=admin;area=eppages;sa=addpage" class="button_submit button">%s</a>
-						<input type="submit" name="save" value="%s" class="button_submit button" />',
+						<input type="submit" name="removePages" value="%s" onclick="return confirm(\'%s\');" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '" />
+						<input type="submit" name="removeAll" value="%s" onclick="return confirm(\'%s\');" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '" />
+						<a href="%s?action=admin;area=eppages;sa=addpage" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '">%s</a>
+						<input type="submit" name="save" value="%s" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '" />',
 						$txt['envision_pages_remove_selected'],
 						$txt['envision_pages_remove_confirm'],
 						$txt['envision_pages_remove_all'],
