@@ -319,13 +319,26 @@ function Listbox() {
 	};
 }
 
-function makeChecks(f) {
+function makeChecks(f)
+{
+	// Set state dependinng on the status of the checkboxes
+	const update = (els, b) =>
+	{
+		let checkedCount = 0;
+		for (const el of els)
+			if (el.checked)
+				checkedCount++;
+
+		b.checked = checkedCount == els.length;
+		b.indeterminate = checkedCount > 0 && checkedCount != els.length;
+	};
+
 	for (const div of f)
-		if (div.nodeName == "FIELDSET") {
-			let allChecked = true;
-			for (let o of div.elements)
-				if (o.nodeName == "INPUT" && o.type == "checkbox")
-					allChecked &= o.checked;
+		if (div.nodeName == "FIELDSET")
+		{
+			const aEls = [...div.elements];
+			if (!aEls.every(o => o.nodeName == "INPUT" && o.type == "checkbox"))
+				continue;
 
 			// Add master checkbox to the legend
 			var
@@ -333,9 +346,9 @@ function makeChecks(f) {
 				b = document.createElement("input"),
 				c = document.createElement("label");
 			b.type = "checkbox";
-			b.checked = allChecked;
 			c.append(b, div.dataset.c || div.firstElementChild.textContent);
 			a.appendChild(c);
+			update(div.elements, b);
 
 			// Prepend it to the fieldset if there is no legend.
 			if (div.firstElementChild.tagName == 'LEGEND')
@@ -343,11 +356,13 @@ function makeChecks(f) {
 			else
 				div.prepend(a);
 
-			b.addEventListener("click", function (els) {
+			aEls.forEach(el => el.addEventListener("click", update.bind(null, aEls, b)));
+			b.addEventListener("click", function(els)
+			{
 				for (const o of els)
 					if (o.nodeName == "INPUT" && o.type == "checkbox")
 						o.checked = this.checked;
-			}.bind(b, div.elements));
+			}.bind(b, aEls));
 		}
 }
 
