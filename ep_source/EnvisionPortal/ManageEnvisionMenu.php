@@ -162,7 +162,7 @@ class ManageEnvisionMenu
 					],
 					'data' => [
 						'function' => fn(array $rowData): string => sprintf(
-							'<a href="%s?action=admin;area=epmenu;sa=editbutton;in=%d" class="button_submit button">%s</a>',
+							'<a href="%s?action=admin;area=epmenu;sa=editbutton;in=%d" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '">%s</a>',
 							$scripturl,
 							$rowData['id_button'],
 							$txt['modify']
@@ -194,10 +194,10 @@ class ManageEnvisionMenu
 					'position' => 'below_table_data',
 					'value' => sprintf(
 						'
-						<input type="submit" name="removeButtons" value="%s" onclick="return confirm(\'%s\');" class="button_submit button" />
-						<input type="submit" name="removeAll" value="%s" onclick="return confirm(\'%s\');" class="button_submit button" />
-						<a href="%s?action=admin;area=epmenu;sa=addbutton" class="button_submit button">%s</a>
-						<input type="submit" name="save" value="%s" class="button_submit button" />',
+						<input type="submit" name="removeButtons" value="%s" onclick="return confirm(\'%s\');" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '" />
+						<input type="submit" name="removeAll" value="%s" onclick="return confirm(\'%s\');" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '" />
+						<a href="%s?action=admin;area=epmenu;sa=addbutton" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '">%s</a>
+						<input type="submit" name="save" value="%s" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . '" />',
 						$txt['ep_menu_remove_selected'],
 						$txt['ep_menu_remove_confirm'],
 						$txt['ep_menu_remove_all'],

@@ -136,16 +136,15 @@ function template_form_below(): void
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input name="in" value="', $context['data']['id'], '" type="hidden" />
 					<div class="righttext padding">
-						<input name="submit" value="', $txt['admin_manage_menu_submit'], '" class="button_submit button" type="submit" />
+						<input name="submit" value="', $txt['admin_manage_menu_submit'], '" class="button' . (defined('SMF_VERSION') ? '' : '_submit') . ' button" type="submit" />
 					</div>
 				</div>
 			<span class="lowerframe"><span></span></span>
 			</form>
 			<script>
 				const f = document.forms.postmodify;
-				const c = new EpManage;
-				c.initGroupToggle(f);
-				c.makeChecks(f);
+				initGroupToggle(f);
+				makeChecks(f);
 				let type = \'text\';
 				for (let o of f.type)
 					if (o.checked)

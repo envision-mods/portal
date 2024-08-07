@@ -432,7 +432,7 @@ function makeUpDownLinks(f) {
 				}
 }
 
-function highlightSections(f) {
+function highlightSections(f, cls) {
 	const s = {};
 	for (const div of f) {
 		if (div.nodeName == "FIELDSET" && div.parentNode.id == 'layout-grid') {
@@ -448,20 +448,22 @@ function highlightSections(f) {
 		}
 
 		if (div.parentNode.parentNode.firstElementChild && s[div.parentNode.parentNode.firstElementChild.textContent]) {
-			// Highlight section boxes when any associated input box get focsus.
+			// Highlight section boxes when any associated input box gains focus.
 			div.addEventListener("focus", function () {
+				const n = this.parentNode.parentNode;
+
 				for (const el of f)
 					if (el.nodeName == "FIELDSET" && el.parentNode.id == 'layout-grid')
-						el.className = el.textContent == this.parentNode.parentNode.firstElementChild.textContent ? 'highlight2 largetext' : 'windowbg largetext';
+						el.className = (el.textContent == n.firstElementChild.textContent ? 'highlight2 ' + (cls == 'bg' ? 'windowbg'  : '') : cls) + ' largetext';
 
-				this.parentNode.parentNode.className = 'highlight2';
+				n.className = 'highlight2';
 			});
 
 			// Release all highlights whenever any relevant input gives the cold shoulder.
 			div.addEventListener("blur", function () {
 				for (const el of f)
 					if (el.nodeName == "FIELDSET" && el.parentNode.id == 'layout-grid')
-						el.className = 'windowbg largetext';
+						el.className = cls + ' largetext';
 
 				this.parentNode.parentNode.className = '';
 			});

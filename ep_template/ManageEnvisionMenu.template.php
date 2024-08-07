@@ -115,7 +115,7 @@ function template_main(): void
 		'checked'
 	), '/>', $txt['ep_menu_new_tab'], '
 						</span>
-						<b>', $txt['ep_menu_button_link'], ':</b><br />
+						<b>', $txt['ep_menu_button_link'], ':</b>
 						<span>
 							<input type="text" name="link" value="', $context['button_data']['link'], '" style="width:98%;" />
 							<span class="smalltext">', $txt['ep_menu_button_link_desc'], '</span>
@@ -177,8 +177,7 @@ function template_form_below(): void
 				const f = document.forms.postmodify;
 				//~ const i = new Listbox;
 				//~ i.init(f.module_icon);
-				const c = new EpManage;
-				c.initGroupToggle(f);
-				c.makeChecks(f);
+				initGroupToggle(f);
+				makeChecks(f);
 			</script>';
 }
