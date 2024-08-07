@@ -1,8 +1,8 @@
 function initModuleToggles(bIsGuest, sSessionId, sSessionVar) {
 	const t = document.getElementById("ep_main");
 	const fn = function (el, event) {
-		if (this.lastChild.src == smf_images_url + "/expand.gif") {
-			this.lastChild.src = smf_images_url + "/collapse.gif";
+		if (this.textContent == "+") {
+			this.textContent = "-";
 			el.nextElementSibling.style.display = "";
 			el.nextElementSibling.nextElementSibling.style.display = "";
 			el.nextElementSibling.nextElementSibling.nextElementSibling.style.display = "";
@@ -12,7 +12,7 @@ function initModuleToggles(bIsGuest, sSessionId, sSessionVar) {
 			else
 				smf_setThemeOption('ep_hide_module_' + el.dataset.id, '0', null, sSessionId, sSessionVar, null);
 		} else {
-			this.lastChild.src = smf_images_url + "/expand.gif";
+			this.textContent = "+";
 			el.nextElementSibling.style.display = "none";
 			el.nextElementSibling.nextElementSibling.style.display = "none";
 			el.nextElementSibling.nextElementSibling.nextElementSibling.style.display = "none";
@@ -23,7 +23,6 @@ function initModuleToggles(bIsGuest, sSessionId, sSessionVar) {
 				smf_setThemeOption('ep_hide_module_' + el.dataset.id, '1', null, sSessionId, sSessionVar, null);
 		}
 
-		event.stopPropagation();
 		event.preventDefault();
 	};
 
@@ -31,19 +30,17 @@ function initModuleToggles(bIsGuest, sSessionId, sSessionVar) {
 		if (col.className == "ep_col")
 			for (const el of col.children)
 				if (el.firstElementChild && el.firstElementChild.className == "ep_upshrink catbg") {
-					const i = document.createElement("img");
+					const a = document.createElement("a");
+					a.href = "#";
+					a.addEventListener("click", fn.bind(a, el));
 					if ((bIsGuest && localStorage.getItem('ep_hide_module_' + el.dataset.id) == '1') || (!bIsGuest && el.dataset.collapsed == '1')) {
-						i.src = smf_images_url + "/expand.gif";
+						a.append("+");
 						el.nextElementSibling.style.display = "none";
 						el.nextElementSibling.nextElementSibling.style.display = "none";
 						el.nextElementSibling.nextElementSibling.nextElementSibling.style.display = "none";
-					} else
-						i.src = smf_images_url + "/collapse.gif";
-
-					const a = document.createElement("a");
-					a.append(i);
-					a.href = "#";
-					a.addEventListener("click", fn.bind(a, el));
+					} else {
+						a.append("-");
+					}
 					el.firstElementChild.appendChild(a);
 				}
 }
