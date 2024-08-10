@@ -46,7 +46,6 @@ if (version_compare(PHP_VERSION, REQUIRED_PHP_VERSION, '<'))
 		<require-dir name="ep_languages" destination="$languagedir" />
 		<require-dir name="ep_scripts" destination="$themedir/scripts" />
 		<require-dir name="ep_template" destination="$themedir" />
-		<require-dir name="ep_images" destination="$themedir/images" />
 		<redirect url="?action=admin;area=epmodules" />
 	</install>
 	<uninstall for="2.1.*">
@@ -55,7 +54,6 @@ if (version_compare(PHP_VERSION, REQUIRED_PHP_VERSION, '<'))
 		<database>uninstall.php</database>
 		<remove-dir name="$sourcedir/ep_source" />
 		<remove-dir name="$themedir/ep_template" />
-		<remove-dir name="$imagesdir/ep_images" />
 		<remove-dir name="$languagedir/ep_languages" />
 		<remove-dir name="$themedir/css/ep_css" />
 		<remove-dir name="$themedir/scripts/ep_scripts" />
@@ -95,7 +93,6 @@ add_integration_function('integrate_load_permissions', 'EnvisionPortal\Integrati
 		<require-dir name="ep_languages" destination="$languagedir" />
 		<require-dir name="ep_scripts" destination="$themedir/scripts" />
 		<require-dir name="ep_template" destination="$themedir" />
-		<require-dir name="ep_images" destination="$themedir/images" />
 		<redirect url="?action=admin;area=epmodules" />
 	</install>
 	<uninstall for="2.0.*">
@@ -117,7 +114,6 @@ remove_integration_function('integrate_load_permissions', 'EnvisionPortal\Integr
 ?>]]></code>
 		<remove-dir name="$sourcedir/ep_source" />
 		<remove-dir name="$themedir/ep_template" />
-		<remove-dir name="$imagesdir/ep_images" />
 		<remove-dir name="$languagedir/ep_languages" />
 		<remove-dir name="$themedir/css/ep_css" />
 		<remove-dir name="$themedir/scripts/ep_scripts" />
