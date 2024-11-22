@@ -1,5 +1,19 @@
 {
     "require-dev": {
-        "saggre/phpdocumentor-markdown": "^0.1.4"
+        "saggre/phpdocumentor-markdown": "^0.1.4",
+        "phpunit/phpunit": "^10.5"
+    },
+    "scripts": {
+        "phpunit": "phpunit --testdox"
+    },
+    "autoload": {
+        "psr-4": {
+            "EnvisionPortal\\": "src/ep_source/EnvisionPortal/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "EnvisionPortal\\Tests\\": "tests/"
+        }
     }
 }
