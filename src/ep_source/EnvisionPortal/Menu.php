@@ -5,87 +5,121 @@ declare(strict_types=1);
 /**
  * @package   Envision Portal
  * @version   2.0.2
- * @author    John Rayes <live627@gmail.com>
- * @copyright Copyright (c) 2014, John Rayes
  * @license   http://opensource.org/licenses/MIT MIT
+ * @author    John Rayes <live627@gmail.com>
  */
 
 namespace EnvisionPortal;
 
+/**
+ * Handles the dynamic addition and manipulation of menu buttons in the Envision Portal.
+ */
+
 class Menu
 {
-	public static function main(&$menu_buttons): void
+	/**
+	 * Main method for injecting dynamic buttons into the menu.
+	 *
+	 * Ensures that this method is always executed last by managing its integration priority.
+	 *
+	 * @param array $menu_buttons Reference to the existing menu button structure.
+	 */
+	public static function main(array &$menu_buttons): void
 	{
-		global $smcFunc, $user_info, $scripturl, $modSettings;
+		global $user_info, $scripturl, $modSettings;
 
-		// Make damn sure we ALWAYS load last. Priority: 100!
-		if (substr($modSettings['integrate_menu_buttons'], -25) !== 'EnvisionPortal\Menu::main') {
-			remove_integration_function('integrate_menu_buttons', 'EnvisionPortal\Menu::main');
-			add_integration_function('integrate_menu_buttons', 'EnvisionPortal\Menu::main');
+		// Ensure this function is always integrated at the highest priority.
+		$integration = 'EnvisionPortal\Menu::main';
+		if (substr($modSettings['integrate_menu_buttons'], -strlen($integration)) !== $integration) {
+			remove_integration_function('integrate_menu_buttons', $integration);
+			add_integration_function('integrate_menu_buttons', $integration);
 		}
 
-		for ($i = 1; $i <= ($modSettings['ep_button_count'] ?? 0); $i++) {
+		// Process each dynamically configured button.
+		$buttonCount = (int) ($modSettings['ep_button_count'] ?? 0);
+		for ($i = 1; $i <= $buttonCount; $i++) {
 			$key = 'ep_button_' . $i;
 
-			if (!isset($modSettings[$key])) {
+			if (empty($modSettings[$key])) {
 				continue;
 			}
+
 			$row = json_decode($modSettings[$key], true);
-			$temp_menu = [
+			$tempMenu = [
 				'title' => $row['name'],
-				'href' => ($row['type'] == 'forum' ? $scripturl . '?' : '') . $row['link'],
+				'href' => ($row['type'] === 'forum' ? $scripturl . '?' : '') . $row['link'],
 				'target' => $row['target'],
-				'show' => (allowedTo('admin_forum') || array_intersect(
-							$user_info['groups'],
-							$row['groups']
-						) != []) && $row['active'],
+				'show' => (allowedTo('admin_forum') || !empty(array_intersect($user_info['groups'], $row['groups'])))
+					&& $row['active'],
 			];
 
-			self::recursive_button($temp_menu, $menu_buttons, $row['parent'], $row['position'], $key);
+			self::addMenuButton($tempMenu, $menu_buttons, $row['parent'], $row['position'], $key);
 		}
 	}
 
-	public static function replay(&$menu_buttons)
+	/**
+	 * Recursively finds the correct position to insert a button into the menu structure.
+	 *
+	 * @param array  $button        The button to add.
+	 * @param array  $menuStructure Reference to the current menu structure.
+	 * @param string $parentKey     The parent button under which this button is placed.
+	 * @param string $position      The position relative to the parent (e.g., before, after, child_of).
+	 * @param string $buttonKey     The unique key for this button.
+	 */
+	public static function addMenuButton(array $button, array &$menuStructure, string $parentKey, string $position, string $buttonKey): void
 	{
-		global $context;
-
-		$context['replayed_menu_buttons'] = $menu_buttons;
-	}
-
-	private static function recursive_button(array $needle, array &$haystack, $insertion_point, $where, $key): void
-	{
-		foreach ($haystack as $area => &$info) {
-			if ($area == $insertion_point)
-				switch ($where) {
+		foreach ($menuStructure as $key => &$menu) {
+			if ($key === $parentKey) {
+				switch ($position) {
 					case 'before':
 					case 'after':
-						self::insert_button([$key => $needle], $haystack, $insertion_point, $where);
+						self::insertButton([$buttonKey => $button], $menuStructure, $parentKey, $position);
 						break 2;
 
 					case 'child_of':
-						$info['sub_buttons'][$key] = $needle;
+						$menu['sub_buttons'][$buttonKey] = $button;
 						break 2;
 				}
-			elseif (!empty($info['sub_buttons'])) {
-				self::recursive_button($needle, $info['sub_buttons'], $insertion_point, $where, $key);
+			} elseif (!empty($menu['sub_buttons'])) {
+				self::addMenuButton($button, $menu['sub_buttons'], $parentKey, $position, $buttonKey);
 			}
 		}
 	}
 
-	private static function insert_button(array $needle, array &$haystack, $insertion_point, $where = 'after'): void
+	/**
+	 * Replay the current state of menu buttons for debugging purposes.
+	 *
+	 * @param array $menu_buttons The current menu button structure.
+	 */
+	public static function replay(array &$menu_buttons): void
+	{
+		global $context;
+		$context['replayed_menu_buttons'] = $menu_buttons;
+	}
+
+	/**
+	 * Inserts a button into a specific position within the menu structure.
+	 *
+	 * @param array  $button        The button to insert.
+	 * @param array  $menuStructure Reference to the current menu structure.
+	 * @param string $referenceKey  The key to position relative to.
+	 * @param string $position      The position relative to the reference (before or after).
+	 */
+	private static function insertButton(array $button, array &$menuStructure, string $referenceKey, string $position = 'after'): void
 	{
 		$offset = 0;
-
-		foreach ($haystack as $area => $dummy) {
-			if (++$offset && $area == $insertion_point) {
+		foreach ($menuStructure as $key => $value) {
+			if (++$offset && $key === $referenceKey) {
 				break;
 			}
 		}
 
-		if ($where == 'before') {
+		if ($position === 'before') {
 			$offset--;
 		}
 
-		$haystack = array_slice($haystack, 0, $offset, true) + $needle + array_slice($haystack, $offset, null, true);
+		$menuStructure = array_slice($menuStructure, 0, $offset, true)
+			+ $button
+			+ array_slice($menuStructure, $offset, null, true);
 	}
 }
