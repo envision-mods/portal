@@ -24,7 +24,7 @@ class MenuTest extends \PHPUnit\Framework\TestCase
 	 *
 	 * @return array
 	 */
-	public function buttonInsertionProvider(): array
+	public static function buttonInsertionProvider(): array
 	{
 		return [
 			'Insert before existing button' => [
@@ -129,7 +129,6 @@ class MenuTest extends \PHPUnit\Framework\TestCase
 			]),
 		];
 
-		$user_info = ['groups' => [1]];
 		$scripturl = '/forum/index.php';
 
 		Menu::main($this->menuButtons);

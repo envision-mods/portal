@@ -12,11 +12,11 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
-class Page implements EntityInterface, \ArrayAccess
+class Page implements \ArrayAccess
 {
 	use ArrayAccessTrait;
 
-	public int $id;
+	public ?int $id;
 	public ?string $slug;
 	public ?string $name;
 	public ?string $type;
@@ -28,7 +28,7 @@ class Page implements EntityInterface, \ArrayAccess
 	public int $views;
 
 	/**
-	 * @param int $id
+	 * @param ?int $id
 	 * @param ?string $slug
 	 * @param ?string $name
 	 * @param ?string $type
@@ -39,7 +39,7 @@ class Page implements EntityInterface, \ArrayAccess
 	 * @param int $views
 	 */
 	public function __construct(
-		int $id,
+		?int $id,
 		?string $slug,
 		?string $name,
 		?string $type,
@@ -47,7 +47,7 @@ class Page implements EntityInterface, \ArrayAccess
 		?array $permissions,
 		?string $status,
 		?string $description,
-		int $views
+		int $views = 0,
 	) {
 		$this->id = $id;
 		$this->slug = $slug;
@@ -58,14 +58,6 @@ class Page implements EntityInterface, \ArrayAccess
 		$this->status = $status;
 		$this->description = $description;
 		$this->views = $views;
-	}
-
-	/**
-	 * @return ?string
-	 */
-	public function getName(): ?string
-	{
-		return $this->name;
 	}
 
 	/**
@@ -93,18 +85,109 @@ class Page implements EntityInterface, \ArrayAccess
 	}
 
 	/**
-	 * @return ?string
+	 * @uses DatabaseHelper::fetchBy
 	 */
-	public function getDescription(): ?string
-	{
-		return $this->description;
+	public static function fetchBy(
+		array $selects,
+		array $params = [],
+		array $joins = [],
+		array $where = [],
+		array $order = [],
+		array $group = [],
+		int $limit = null,
+		int $offset = null
+	): array {
+		$entries = DatabaseHelper::fetchBy($selects, '{db_prefix}envision_pages', $params, $joins, $where, $order, $group, $limit, $offset);
+		$pages = [];
+
+		foreach ($entries as $entry) {
+			$pages[] = new Page(
+				(int) $entry['id_page'],
+				$entry['slug'] ?? null,
+				$entry['name'] ?? null,
+				$entry['type'] ?? null,
+				$entry['body'] ?? null,
+				isset($entry['permissions']) ? explode(',', $entry['permissions']) : null,
+				$entry['status'] ?? null,
+				$entry['description'] ?? null,
+				(int) ($entry['views'] ?? null)
+			);
+		}
+
+		return $pages;
 	}
 
 	/**
-	 * @return int
+	 * @uses DatabaseHelper::insert
 	 */
-	public function getId(): int
+	public function insert(): void
 	{
-		return $this->id;
+		global $user_info;
+
+		DatabaseHelper::insert('{db_prefix}envision_pages', [
+			'name' => ['string-255', $this->name],
+			'slug' => ['string-65', $this->slug],
+			'type' => ['string-65', $this->type],
+			'description' => ['string-255', $this->description],
+			'status' => ['string-255', $this->status],
+			'body' => ['string', $this->body],
+			'permissions' => ['string-255', implode(',', $this->permissions)],
+			'poster_name' => ['string', $user_info['name']],
+			'id_member' => ['int', $user_info['id']],
+			'created_at' => ['raw', 'NOW()'],
+		]);
+	}
+
+	/**
+	 * @uses DatabaseHelper::update
+	 */
+	public function update(): void
+	{
+		DatabaseHelper::update('{db_prefix}envision_pages', [
+			'name' => ['string-255', $this->name],
+			'slug' => ['string-65', $this->slug],
+			'type' => ['string-65', $this->type],
+			'description' => ['string-255', $this->description],
+			'status' => ['string-255', $this->status],
+			'body' => ['string', $this->body],
+			'permissions' => ['string-255', implode(',', $this->permissions)],
+			'updated_at' => ['raw', 'NOW()'],
+		],'id_page', $this->id);
+	}
+
+	public function delete(): void
+	{
+		$this->deleteMany([$this->id]);
+	}
+
+	/**
+	 * @uses DatabaseHelper::deleteMany
+	 */
+	public function deleteMany(array $ids): void
+	{
+		DatabaseHelper::deleteMany('{db_prefix}envision_pages', 'id_page', $ids);
+	}
+
+	/**
+	 * @uses DatabaseHelper::deleteAll()
+	 */
+	public function deleteAll(): void
+	{
+		DatabaseHelper::deleteAll('{db_prefix}envision_pages');
+	}
+
+	/**
+	 * Increment the view count for a page if not already viewed in the current session.
+	 *
+	 * @uses DatabaseHelper::increment()
+	 */
+	public function incrementViews(): void
+	{
+		if (!isset($_SESSION['viewed_page_' . $this->id])) {
+			DatabaseHelper::increment('{db_prefix}envision_pages', 'views', 'id_page', $this->id);
+
+			$_SESSION['viewed_page_' . $this->id] = '1';
+			$this->views++;
+		}
 	}
 }

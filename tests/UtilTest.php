@@ -17,7 +17,7 @@ class UtilTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals($expected, Util::decamelize($input));
 	}
 
-	public function decamelizeProvider(): array
+	public static function decamelizeProvider(): array
 	{
 		return [
 			['helloWorld', 'hello_world'],
@@ -35,7 +35,7 @@ class UtilTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals($expected, Util::camelize($input));
 	}
 
-	public function camelizeProvider(): array
+	public static function camelizeProvider(): array
 	{
 		return [
 			['hello_world', 'HelloWorld'],
@@ -53,7 +53,7 @@ class UtilTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals($expected, Util::replaceVars($template, $variables));
 	}
 
-	public function replaceVarsProvider(): array
+	public static function replaceVarsProvider(): array
 	{
 		return [
 			['Hello {{name}}, welcome to {{place}}!', ['name' => 'John', 'place' => 'Earth'], 'Hello John, welcome to Earth!'],
@@ -71,7 +71,7 @@ class UtilTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals($expected, Util::process($start, $items_per_page, $sort, $list));
 	}
 
-	public function processProvider(): array
+	public static function processProvider(): array
 	{
 		return [
 			[
@@ -125,40 +125,23 @@ class UtilTest extends \PHPUnit\Framework\TestCase
 
 	public function testListGroups()
 	{
-		global $txt, $smcFunc, $modSettings;
+		$groups = Util::listGroups([-1], false);
 
-		// Mock global variables
-		$txt = ['parent_guests_only' => 'Guests', 'parent_members_only' => 'Members'];
-		$smcFunc = [
-			'db_query' => fn() => new \ArrayIterator([
-				[1, 'Admin', -1],
-				[2, 'Moderator', 0],
-			]),
-			'db_fetch_row' => function (\Iterator $iterator): mixed {
-				$return = $iterator->current();
-				$iterator->next();
-				return $return;
-			},
-			'db_free_result' => fn($result) => null,
-		];
-
-		$modSettings = ['permission_enable_postgroups' => true];
-
-		$groups = Util::listGroups([-1, 2], false);
-
-		$this->assertCount(4, $groups);
+		$this->assertCount(3, $groups);
 		$this->assertArrayHasKey(-1, $groups);
 		$this->assertArrayHasKey(2, $groups);
 		$this->assertEquals('Guests', $groups[-1]['name']);
 		$this->assertTrue($groups[-1]['checked']);
-		$this->assertFalse($groups[1]['checked']);
-		$this->assertEquals('Admin', $groups[1]['name']);
-		$this->assertEquals('Moderator', $groups[2]['name']);
+		$this->assertFalse($groups[0]['checked']);
+		$this->assertEquals('Members', $groups[0]['name']);
+		$this->assertFalse($groups[2]['checked']);
+		$this->assertEquals('Global Moderator', $groups[2]['name']);
 
 		$groups = Util::listGroups([-3], false);
 
 		$this->assertTrue($groups[-1]['checked']);
-		$this->assertTrue($groups[1]['checked']);
+		$this->assertTrue($groups[0]['checked']);
+		$this->assertTrue($groups[2]['checked']);
 	}
 
 	/**
@@ -173,7 +156,7 @@ class UtilTest extends \PHPUnit\Framework\TestCase
 		$this->assertSame($expected, $result);
 	}
 
-	public function mapProvider(): array
+	public static function mapProvider(): array
 	{
 		return [
 			// Test case 1: Simple transformation

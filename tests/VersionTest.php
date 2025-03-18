@@ -64,7 +64,7 @@ class VersionTest extends TestCase
 	/**
 	 * Data provider for testCompareTo.
 	 */
-	public function compareToDataProvider(): array
+	public static function compareToDataProvider(): array
 	{
 		return [
 			'major version higher' => ['2.0.0', '1.9.9'],
@@ -216,7 +216,7 @@ class VersionTest extends TestCase
 	/**
 	 * Data provider for testFindHighestCompatible.
 	 */
-	public function findHighestCompatibleDataProvider(): array
+	public static function findHighestCompatibleDataProvider(): array
 	{
 		return [
 			['1.4.0', '1.0, 1.2-1.5', '1.5.0'],            // Finds highest in range

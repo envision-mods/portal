@@ -24,33 +24,9 @@ class Pages
 			$query = 'id_page = {int:page}';
 		}
 
-		$request = $smcFunc['db_query']('', '
-			SELECT *
-			FROM {db_prefix}envision_pages
-			WHERE ' . $query . '
-			LIMIT 1',
-			[
-				'page' => $call,
-			]
-		);
+		$entries = Page::fetchBy(['*'], ['page' => $call], [], [$query]);
 
-		if ($smcFunc['db_num_rows']($request) == 0) {
-			return null;
-		}
-
-		$row = $smcFunc['db_fetch_assoc']($request);
-
-		return new Page(
-			(int) $row['id_page'],
-			$row['slug'],
-			$row['name'],
-			$row['type'],
-			$row['body'],
-			explode(',', $row['permissions']),
-			$row['status'],
-			$row['description'],
-			(int) $row['views']
-		);
+		return $entries[0] ?? null;
 	}
 
 	public static function main(): void
@@ -72,7 +48,7 @@ class Pages
 			fatal_lang_error('ep_pages_not_exist', false);
 		}
 		if ($row->isAllowed()) {
-			$context['page_title'] = $row->getName();
+			$context['page_title'] = $row->name;
 
 			$context['page_data'] = [
 				'body' => $row->getBody(),

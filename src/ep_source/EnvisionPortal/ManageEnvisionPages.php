@@ -17,8 +17,6 @@ namespace EnvisionPortal;
  */
 class ManageEnvisionPages
 {
-	private DataMapper $dataMapper;
-
 	public function __construct(string $sa)
 	{
 		global $context, $settings, $txt;
@@ -40,7 +38,6 @@ class ManageEnvisionPages
 		];
 		$context['html_headers'] .= '
 	<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/ep_scripts/admin.js"></script>';
-		$this->dataMapper = new DataMapper;
 
 		$subActions = [
 			'manmenu' => 'ManageMenu',
@@ -68,7 +65,7 @@ class ManageEnvisionPages
 		} // Changing the status?
 		elseif (isset($_POST['save'])) {
 			checkSession();
-			$entries = $this->dataMapper->fetchBy(
+			$entries = Page::fetchBy(
 				['id_page', 'name', 'type', 'slug', 'status', 'description']
 			);
 
@@ -89,7 +86,7 @@ class ManageEnvisionPages
 	{
 		global $context, $txt, $scripturl, $sourcedir;
 
-		$entries = $this->dataMapper->fetchBy(
+		$entries = Page::fetchBy(
 			['id_page', 'name', 'type', 'slug', 'status', 'description']
 		);
 
@@ -266,7 +263,7 @@ class ManageEnvisionPages
 		}
 
 		// Let's make sure you're not trying to make a slug that's already taken.
-		$entries = $this->dataMapper->fetchBy(
+		$entries = Page::fetchBy(
 			['id_page'],
 			[
 				'slug' => $data['slug'],
@@ -353,10 +350,10 @@ class ManageEnvisionPages
 					0
 				);
 
-				if ($page->getId() == 0) {
-					$this->dataMapper->insert($page);
+				if ($page->id == 0) {
+					$page->insert();
 				} else {
-					$this->dataMapper->update($page);
+					$page->update();
 				}
 				redirectexit('action=admin;area=eppages');
 			} else {
@@ -394,7 +391,7 @@ class ManageEnvisionPages
 			fatal_lang_error('no_access', false);
 		}
 
-		$entries = $this->dataMapper->fetchBy(['*'], ['id' => $_GET['in']], [], ['id_page = {int:id}']);
+		$entries = Page::fetchBy(['*'], ['id' => $_GET['in']], [], ['id_page = {int:id}']);
 		$row = $entries[0] ?? [];
 		if ($row == []) {
 			fatal_lang_error('no_access', false);

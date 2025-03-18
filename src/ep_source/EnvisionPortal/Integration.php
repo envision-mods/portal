@@ -442,7 +442,7 @@ class Integration
 			if ($row->isAllowed()) {
 				$data = Util::replaceVars(
 					$txt['ep_who_page'],
-					['scripturl' => $scripturl, 'page' => $actions['page'], 'page_name' => censorText($row->getName())]
+					['scripturl' => $scripturl, 'page' => $actions['page'], 'page_name' => censorText($row->name)]
 				);
 			}
 		}
