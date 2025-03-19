@@ -18,6 +18,11 @@ function allowedTo(string $string)
 	return true;
 }
 
+function isAllowedTo(string $string)
+{
+	return true;
+}
+
 function call_integration_hook($hook, $parameters = array())
 {
 	// You're fired!  You're all fired!  Get outta here!
@@ -29,7 +34,20 @@ function fatal_error($msg, $log)
 	echo $msg;
 }
 
+function fatal_lang_error($msg, $log)
+{
+	throw new Error($msg);
+}
+
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
+{
+}
+
+function checkSession($method, $param, $fatal)
+{
+}
+
+function redirectexit($url)
 {
 }
 
@@ -61,6 +79,32 @@ function parse_bbc($text)
 	// Replacing the BBcodes with corresponding HTML tags
 	return preg_replace($find, $replace, $text);
 }
+
+function fixchar__callback($matches)
+{
+	if (!isset($matches[1]))
+		return '';
+
+	$num = $matches[1][0] === 'x' ? hexdec(substr($matches[1], 1)) : (int) $matches[1];
+
+	// <0x20 are control characters, > 0x10FFFF is past the end of the utf8 character set
+	// 0xD800 >= $num <= 0xDFFF are surrogate markers (not valid for utf8 text), 0x202D-E are left to right overrides
+	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202D || $num === 0x202E)
+		return '';
+	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and punctuation
+	elseif ($num < 0x80)
+		return chr($num);
+	// <0x800 (2048)
+	elseif ($num < 0x800)
+		return chr(($num >> 6) + 192) . chr(($num & 63) + 128);
+	// < 0x10000 (65536)
+	elseif ($num < 0x10000)
+		return chr(($num >> 12) + 224) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+	// <= 0x10FFFF (1114111)
+	else
+		return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
+}
+
 class TestObj
 {
 	public static $last_query;
@@ -72,8 +116,26 @@ class TestObj
 
 global $smcFunc, $user_info, $txt;
 
+global $context, $settings, $txt, $user_info;
+
+// Set up necessary global variables
+$context = [
+	'html_headers' => '',
+	'admin_menu_name' => 'Admin Menu',
+];
+$settings = ['default_theme_url' => '/theme/url'];
+$txt = [
+	'admin_menu_title' => 'Admin Menu Title',
+	'admin_menu' => 'Admin Menu',
+	'admin_menu_description' => 'Admin Menu Description',
+	'admin_manage_menu_description' => 'Manage Menu Description',
+	'admin_menu_add_page_description' => 'Add Page Description',
+	'parent_guests_only' => 'Guests',
+	'parent_members_only' => 'Members',
+];
 $user_info = ['is_admin' => true, 'is_guest' => false, 'language' => '', 'id' => 1, 'name' => 'Test User', 'groups' => [0], 'permissions' => []];
-$txt = ['parent_guests_only' => 'Guests', 'parent_members_only' => 'Members'];
+
+require __DIR__ . '/../src/ep_languages/ManageEnvisionPages.english.php';
 
 TestObj::$pdo = new PDO('sqlite::memory:');
 TestObj::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

@@ -212,7 +212,7 @@ class ManageEnvisionPages
 		$context['default_list'] = 'list';
 	}
 
-	private function getInput(): array
+	public function getInput(): array
 	{
 		$member_groups = Util::listGroups([-3]);
 		$args = [
@@ -284,6 +284,11 @@ class ManageEnvisionPages
 		if (isset($_POST['submit'])) {
 			$data = array_replace(
 				[
+					'in' => 0,
+					'name' => '',
+					'slug' => '',
+					'description' => '',
+					'body' => '',
 					'type' => 'HTML',
 					'permissions' => [],
 					'status' => 'active',
@@ -344,7 +349,7 @@ class ManageEnvisionPages
 					$data['name'],
 					$data['type'],
 					$data['body'],
-					array_map('intval', array_filter(explode(',', $data['permissions']), 'is_string')),
+					array_map('intval', array_filter($data['permissions'], 'is_string')),
 					$data['status'],
 					$data['description'],
 					0
@@ -398,15 +403,15 @@ class ManageEnvisionPages
 		}
 
 		$context['data'] = [
-			'id' => $row['id_page'],
-			'name' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row['name']),
-			'slug' => $row['slug'],
-			'type' => $row['type'],
+			'id' => $row->id,
+			'name' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row->name),
+			'slug' => $row->slug,
+			'type' => $row->type,
 			'types' => $this->getTypes(),
-			'permissions' => Util::listGroups(explode(',', $row['permissions'])),
-			'body' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row['body']),
-			'status' => $row['status'],
-			'description' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row['description']),
+			'permissions' => Util::listGroups($row->permissions),
+			'body' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row->body),
+			'status' => $row->status,
+			'description' => preg_replace_callback('/&#([1-9][0-9]{4,6});/', 'fixchar__callback', $row->description),
 		];
 		$context['page_title'] = $txt['envision_pages_edit_title'];
 		$context['template_layers'][] = 'form';

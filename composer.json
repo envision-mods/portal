@@ -1,4 +1,7 @@
 {
+    "require": {
+        "php": ">=7.4"
+    },
     "require-dev": {
         "saggre/phpdocumentor-markdown": "^0.1.4",
         "phpunit/phpunit": "^10.5"

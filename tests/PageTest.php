@@ -145,9 +145,9 @@ class PageTest extends TestCase
 	public static function getBodyProvider(): array
 	{
 		return [
-			['php', '<?php echo "Hello"; ?>', 'Hello'],
-			['bbcode', '[b]Hello[/b]', '<b>Hello</b>'],
-			['html', '<p>Hello</p>', '<p>Hello</p>'],
+			['PHP', '<?php echo "Hello"; ?>', 'Hello'],
+			['BBCode', '[b]Hello[/b]', '<b>Hello</b>'],
+			['HTML', '<p>Hello</p>', '<p>Hello</p>'],
 		];
 	}
 
