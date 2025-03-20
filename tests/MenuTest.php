@@ -102,7 +102,6 @@ class MenuTest extends \PHPUnit\Framework\TestCase
 	{
 		global $context;
 
-		$context = [];
 		Menu::replay($this->menuButtons);
 
 		// Verify the replayed menu is stored in the global context

@@ -121,6 +121,7 @@ global $context, $settings, $txt, $user_info;
 
 // Set up necessary global variables
 $context = [
+	'forum_name' => '',
 	'html_headers' => '',
 	'admin_menu_name' => 'Admin Menu',
 ];

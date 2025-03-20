@@ -39,15 +39,16 @@ class Pages
 
 		$call = $_GET['page'] ?? redirectexit();
 
-		// Put it in the session to prevent it from being logged when they refresh the page.
-		$_SESSION['last_page_id'] = $call;
-
 		$row = self::fetch($call);
 
 		if ($row === null) {
 			fatal_lang_error('ep_pages_not_exist', false);
 		}
+
 		if ($row->isAllowed()) {
+			// Put it in the session to prevent it from being logged when they refresh the page.
+			$_SESSION['last_page_id'] = $row->id;
+
 			$context['page_title'] = $row->name;
 
 			$context['page_data'] = [
@@ -62,9 +63,9 @@ class Pages
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="' . $context['forum_name'] . '">
 	<meta property="og:title" content="' . $context['page_title'] . '">
-	<meta property="og:description" content="' . $smcFunc['htmlspecialchars']($row->getDescription()) . '">';
+	<meta property="og:description" content="' . $smcFunc['htmlspecialchars']($row->description) . '">';
 			} else {
-				$context['meta_description'] = $smcFunc['htmlspecialchars']($row->getDescription());
+				$context['meta_description'] = $smcFunc['htmlspecialchars']($row->description);
 				self::setMetaProperty('type', 'website');
 			}
 		} else {
