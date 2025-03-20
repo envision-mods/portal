@@ -16,37 +16,37 @@ class Page implements \ArrayAccess
 {
 	use ArrayAccessTrait;
 
-	public ?int $id;
-	public ?string $slug;
-	public ?string $name;
-	public ?string $type;
-	public ?string $body;
-	public ?array $permissions;
-	public ?string $status;
-	public ?string $description;
+	public int $id;
+	public string $slug;
+	public string $name;
+	public string $type;
+	public string $body;
+	public array $permissions;
+	public string $status;
+	public string $description;
 	private PageModeInterface $mode;
 	public int $views;
 
 	/**
-	 * @param ?int $id
-	 * @param ?string $slug
-	 * @param ?string $name
-	 * @param ?string $type
-	 * @param ?string $body
-	 * @param ?array $permissions
-	 * @param ?string $status
-	 * @param ?string $description
+	 * @param int $id
+	 * @param string $slug
+	 * @param string $name
+	 * @param string $type
+	 * @param string $body
+	 * @param array $permissions
+	 * @param string $status
+	 * @param string $description
 	 * @param int $views
 	 */
 	public function __construct(
-		?int $id,
-		?string $slug,
-		?string $name,
-		?string $type,
-		?string $body,
-		?array $permissions,
-		?string $status,
-		?string $description,
+		int $id = 0,
+		string $slug = '',
+		string $name = '',
+		string $type = '',
+		string $body = '',
+		array $permissions = [],
+		string $status = '',
+		string $description = '',
 		int $views = 0,
 	) {
 		$this->id = $id;
@@ -103,14 +103,14 @@ class Page implements \ArrayAccess
 		foreach ($entries as $entry) {
 			$pages[] = new Page(
 				(int) $entry['id_page'],
-				$entry['slug'] ?? null,
-				$entry['name'] ?? null,
-				$entry['type'] ?? null,
-				$entry['body'] ?? null,
-				isset($entry['permissions']) ? explode(',', $entry['permissions']) : null,
-				$entry['status'] ?? null,
-				$entry['description'] ?? null,
-				(int) ($entry['views'] ?? null)
+				$entry['slug'] ?? '',
+				$entry['name'] ?? '',
+				$entry['type'] ?? '',
+				$entry['body'] ?? '',
+				isset($entry['permissions']) ? explode(',', $entry['permissions']) : [],
+				$entry['status'] ?? '',
+				$entry['description'] ?? '',
+				(int) ($entry['views'] ?? '')
 			);
 		}
 
@@ -157,7 +157,7 @@ class Page implements \ArrayAccess
 
 	public function delete(): void
 	{
-		DatabaseHelper::deleteMany('{db_prefix}envision_pages', 'id_page', $this->id);
+		DatabaseHelper::delete('{db_prefix}envision_pages', 'id_page', $this->id);
 	}
 
 	/**

@@ -36,6 +36,9 @@ class ManageEnvisionPagesTest extends TestCase
 	{
 		TestObj::$pdo->exec('DELETE FROM envision_pages');
 		TestObj::$pdo->exec('DELETE FROM SQLITE_SEQUENCE where name=\'envision_pages\'');
+
+		$_GET = [];
+		$_POST = [];
 	}
 
 	protected function setUp(): void
@@ -44,6 +47,11 @@ class ManageEnvisionPagesTest extends TestCase
 		$stmt->execute([1, 'test-slug', 'Test Page', 'html', '<p>Body</p>', '1', 'active', 'A test page', 10]);
 		$stmt->execute([2, 'second-slug', 'Second Page', 'php', '<?php echo "Hello"; ?>', '1,2', 'inactive', 'Second test page', 5]);
 		$stmt->execute([3, 'third-slug', 'Third Page', 'html', '<div>Third Body</div>', '2', 'active', 'Third test page', 7]);
+
+        $this->manageEnvisionPages = $this->getMockBuilder(EnvisionPortal\ManageEnvisionPages::class)
+                ->disableOriginalConstructor()
+            ->onlyMethods(['getInput'])
+            ->getMock();
 	}
 
     public function t4estManageMenu()
@@ -59,10 +67,6 @@ class ManageEnvisionPagesTest extends TestCase
     {
         global $context;
 
-        $this->manageEnvisionPages = $this->getMockBuilder(EnvisionPortal\ManageEnvisionPages::class)
-                ->disableOriginalConstructor()
-            ->onlyMethods(['getInput'])
-            ->getMock();
         $data = [
             'name' => 'Test Page',
             'slug' => 'test-page',
@@ -133,7 +137,7 @@ class ManageEnvisionPagesTest extends TestCase
 		$this->assertEquals('Test Page', $context['data']['name']);
 		$this->assertEquals('html', $context['data']['type']);
 		$this->assertIsList($context['data']['types']);
-		$this->assertEquals('html', $context['data']['types'][1][0]);
+		$this->assertEquals('HTML', $context['data']['types'][1][0]);
 		$this->assertEquals('<p>Body</p>', $context['data']['body']);
 		$this->assertCount(3, $context['data']['permissions']);
 		$this->assertArrayHasKey(2, $context['data']['permissions']);
@@ -168,7 +172,7 @@ class ManageEnvisionPagesTest extends TestCase
 		$this->assertIsList($context['data']['types'][0]);
 		$this->assertEquals('bb_code', $context['data']['types'][0][1]);
 		$this->assertEquals('BBCode', $context['data']['types'][0][0]);
-		$this->assertInstanceOf(EnvisionPortal\PageModeInterface::class, $context['data']['types'][0][1]);
+		$this->assertInstanceOf(EnvisionPortal\PageModeInterface::class, $context['data']['types'][0][2]);
 		$this->assertIsList($context['data']['types'][1]);
 		$this->assertEquals('html', $context['data']['types'][1][1]);
 		$this->assertEquals('HTML', $context['data']['types'][1][0]);
@@ -179,7 +183,7 @@ class ManageEnvisionPagesTest extends TestCase
 		$_POST['removeAll'] = true;
 		$this->manageEnvisionPages->ManageMenu();
 
-		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages WHERE id_page = 1');
+		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages');
 		$count = $stmt->fetchColumn();
 		$this->assertEquals(0, $count, 'All pages should be deleted');
     }
@@ -189,7 +193,7 @@ class ManageEnvisionPagesTest extends TestCase
 		$_POST = ['removePages' => true, 'remove' => ['1', '3r', '2']];
 		$this->manageEnvisionPages->ManageMenu();
 
-		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages WHERE id_page = 1');
+		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages');
 		$count = $stmt->fetchColumn();
 		$this->assertEquals(1, $count, 'Only one page should remain after removal');
     }
@@ -199,8 +203,8 @@ class ManageEnvisionPagesTest extends TestCase
 		$_POST = ['save' => true, 'status' => ['2' => 'on']];
 		$this->manageEnvisionPages->ManageMenu();
 
-		$pages = EnvisionPortal\Page::fetchBy(['status']]);
-		$this->assertEquals('inactive', $pages[0]['status']);
+		$pages = EnvisionPortal\Page::fetchBy(['id_page', 'status']);
+		$this->assertEquals('inactive', $pages[0]['status'],'nnnnnnnnnnnnnn');
 		$this->assertEquals('active', $pages[1]['status']);
 		$this->assertEquals('inactive', $pages[2]['status']);
 	}

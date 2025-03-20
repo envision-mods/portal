@@ -63,23 +63,22 @@ class ManageEnvisionPages
 		} // Changing the status?
 		elseif (isset($_POST['save'])) {
 			checkSession();
-			$entries = Page::fetchBy(
-				['id_page', 'name', 'type', 'slug', 'status', 'description']
-			);
 
-			foreach ($entries as $item) {
-				$status = !empty($_POST['status'][$item['id_page']]) ? 'active' : 'inactive';
+			$entries = Page::fetchBy(['*']);
 
-				if ($page->status != $item['status']) {
-					$page->status == $item['status'];
-					$page->saave();
+			foreach ($entries as $page) {
+				$status = !empty($_POST['status'][$page->id]) ? 'active' : 'inactive';
+
+				if ($page->status != $status) {
+					$page->status = $status;
+					$page->update();
 				}
 			}
 
 			redirectexit('action=admin;area=eppages');
+		} else {
+			$this->listPages();
 		}
-
-		$this->listPages();
 	}
 
 	private function listPages(): void
