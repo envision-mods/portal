@@ -54,7 +54,7 @@ class ManageEnvisionPages
 		if (isset($_POST['removeAll'])) {
 			checkSession();
 			$this->um->deleteallPages();
-			$this->um->rebuildMenu();
+			$this->um->rebuildMenu()
 			redirectexit('action=admin;area=eppages');
 		} // User pressed the 'remove selection page'.
 		elseif (isset($_POST['removePages'], $_POST['remove']) && is_array($_POST['remove'])) {

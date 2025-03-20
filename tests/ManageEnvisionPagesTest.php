@@ -167,8 +167,8 @@ class ManageEnvisionPagesTest extends TestCase
 		$this->assertIsList($context['data']['types']);
 		$this->assertIsList($context['data']['types'][0]);
 		$this->assertEquals('bb_code', $context['data']['types'][0][0]);
-		$this->assertEquals('BBCode', $context['data']['types'][0][1]);
-		$this->assertInstanceOf(EnvisionPortal\PageModeInterface::class, $context['data']['types'][0][1]);
+		$this->assertEquals('BBCode', $context['data']['types'][[0][1]);
+		$this->assertInstanceOf(EnvisionPortal\PageModeInterface::class, $context['data']['types'][[0][1]);
 		$this->assertIsList($context['data']['types'][1]);
 		$this->assertEquals('html', $context['data']['types'][1][0]);
 		$this->assertEquals('HTML', $context['data']['types'][1][1]);
