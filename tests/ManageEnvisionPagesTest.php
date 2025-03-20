@@ -166,11 +166,42 @@ class ManageEnvisionPagesTest extends TestCase
 		$this->assertEquals('HTML', $context['data']['type']);
 		$this->assertIsList($context['data']['types']);
 		$this->assertIsList($context['data']['types'][0]);
-		$this->assertEquals('bb_code', $context['data']['types'][0][0]);
-		$this->assertEquals('BBCode', $context['data']['types'][[0][1]);
-		$this->assertInstanceOf(EnvisionPortal\PageModeInterface::class, $context['data']['types'][[0][1]);
+		$this->assertEquals('bb_code', $context['data']['types'][0][1]);
+		$this->assertEquals('BBCode', $context['data']['types'][0][0]);
+		$this->assertInstanceOf(EnvisionPortal\PageModeInterface::class, $context['data']['types'][0][1]);
 		$this->assertIsList($context['data']['types'][1]);
-		$this->assertEquals('html', $context['data']['types'][1][0]);
-		$this->assertEquals('HTML', $context['data']['types'][1][1]);
+		$this->assertEquals('html', $context['data']['types'][1][1]);
+		$this->assertEquals('HTML', $context['data']['types'][1][0]);
     }
+
+	public function testRemoveAll(): void
+	{
+		$_POST['removeAll'] = true;
+		$this->manageEnvisionPages->ManageMenu();
+
+		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages WHERE id_page = 1');
+		$count = $stmt->fetchColumn();
+		$this->assertEquals(0, $count, 'All pages should be deleted');
+    }
+
+	public function testRemoveMany(): void
+	{
+		$_POST = ['removePages' => true, 'remove' => ['1', '3r', '2']];
+		$this->manageEnvisionPages->ManageMenu();
+
+		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages WHERE id_page = 1');
+		$count = $stmt->fetchColumn();
+		$this->assertEquals(1, $count, 'Only one page should remain after removal');
+    }
+
+	public function testChangeStatus(): void
+	{
+		$_POST = ['save' => true, 'status' => ['2' => 'on']];
+		$this->manageEnvisionPages->ManageMenu();
+
+		$pages = EnvisionPortal\Page::fetchBy(['status']]);
+		$this->assertEquals('inactive', $pages[0]['status']);
+		$this->assertEquals('active', $pages[1]['status']);
+		$this->assertEquals('inactive', $pages[2]['status']);
+	}
 }

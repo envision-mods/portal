@@ -157,13 +157,13 @@ class Page implements \ArrayAccess
 
 	public function delete(): void
 	{
-		$this->deleteMany([$this->id]);
+		DatabaseHelper::deleteMany('{db_prefix}envision_pages', 'id_page', $this->id);
 	}
 
 	/**
 	 * @uses DatabaseHelper::deleteMany
 	 */
-	public function deleteMany(array $ids): void
+	public static function deleteMany(array $ids): void
 	{
 		DatabaseHelper::deleteMany('{db_prefix}envision_pages', 'id_page', $ids);
 	}
@@ -171,7 +171,7 @@ class Page implements \ArrayAccess
 	/**
 	 * @uses DatabaseHelper::deleteAll()
 	 */
-	public function deleteAll(): void
+	public static function deleteAll(): void
 	{
 		DatabaseHelper::deleteAll('{db_prefix}envision_pages');
 	}

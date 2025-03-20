@@ -53,14 +53,12 @@ class ManageEnvisionPages
 		// Get rid of all of em!
 		if (isset($_POST['removeAll'])) {
 			checkSession();
-			$this->um->deleteallPages();
-			$this->um->rebuildMenu()
+			Page::deleteAll();
 			redirectexit('action=admin;area=eppages');
 		} // User pressed the 'remove selection page'.
 		elseif (isset($_POST['removePages'], $_POST['remove']) && is_array($_POST['remove'])) {
 			checkSession();
-			$this->um->deletePage(array_filter($_POST['remove'], 'ctype_digit'));
-			$this->um->rebuildMenu();
+			Page::deleteMany(array_filter($_POST['remove'], 'ctype_digit'));
 			redirectexit('action=admin;area=eppages');
 		} // Changing the status?
 		elseif (isset($_POST['save'])) {
@@ -70,9 +68,11 @@ class ManageEnvisionPages
 			);
 
 			foreach ($entries as $item) {
-				$status = !empty($updates['status'][$item['id_page']]) ? 'active' : 'inactive';
+				$status = !empty($_POST['status'][$item['id_page']]) ? 'active' : 'inactive';
 
-				if ($status != $item['status']) {
+				if ($page->status != $item['status']) {
+					$page->status == $item['status'];
+					$page->saave();
 				}
 			}
 

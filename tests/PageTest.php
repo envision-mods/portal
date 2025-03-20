@@ -158,7 +158,7 @@ class PageTest extends TestCase
 
 	public function testDeleteMany(): void
 	{
-		$this->page->deleteMany([2, 3]);
+		Page::deleteMany([2, 3]);
 		$this->assertStringContainsString('DELETE FROM {db_prefix}envision_pages WHERE', TestObj::$last_query);
 		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages');
 		$count = $stmt->fetchColumn();
@@ -167,7 +167,7 @@ class PageTest extends TestCase
 
 	public function testDeleteAll(): void
 	{
-		$this->page->deleteAll();
+		Page::deleteAll();
 		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages');
 		$count = $stmt->fetchColumn();
 		$this->assertEquals(0, $count);

@@ -43,7 +43,8 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 {
 }
 
-function checkSession($method, $param, $fatal)
+
+function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 {
 }
 
