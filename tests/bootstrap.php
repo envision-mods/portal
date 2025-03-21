@@ -5,12 +5,34 @@ require_once './vendor/autoload.php';
 // What are you doing here, SMF?
 const SMF = 1;
 
-function remove_integration_function(string $string, string $integration)
+function remove_integration_function($hook, $function)
 {
+	global $modSettings;
+
+	// Turn the function list into something usable.
+	$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
+
+	// You can only remove it if it's available.
+	if (!in_array($function, $functions))
+		return;
+
+	$functions = array_diff($functions, array($function));
+	$modSettings[$hook] = implode(',', $functions);
 }
 
-function add_integration_function(string $string, string $integration)
+function add_integration_function($hook, $function, $permanent = true)
 {
+	global $modSettings;
+
+	// Make current function list usable.
+	$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
+
+	// Do nothing, if it's already there.
+	if (in_array($function, $functions))
+		return;
+
+	$functions[] = $function;
+	$modSettings[$hook] = implode(',', $functions);
 }
 
 function allowedTo(string $string)
@@ -25,7 +47,26 @@ function isAllowedTo(string $string)
 
 function call_integration_hook($hook, $parameters = array())
 {
-	// You're fired!  You're all fired!  Get outta here!
+	global $modSettings;
+
+	$results = array();
+	if (empty($modSettings[$hook]))
+		return $results;
+
+	$functions = explode(',', $modSettings[$hook]);
+
+	// Loop through each function.
+	foreach ($functions as $function)
+	{
+		$function = trim($function);
+		$call = strpos($function, '::') !== false ? explode('::', $function) : $function;
+
+		// Is it valid?
+		if (is_callable($call))
+			$results[$function] = call_user_func_array($call, $parameters);
+	}
+
+	return $results;
 	return [];
 }
 
@@ -106,6 +147,71 @@ function fixchar__callback($matches)
 		return chr(($num >> 18) + 240) . chr((($num >> 12) & 63) + 128) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
 }
 
+// Updates the settings table as well as $modSettings... only does one at a time if $update is true.
+function updateSettings($changeArray, $update = false, $debug = false)
+{
+	global $modSettings, $smcFunc;
+
+	if (empty($changeArray) || !is_array($changeArray))
+		return;
+
+	// In some cases, this may be better and faster, but for large sets we don't want so many UPDATEs.
+	if ($update)
+	{
+		foreach ($changeArray as $variable => $value)
+		{
+			$smcFunc['db_query']('', '
+				UPDATE {db_prefix}settings
+				SET value = {' . ($value === false || $value === true ? 'raw' : 'string') . ':value}
+				WHERE variable = {string:variable}',
+				array(
+					'value' => $value === true ? 'value + 1' : ($value === false ? 'value - 1' : $value),
+					'variable' => $variable,
+				)
+			);
+			$modSettings[$variable] = $value === true ? $modSettings[$variable] + 1 : ($value === false ? $modSettings[$variable] - 1 : $value);
+		}
+
+		return;
+	}
+
+	$replaceArray = array();
+	foreach ($changeArray as $variable => $value)
+	{
+		// Don't bother if it's already like that ;).
+		if (isset($modSettings[$variable]) && $modSettings[$variable] == $value)
+			continue;
+		// If the variable isn't set, but would only be set to nothing'ness, then don't bother setting it.
+		elseif (!isset($modSettings[$variable]) && empty($value))
+			continue;
+
+		$replaceArray[] = array($variable, $value);
+
+		$modSettings[$variable] = $value;
+	}
+
+	if (empty($replaceArray))
+		return;
+
+	$smcFunc['db_insert']('replace',
+		'{db_prefix}settings',
+		array('variable' => 'string-255', 'value' => 'string-65534'),
+		$replaceArray,
+		array('variable')
+	);
+}
+
+// Empty out the cache folder.
+function clean_cache($type = '')
+{
+}
+
+function setupMenuContext()
+{
+	$buttons = [];
+	call_integration_hook('integrate_menu_buttons', [&$buttons]);
+}
+
 class TestObj
 {
 	public static $last_query;
@@ -115,9 +221,7 @@ class TestObj
 	public static PDO $pdo;
 }
 
-global $smcFunc, $user_info, $txt;
-
-global $context, $settings, $txt, $user_info;
+global $smcFunc, $context, $settings, $txt, $user_info;
 
 // Set up necessary global variables
 $context = [
@@ -137,11 +241,18 @@ $txt = [
 ];
 $user_info = ['is_admin' => true, 'is_guest' => false, 'language' => '', 'id' => 1, 'name' => 'Test User', 'groups' => [0], 'permissions' => []];
 
+require __DIR__ . '/../src/ep_languages/ManageEnvisionMenu.english.php';
 require __DIR__ . '/../src/ep_languages/ManageEnvisionPages.english.php';
 
 TestObj::$pdo = new PDO('sqlite::memory:');
 TestObj::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-TestObj::$pdo->exec('CREATE TABLE membergroups (
+TestObj::$pdo->exec('CREATE TABLE settings (
+	variable TEXT PRIMARY KEY,
+	value TEXT NOT NULL DEFAULT \'\'
+);
+
+
+CREATE TABLE membergroups (
 	id_group INTEGER PRIMARY KEY AUTOINCREMENT,
 	group_name TEXT NOT NULL DEFAULT \'\',
 	description TEXT NOT NULL,

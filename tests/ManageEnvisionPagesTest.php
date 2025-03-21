@@ -34,11 +34,15 @@ class ManageEnvisionPagesTest extends TestCase
 
 	public function tearDown(): void
 	{
+        global $context;
+
 		TestObj::$pdo->exec('DELETE FROM envision_pages');
 		TestObj::$pdo->exec('DELETE FROM SQLITE_SEQUENCE where name=\'envision_pages\'');
 
 		$_GET = [];
 		$_POST = [];
+		unset($context['data']);
+		unset($context['post_error']);
 	}
 
 	protected function setUp(): void
