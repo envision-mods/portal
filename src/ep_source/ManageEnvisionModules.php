@@ -513,15 +513,16 @@ function AddEnvisionLayout2()
 			}
 		}
 
-	$layout_positions[] = new Layout(
-		0,
-		(int)$col['row'],
-		(int)$col['rowspan'],
-		(int)$col['col'],
-		(int)$col['colspan'],
-		$_POST['smf'] == $i,
-		!empty($col['enabled'])
-	);
+		$layout_positions[] = new Layout(
+			0,
+			(int)$col['row'],
+			(int)$col['rowspan'],
+			(int)$col['col'],
+			(int)$col['colspan'],
+			$_POST['smf'] == $i,
+			!empty($col['enabled'])
+		);
+	}
 
 	if ($all_removed) {
 		$errors[] = ['cant_delete_all', []];
