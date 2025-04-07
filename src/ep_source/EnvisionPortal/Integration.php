@@ -39,7 +39,6 @@ class Integration
 
 	public static function actions(array &$action_array)
 	{
-		$action_array['envision'] = ['ep_source/EnvisionPortal.php', 'envisionActions'];
 		$action_array['forum'] = ['BoardIndex.php', 'BoardIndex'];
 	}
 
@@ -96,6 +95,7 @@ class Integration
 				$context['sub_template'] = 'portal';
 				$context['page_title'] = $context['forum_name'] . ' - ' . $txt['home'];
 				self::$isPortalPage = true;
+				Portal::init('[home]');
 			}
 		}
 	}
@@ -108,7 +108,7 @@ class Integration
 		global $context, $scripturl, $sourcedir;
 
 		if (self::$isActive) {
-			Portal::fromAction('forum');
+			Portal::init('action=forum');
 			$context['canonical_url'] = $scripturl . '?action=forum';
 		}
 		require_once $sourcedir . '/BoardIndex.php';
@@ -260,7 +260,7 @@ class Integration
 
 		$eta = -hrtime(true);
 		$qc = -$GLOBALS['db_count'];
-		Portal::fromAction($context['current_action']);
+		Portal::init();
 		$context['ep_time'] = $eta + hrtime(true);
 		$context['ep_qc'] = $qc + $GLOBALS['db_count'];
 	}
@@ -442,7 +442,7 @@ class Integration
 			if ($row->isAllowed()) {
 				$data = Util::replaceVars(
 					$txt['ep_who_page'],
-					['scripturl' => $scripturl, 'page' => $actions['page'], 'page_name' => censorText($row->name)]
+					['scripturl' => $scripturl, 'page' => $actions['page'], 'page_name' => censorText($row->getName())]
 				);
 			}
 		}
@@ -450,7 +450,7 @@ class Integration
 		return $data;
 	}
 
-	public static function fix_url(&$val)
+	 static function fix_url(&$val)
 	{
 		global $context, $modSettings, $scripturl;
 

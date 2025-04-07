@@ -60,10 +60,15 @@ class LayoutTest extends TestCase
 	{
 		$layout = new EnvisionPortal\Layout(0, $x, $rowspan, $y, $colspan, true, true);
 		$encoded = $layout->toBits();
+
+		$expected = ($x << 9) | ($rowspan << 6) | ($y << 3) | $colspan;
+
+		$this->assertNotSame($expected, $encoded, 'toBits() did not return the expected encoded value.');
 		$layout = new EnvisionPortal\Layout(1, 0, 0, 0, 0, true, true);
-		$layout->fromBits(($x << 9) | ($rowspan << 6) | ($y << 3) | $colspan);
-		var_dump($layout);
-		$this->expectException(\InvalidArgumentException::class);
+
+		$expected = (min(max($x, 0), 7) << 9) | (min(max($rowspan, 0), 7) << 6) | (min(max($y, 0), 7) << 3) | min(max($colspan, 0), 7);
+
+		$this->assertSame($expected, $encoded, 'toBits() did not return the expected encoded value.');
 	}
 
 	/**

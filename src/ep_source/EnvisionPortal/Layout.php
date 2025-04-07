@@ -17,26 +17,26 @@ namespace EnvisionPortal;
  *
  * ## Bitmask Structure (12 bits total):
  * ```
- * | Bits | Field    | Max Value | Bitwise Shift |
+ * | Bits | Field   | Max Value | Bitwise Shift |
  * |------|---------|-----------|---------------|
- * | 3    | x_pos   | 7         | << 9          |
+ * | 3    | x       | 7         | << 9          |
  * | 3    | rowspan | 7         | << 6          |
- * | 3    | y_pos   | 7         | << 3          |
+ * | 3    | y       | 7         | << 3          |
  * | 3    | colspan | 7         | << 0          |
  * ```
  * 
  * ### Encoding Formula (`toBits`)
- * Converts four integer values (`x_pos`, `rowspan`, `y_pos`, `colspan`) into a **12-bit** packed integer:
+ * Converts four integer values (`x`, `rowspan`, `y`, `colspan`) into a **12-bit** packed integer:
  * ```
- * bitmask = (x_pos << 9) | (rowspan << 6) | (y_pos << 3) | (colspan)
+ * bitmask = (x << 9) | (rowspan << 6) | (y << 3) | (colspan)
  * ```
  *
  * ### Decoding Formula (`fromBits`)
  * Extracts the four original values from a **12-bit** integer:
  * ```
- * x_pos   = (bitmask >> 9) & 0x7
+ * x   = (bitmask >> 9) & 0x7
  * rowspan = (bitmask >> 6) & 0x7
- * y_pos   = (bitmask >> 3) & 0x7
+ * y   = (bitmask >> 3) & 0x7
  * colspan = (bitmask) & 0x7
  * ```
  *
@@ -44,9 +44,9 @@ namespace EnvisionPortal;
  * - Each value **must be within the range [0, 7]** (3-bit max: `0b111 = 7`).
  * - `is_smf` and `status` **are NOT stored in the bitmask** and should be handled separately.
  *
- * @param int $x_pos   Horizontal position (0-7).
+ * @param int $x   Horizontal position (0-7).
  * @param int $rowspan Number of rows spanned (0-7).
- * @param int $y_pos   Vertical position (0-7).
+ * @param int $y   Vertical position (0-7).
  * @param int $colspan Number of columns spanned (0-7).
  *
  * @return int Encoded 12-bit integer.
@@ -64,24 +64,20 @@ class Layout implements \ArrayAccess
 	public bool $enabled;
 
 	/**
-	 * @param int $x_pos The X-axis position in the layout (0-7).
+	 * @param int $x The X-axis position in the layout (0-7).
 	 * @param int $rowspan The number of rows spanned (0-7).
-	 * @param int $y_pos The Y-axis position in the layout (0-7).
+	 * @param int $y The Y-axis position in the layout (0-7).
 	 * @param int $colspan The number of columns spanned (0-7).
 	 */
 	public function __construct(int $id, int $x, int $rowspan, int $y, int $colspan, bool $is_smf, bool $enabled)
 	{
 		$this->id = $id;
-		$this->x = $x;
-		$this->rowspan = $rowspan;
-		$this->y = $y;
-		$this->colspan = $colspan;
+		$this->x = $this->clampTo3Bit($x);
+		$this->rowspan = $this->clampTo3Bit($rowspan);
+		$this->y = $this->clampTo3Bit($y);
+		$this->colspan = $this->clampTo3Bit($colspan);
 		$this->is_smf = $is_smf;
 		$this->enabled = $enabled;
-		$this->x_pos = $this->clampTo3Bit($x_pos);
-		$this->rowspan = $this->clampTo3Bit($rowspan);
-		$this->y_pos = $this->clampTo3Bit($y_pos);
-		$this->colspan = $this->clampTo3Bit($colspan);
 	}
 
 	/**
@@ -94,28 +90,22 @@ class Layout implements \ArrayAccess
 	 */
 	public function clampTo3Bit(int $v): int
 	{
-		// If out of the 3-bit range (0-7), clamp to min (0) or max (7).
-		if ($v < 0) {
-			return 0;
-		} elseif ($v > 7) {
-			return 7;
-		}
-		return $v;
+		return ($v < 0) ? 0 : (($v > 7) ? 7 : $v);
 	}
-	
+
 	/**
 	 * Encodes layout position attributes into a compact 12-bit integer.
 	 *
-	 * This function converts four integer values (`x_pos`, `rowspan`, `y_pos`, and `colspan`)
+	 * This function converts four integer values (`x`, `rowspan`, `y`, and `colspan`)
 	 * into a single bitmask representation. Each value is constrained to a maximum of 7 (3-bit storage).
 	 *
 	 * ### Bit Allocation Table:
 	 * | Field     | Bits Used | Max Value | Encoding Shift |
-	 * |-----------|----------|-----------|---------------|
-	 * | `x_pos`   | 3 bits   | 7         | `<< 9`  |
-	 * | `rowspan` | 3 bits   | 7         | `<< 6`  |
-	 * | `y_pos`   | 3 bits   | 7         | `<< 3`  |
-	 * | `colspan` | 3 bits   | 7         | `<< 0`  |
+	 * |-----------|-----------|-----------|----------------|
+	 * | `x`       | 3 bits    | 7         | `<< 9`         |
+	 * | `rowspan` | 3 bits    | 7         | `<< 6`         |
+	 * | `y`       | 3 bits    | 7         | `<< 3`         |
+	 * | `colspan` | 3 bits    | 7         | `<< 0`         |
 	 *
 	 * **Maximum possible value for `toBits`:** `8151`
 	 *
@@ -135,16 +125,16 @@ class Layout implements \ArrayAccess
 	/**
 	 * Decodes a bitmask into layout position attributes and applies them to a Layout object.
 	 *
-	 * This function extracts the `x_pos`, `rowspan`, `y_pos`, and `colspan` values from
+	 * This function extracts the `x`, `rowspan`, `y`, and `colspan` values from
 	 * a compact integer bitmask and updates the corresponding properties of a given `Layout` object.
 	 *
 	 * ### Bit Allocation Table:
-	 * | Field     | Bits Used | Max Value | Decoding Mask |
-	 * |-----------|----------|-----------|--------------|
-	 * | `x_pos`   | 3 bits   | 7         | `($area >> 9) & 0x7`  |
-	 * | `rowspan` | 3 bits   | 7         | `($area >> 6) & 0x7`  |
-	 * | `y_pos`   | 3 bits   | 7         | `($area >> 3) & 0x7`  |
-	 * | `colspan` | 3 bits   | 7         | `($area) & 0x7`  |
+	 * | Field     | Bits Used | Max Value | Decoding Mask         |
+	 * |-----------|-----------|-----------|-----------------------|
+	 * | `x`       | 3 bits    | 7         | `($area >> 9) & 0x7`  |
+	 * | `rowspan` | 3 bits    | 7         | `($area >> 6) & 0x7`  |
+	 * | `y`       | 3 bits    | 7         | `($area >> 3) & 0x7`  |
+	 * | `colspan` | 3 bits    | 7         | `($area) & 0x7`       |
 	 *
 	 * @param int $area The encoded layout bitmask (range: 0-8151).
 	 */

@@ -58,56 +58,76 @@ class Portal
 		return $skip_this;
 	}
 
-	private function getMatch($da_action)
+	/**
+	 * Matches a layout specification string against the current URL's GET parameters.
+	 *
+	 * Supported formats:
+	 * - [param]              → Checks if the parameter is present (e.g., [topic] → $_GET['topic'])
+	 * - [param]=value        → Checks if the parameter equals a specific value (e.g., [board]=1)
+	 * - action;key=value     → Matches actions with subparameters (e.g., profile;area=statistics)
+	 * - action;key=val1,val2 → Matches if subparameter matches any value in list
+	 *
+	 * @param string $spec The layout specification string.
+	 * @param array $params The current $_GET parameters.
+	 *
+	 * @return bool True if the layout spec matches the URL, false otherwise.
+	 */
+	private function matchLayoutSpec(string $spec, array $params): bool
 	{
-		if (isset($_REQUEST['board'])) {
-			return '[board]=' . $_REQUEST['board'];
-		} elseif (isset($_REQUEST['topic'])) {
-			return '[topic]=' . $_REQUEST['topic'];
-		} elseif (isset($_REQUEST['page'])) {
-			return '[page]=' . $_REQUEST['page'];
+		// Support bracketed params like [topic] and [topic]=1
+		if (preg_match('/^\[(\w+)\](?:=(\d+))?$/', $spec, $matches)) {
+			$param = $matches[1];
+			$value = $matches[2] ?? null;
+			if (isset($params[$param])) {
+				return $value === null || $params[$param] == $value;
+			}
+			return false;
 		}
 
-		return $da_action;
-	}
-
-	private function getGeneralMatch(): string
-	{
-		if (isset($_REQUEST['board'])) {
-			return '[boards]';
-		} elseif (isset($_REQUEST['topic'])) {
-			return '[topics]';
-		} elseif (isset($_REQUEST['page'])) {
-			return '[pages]';
-		} elseif (isset($_REQUEST['action'])) {
-			return '[actions]';
+		// Support action-based specs like admin;area=serversettings;sa=cache,layout
+		$parts = explode(';', $spec);
+		foreach ($parts as $part) {
+			if (strpos($part, '=') !== false) {
+				list($key, $values) = explode('=', $part, 2);
+				$values = explode(',', $values);
+				if (!isset($params[$key]) || !in_array($params[$key], $values)) {
+					return false;
+				}
+			} else {
+				// First part (before =) is usually action
+				if (!isset($params['action']) || $params['action'] != $part) {
+					return false;
+				}
+			}
 		}
 
-		return '[home]';
+		return true;
 	}
 
-	private function getMatchedLayout($da_action): ?int
+	private function getMatchedLayout($source_of_truth): ?int
 	{
 		global $smcFunc;
 
-		$match = $this->getMatch($da_action);
-		$general_match = $this->getGeneralMatch();
-
+		$i = 0;
+		$result = [];
+		$actions = [];
 		$request = $smcFunc['db_query']('', '
 			SELECT
 				id_layout, action
-			FROM {db_prefix}ep_layout_actions
-				WHERE action IN ({string:match}, {string:general_match})',
-			[
-				'match' => $match,
-				'general_match' => $general_match,
-			]
-		);
+			FROM {db_prefix}ep_layout_actions');
 
-		while (list ($id_layout, $action) = $smcFunc['db_fetch_row']($request)) {
-			if ($action == $match || $action == $general_match) {
-				return (int)$id_layout;
+		while ([$id_layout, $action] = $smcFunc['db_fetch_row']($request)) {
+			$actions[$action] = (int) $id_layout;
+		}
+
+		if (\is_array($source_of_truth)) {
+			foreach ($actions as $action => $id_layout) {
+				if ($this->matchLayoutSpec($action, $source_of_truth)) {
+					return $id_layout;
+				}
 			}
+		} elseif (\is_string($source_of_truth) && isset($actions[$source_of_truth])) {
+			return $actions[$source_of_truth];
 		}
 
 		return null;
@@ -116,47 +136,21 @@ class Portal
 	/**
 	 * Load a layout that is assigned to the current SMF action.
 	 *
-	 * @param string|null $init_action
+	 * @param string|null $source_of_truth
 	 */
-	public static function fromAction(?string $init_action = null)
+	public static function init(?string $source_of_truth = null)
 	{
 		global $context, $boarddir, $boardurl;
 		global $board, $topic, $scripturl, $txt;
 
-		// Oh no, the fights out / gonna punch your lights out
-		unset($_GET['PHPSESSID'], $_GET['theme']);
-
-		// We want the first item in the requested URI
-		reset($_GET);
-		$uri = key($_GET);
-
-		// If a registered SMF action was called, use that instead
-		$da_action = $init_action ?? '[' . $uri . ']';
-
-		if (self::canSkipAction($da_action)) {
+		if (self::canSkipAction($context['current_action'])) {
 			return;
 		}
 
-		if (!empty($board) || !empty($topic) || $context['current_action'] == 'forum') {
-			array_splice($context['linktree'], 1, 0, [
-				[
-					'name' => $txt['forum'],
-					'url' => $scripturl . '?action=forum',
-				],
-			]);
-		}
-
-		$context['ep_icon_url'] = $boardurl . '/ep_extra/module_icons/';
-		$context['module_image_url'] = $boardurl . '/ep_extra/module_images/';
-		$context['epadmin_image_url'] = $boardurl . '/ep_extra/images/admin';
-		$context['module_modules_dir'] = $boarddir . '/ep_extra/modules';
-		$context['ep_plugins_dir'] = $boarddir . '/ep_extra/plugins';
-		$context['ep_plugins_url'] = $boardurl . '/ep_extra/plugins';
 		$context['module_icon_url'] = $boardurl . '/ep_extra/module_icons';
 		$context['module_icon_dir'] = $boarddir . '/ep_extra/module_icons';
-		$context['module_template'] = $boarddir . '/ep_extra/module_templates';
 
-		$layout = self::getLoadedLayoutFromName($da_action);
+		$layout = self::getLoadedLayoutFromName($source_of_truth);
 
 		if ($layout !== null) {
 			$context['ep_cols'] = $layout;
@@ -164,30 +158,34 @@ class Portal
 			if ($context['template_layers'] != []) {
 				$context['template_layers'][] = 'portal';
 			}
+
+			if (!empty($board) || !empty($topic) || $context['current_action'] == 'forum') {
+				array_splice($context['linktree'], 1, 0, [
+					[
+						'name' => $txt['forum'],
+						'url' => $scripturl . '?action=forum',
+					],
+				]);
+			}
 		}
 	}
 
 	/**
-	 * @param string|null $init_action
+	 * @param string|null $layout_name
 	 *
 	 * @return array|null
 	 */
-	public static function getLoadedLayoutFromName(?string $init_action = null): ?array
+	public static function getLoadedLayoutFromName(?string $layout_name = null): ?array
 	{
 		$obj = new self;
-		$cache_key = 'envisionportal_' . $obj->getMatch($init_action) . '_' . $obj->getGeneralMatch();
+		$id_layout = $obj->getMatchedLayout($layout_name ?? $_GET);
 
-		if (($data = cache_get_data($cache_key, 3600)) === null) {
-			$id_layout = $obj->getMatchedLayout($init_action);
+		if ($id_layout !== null) {
+			$data = $obj->loadLayoutData($id_layout);
 
-			if ($id_layout !== null) {
-				$data = $obj->loadLayoutData($id_layout);
-				cache_put_data($cache_key, $data, 3600);
+			if ($data !== null) {
+				return $obj->loadLayoutContext($data);
 			}
-		}
-
-		if ($data !== null) {
-			return $obj->loadLayoutContext($data);
 		}
 
 		return null;
