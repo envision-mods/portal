@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use EnvisionPortal\Portal;
-use ReflectionClass;
 
 class PortalTest extends TestCase
 {
-	private $button;
-
 	public static function setUpBeforeClass(): void
 	{
 		TestObj::$pdo->exec('
