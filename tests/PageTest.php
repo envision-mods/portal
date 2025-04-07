@@ -6,6 +6,8 @@ use PHPUnit\Framework\TestCase;
 
 class PageTest extends TestCase
 {
+	private $page;
+
 	public static function setUpBeforeClass(): void
 	{
 		TestObj::$pdo->exec('CREATE TABLE envision_pages (

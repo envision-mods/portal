@@ -132,15 +132,16 @@ function addLayout(string $layout_name, array $layout_actions, array $layout_pos
 	];
 
 	$data = [];
+
 	foreach ($layout_positions as $layout_position) {
 		$data[] = [
 			$iid,
-			$layout_position['x_pos'],
-			$layout_position['rowspan'],
-			$layout_position['y_pos'],
-			$layout_position['colspan'],
-			$layout_position['status'],
-			$layout_position['is_smf'],
+			$layout_position->x_pos,
+			$layout_position->rowspan,
+			$layout_position->y_pos,
+			$layout_position->colspan,
+			$layout_position->enabled ? 'active' : 'inactive',
+			$layout_position->is_smf,
 		];
 	}
 
@@ -214,31 +215,32 @@ function editLayout(
 		'is_smf' => '',
 	];
 	foreach ($layout_positions as $layout_position) {
-		if (isset($layout_position['id_layout_position'])) {
-			$update_query['x_pos'] .= ' WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:x_pos' . $layout_position['id_layout_position'] . '}';
-			$update_query['rowspan'] .= ' WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:rowspan' . $layout_position['id_layout_position'] . '}';
-			$update_query['y_pos'] .= ' WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:y_pos' . $layout_position['id_layout_position'] . '}';
-			$update_query['colspan'] .= ' WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:colspan' . $layout_position['id_layout_position'] . '}';
-			$update_query['status'] .= ' WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {string:status' . $layout_position['id_layout_position'] . '}';
-			$update_query['is_smf'] .= ' WHEN {int:id_layout_position' . $layout_position['id_layout_position'] . '} THEN {int:is_smf' . $layout_position['id_layout_position'] . '}';
+		if ($layout_position->id != 0) {
+			$update_query['x_pos'] .= ' WHEN {int:id_layout_position' . $layout_position->id . '} THEN {int:x_pos' . $layout_position->id . '}';
+			$update_query['rowspan'] .= ' WHEN {int:id_layout_position' . $layout_position->id . '} THEN {int:rowspan' . $layout_position->id . '}';
+			$update_query['y_pos'] .= ' WHEN {int:id_layout_position' . $layout_position->id . '} THEN {int:y_pos' . $layout_position->id . '}';
+			$update_query['colspan'] .= ' WHEN {int:id_layout_position' . $layout_position->id . '} THEN {int:colspan' . $layout_position->id . '}';
+			$update_query['status'] .= ' WHEN {int:id_layout_position' . $layout_position->id . '} THEN {string:status' . $layout_position->id . '}';
+			$update_query['is_smf'] .= ' WHEN {int:id_layout_position' . $layout_position->id . '} THEN {int:is_smf' . $layout_position->id . '}';
+
 			$update_params += [
-				'id_layout_position' . $layout_position['id_layout_position'] => $layout_position['id_layout_position'],
-				'x_pos' . $layout_position['id_layout_position'] => $layout_position['x_pos'],
-				'rowspan' . $layout_position['id_layout_position'] => $layout_position['rowspan'],
-				'y_pos' . $layout_position['id_layout_position'] => $layout_position['y_pos'],
-				'colspan' . $layout_position['id_layout_position'] => $layout_position['colspan'],
-				'status' . $layout_position['id_layout_position'] => $layout_position['status'],
-				'is_smf' . $layout_position['id_layout_position'] => $layout_position['is_smf'],
+				'id_layout_position' . $layout_position->id => $layout_position->id,
+				'x_pos' . $layout_position->id => $layout_position->x_pos,
+				'rowspan' . $layout_position->id => $layout_position->rowspan,
+				'y_pos' . $layout_position->id => $layout_position->y_pos,
+				'colspan' . $layout_position->id => $layout_position->colspan,
+				'status' . $layout_position->id => $layout_position->enabled ? 'active' : 'inactive',
+				'is_smf' . $layout_position->id => $layout_position->is_smf,
 			];
 		} else {
 			$data[] = [
 				$id_layout,
-				$layout_position['x_pos'],
-				$layout_position['rowspan'],
-				$layout_position['y_pos'],
-				$layout_position['colspan'],
-				$layout_position['status'],
-				$layout_position['is_smf'],
+				$layout_position->x_pos,
+				$layout_position->rowspan,
+				$layout_position->y_pos,
+				$layout_position->colspan,
+				$layout_position->enabled ? 'active' : 'inactive',
+				$layout_position->is_smf,
 			];
 		}
 	}
@@ -284,25 +286,3 @@ function deleteLayouts(array $layout_list): void
 		EnvisionPortal\DatabaseHelper::deleteMany('{db_prefix}ep_' . $table_name, 'id_layout', $layout_list);
 	}
 }
-
-/// maxx  val 8151
-function toBits(int $x_pos, int $rowspan, int $y_pos, int $colspan):  int
-{
-	$area = 0;
-	$area |= ($x_pos & 0x7) << 9;
-	$area |= ($rowspan & 0x7) << 6;
-	$area |= ($y_pos & 0x7) << 3;
-	$area |= ($colspan & 0x7);
-
-	return $area;
-}
-
-function fromBits(int $area): array
-{
-	return [
-		($area >> 9) & 0x7,
-		($area >> 6) & 0x7,
-		($area >> 3) & 0x7,
-		$area & 0x7
-	];
-} 

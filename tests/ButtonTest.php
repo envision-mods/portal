@@ -6,6 +6,8 @@ use PHPUnit\Framework\TestCase;
 
 class ButtonTest extends TestCase
 {
+	private $button;
+
 	public static function setUpBeforeClass(): void
 	{
 		TestObj::$pdo->exec('CREATE TABLE ep_menu (

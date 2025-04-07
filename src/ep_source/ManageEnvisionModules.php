@@ -513,15 +513,15 @@ function AddEnvisionLayout2()
 			}
 		}
 
-		$layout_positions[] = [
-			'x_pos' => (int)$col['row'],
-			'rowspan' => (int)$col['rowspan'],
-			'y_pos' => (int)$col['col'],
-			'colspan' => (int)$col['colspan'],
-			'status' => !empty($col['enabled']) ? 'active' : 'inactive',
-			'is_smf' => $_POST['smf'] == $i,
-		];
-	}
+	$layout_positions[] = new Layout(
+		0,
+		(int)$col['row'],
+		(int)$col['rowspan'],
+		(int)$col['col'],
+		(int)$col['colspan'],
+		$_POST['smf'] == $i,
+		!empty($col['enabled'])
+	);
 
 	if ($all_removed) {
 		$errors[] = ['cant_delete_all', []];
@@ -827,15 +827,15 @@ function EditEnvisionLayout2()
 			}
 		}
 
-		$layout_positions[] = [
-			'id_layout_position' => $col['id'],
-			'x_pos' => (int)$_POST['row'][$col['id']],
-			'rowspan' => (int)$_POST['rowspan'][$col['id']],
-			'y_pos' => (int)$_POST['col'][$col['id']],
-			'colspan' => (int)$_POST['colspan'][$col['id']],
-			'status' => !empty($_POST['enabled'][$col['id']]) ? 'active' : 'inactive',
-			'is_smf' => (int)($_POST['smf'] == $col['id']),
-		];
+		$layout_positions[] = new Layout(
+			$col['id'],
+			(int)$_POST['row'][$col['id']],
+			(int)$_POST['rowspan'][$col['id']],
+			(int)$_POST['col'][$col['id']],
+			(int)$_POST['colspan'][$col['id']],
+			$_POST['smf'] == $col['id'],
+			!empty($_POST['enabled'][$col['id']])
+		);
 
 		$all_removed = $all_removed && in_array($col['id'], $_POST['remove'] ?? []);
 	}

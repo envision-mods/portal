@@ -368,23 +368,23 @@ class Portal
 			if (!isset($data['layout'][$row['id_layout_position']])) {
 				$rows[$row['id_layout_position']] = $row['x_pos'];
 				$cols[$row['id_layout_position']] = $row['y_pos'];
-				$data['layout'][$row['id_layout_position']] = [
-					'id' => $row['id_layout_position'],
-					'x' => $row['x_pos'],
-					'rowspan' => $row['rowspan'],
-					'y' => $row['y_pos'],
-					'colspan' => $row['colspan'],
-					'is_smf' => $row['is_smf'] != 0,
-					'enabled' => $row['status'] == 'active',
-					'modules' => [],
-				];
+
+				$data['layout'][$row['id_layout_position']] = new Layout(
+					$row['id_layout_position'],
+					$row['x_pos'],
+					$row['rowspan'],
+					$row['y_pos'],
+					$row['colspan'],
+					$row['is_smf'] != 0,
+					$row['status'] == 'active'
+				);
 			}
 
 			if ($row['id_position'] !== null) {
-				$data['layout'][$row['id_layout_position']]['modules'][$row['position']] = [
-					'type' => $row['type'],
-					'id' => $row['id_position'],
-				];
+				$data['layout'][$row['id_layout_position']]->modules[$row['position']] = new Module(
+					$row['type'],
+					$row['id_position']
+				);
 			}
 		}
 
