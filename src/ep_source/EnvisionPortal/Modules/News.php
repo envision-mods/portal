@@ -128,10 +128,21 @@ class News implements ModuleInterface, SharedPermissionsInterface
 
 		while ($row = $smcFunc['db_fetch_assoc']($request)) {
 			$this->findMessageIcons($row['icon']);
+
+			// Only parse BBCode if detected (simple check for [b], [i], etc.)
+			// parse_bbc can be quite slow, especially on larger messages, probably
+			// because of its approach of splitting strings and then joining them
+			// back together.  This trick will only work as expected for common bbcodes.
+			if (preg_match('/\[(b|i|u|quote|size|color|url|img)[^]]*\]/i', $row['body'])) {
+				$parsed_body = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+			} else {
+				$parsed_body = $row['body'];
+			}
+
 			$row['body'] = nl2br(
 				$this->truncate(
 					strip_tags(
-						strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), ['<br>' => "\n"])
+						strtr($parsed_body, ['<br>' => "\n"])
 					)
 				)
 			);

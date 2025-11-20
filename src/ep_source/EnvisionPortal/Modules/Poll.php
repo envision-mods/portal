@@ -143,7 +143,7 @@ class Poll implements ModuleInterface, SharedPermissionsInterface
 
 				$options[$id_choice] = [
 					'votes' => $votes,
-					'option' => parse_bbc($label),
+					'option' => preg_match('/\[(b|i|u|quote|size|color|url|img)[^]]*\]/i', $label) ? parse_bbc($label) : $label,
 					'percent' => round(($votes * 100) / $divisor, $precision),
 				];
 			}
