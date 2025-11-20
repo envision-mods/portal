@@ -368,11 +368,11 @@ class Portal
 				$cols[$row['id_layout_position']] = $row['y_pos'];
 
 				$data['layout'][$row['id_layout_position']] = new Layout(
-					$row['id_layout_position'],
-					$row['x_pos'],
-					$row['rowspan'],
-					$row['y_pos'],
-					$row['colspan'],
+					(int)$row['id_layout_position'],
+					(int)$row['x_pos'],
+					(int)$row['rowspan'],
+					(int)$row['y_pos'],
+					(int)$row['colspan'],
 					$row['is_smf'] != 0,
 					$row['status'] == 'active'
 				);
@@ -381,7 +381,7 @@ class Portal
 			if ($row['id_position'] !== null) {
 				$data['layout'][$row['id_layout_position']]->modules[$row['position']] = new Module(
 					$row['type'],
-					$row['id_position']
+					(int) $row['id_position']
 				);
 			}
 		}
@@ -389,7 +389,7 @@ class Portal
 		array_multisort($rows, $cols, $data['layout']);
 
 		foreach ($data['layout'] as &$col) {
-			ksort($col['modules']);
+			ksort($col->modules);
 		}
 
 		return $data;
@@ -400,11 +400,11 @@ class Portal
 		foreach ($data['layout'] as $id_layout_position => $row) {
 			foreach ($row['modules'] as $module_position => $module) {
 				$time = hrtime(true);
-				$data['layout'][$id_layout_position]['modules'][$module_position] = $this->process_module(
+				$data['layout'][$id_layout_position]->modules[$module_position] = $this->process_module(
 					$data['modules'],
 					$module
 				);
-				$data['layout'][$id_layout_position]['modules'][$module_position]['time'] = (hrtime(true) - $time) / 1e6;
+				$data['layout'][$id_layout_position]->modules[$module_position]['time'] = (hrtime(true) - $time) / 1e6;
 			}
 		}
 
@@ -433,7 +433,10 @@ class Portal
 				if ($module['class'] instanceof SharedPermissionsInterface) {
 					$module['class']->setSharedPermissions($boards_can);
 				}
-				$data['layout'][$id_layout_position]['modules'][$module_position]['time'] += (hrtime(true) - $time) / 1e6;
+
+				$module_name = substr(strrchr(get_class($module['class']), '\\'), 1);
+
+				$data['layout'][$id_layout_position]->modules[$module_position]['time'] += (hrtime(true) - $time) / 1e6;
 			}
 		}
 
@@ -445,7 +448,7 @@ class Portal
 		'permissions' => [],
 	];
 
-	private function process_module(array $module_fields, array $data)
+	private function process_module(array $module_fields, array|Module $data)
 	{
 		global $options, $txt, $user_info, $scripturl;
 

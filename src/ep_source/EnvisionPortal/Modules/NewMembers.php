@@ -11,6 +11,8 @@ class NewMembers implements ModuleInterface, SharedMemberDataInterface
 	use ModuleTrait;
 
 	private $groups = [];
+	private int $list_type;
+	private array $members_list;
 
 	public function __invoke(array $fields)
 	{

@@ -82,7 +82,7 @@ class PHP implements PageModeInterface
 							implode(
 								', ',
 								array_map(
-									function (array $stackPoint): array {
+									function ($stackPoint): array {
 										$args = [];
 										if (isset($stackPoint['args'])) {
 											foreach ($stackPoint['args'] as $arg) {
@@ -108,7 +108,7 @@ class PHP implements PageModeInterface
 
 				fatal_error(
 					str_replace(
-						$GLOBALS['boaarddir'],
+						$GLOBALS['boarddir'],
 						'.',
 						sprintf(
 							"'%s' with message '%s' in %s:%s<br>Stack trace:<br>%s<br>  thrown in %s on line %s",

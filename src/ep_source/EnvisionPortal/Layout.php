@@ -62,6 +62,7 @@ class Layout implements \ArrayAccess
 	public int $colspan;
 	public bool $is_smf;
 	public bool $enabled;
+	public array $modules = [];
 
 	/**
 	 * @param int $x The X-axis position in the layout (0-7).

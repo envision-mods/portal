@@ -12,6 +12,7 @@ class News implements ModuleInterface, SharedPermissionsInterface
 {
 	use ModuleTrait;
 
+	private array $icons;
 	private array $boards_can;
 
 	/**

@@ -12,9 +12,19 @@ declare(strict_types=1);
 
 namespace EnvisionPortal;
 
+use EnvisionPortal\ModuleInterface;
+
 class Module implements \ArrayAccess
 {
 	use ArrayAccessTrait;
+
+	public string $module_title;
+	public ModuleInterface $class;
+	public string $module_target;
+	public string $module_icon;
+	public bool $is_collapsed;
+	public string $header_display = '';
+	public float $time;
 
 	public string $type;
 	public int $id;
