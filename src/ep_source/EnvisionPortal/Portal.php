@@ -75,7 +75,7 @@ class Portal
 	private function matchLayoutSpec(string $spec, array $params): bool
 	{
 		// Support bracketed params like [topic] and [topic]=1
-		if (preg_match('/^\[(\w+)\](?:=(\d+))?$/', $spec, $matches)) {
+		if (preg_match('/^\[(\w+)\](?:=([\w\d-]+))?$/', $spec, $matches)) {
 			$param = $matches[1];
 			$value = $matches[2] ?? null;
 			if (isset($params[$param])) {
