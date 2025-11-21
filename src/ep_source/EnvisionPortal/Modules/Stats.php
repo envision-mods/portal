@@ -61,7 +61,7 @@ class Stats implements ModuleInterface
 	}
 
 	private $totals = [];
-	private $stat_choices = [];
+	private array $stat_choices = [];
 
 	public function __invoke(array $fields)
 	{

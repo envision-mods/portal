@@ -62,7 +62,7 @@ class Recent implements ModuleInterface
 			FROM {db_prefix}boards
 			ORDER BY board_order'
 		);
-		while (list ($id_board, $name) = $smcFunc['db_fetch_row']($request)) {
+		while ([$id_board, $name] = $smcFunc['db_fetch_row']($request)) {
 			$boards[$id_board] = $name;
 		}
 		$smcFunc['db_free_result']($request);
@@ -96,7 +96,7 @@ class Recent implements ModuleInterface
 		$board_list = [];
 		$topics = [];
 
-		while (list ($id_topic, $id_board, $replies, $views) = $smcFunc['db_fetch_row']($request)) {
+		while ([$id_topic, $id_board, $replies, $views] = $smcFunc['db_fetch_row']($request)) {
 			$topic_list[] = $id_topic;
 			$board_list[$id_board] = $id_board;
 			$topics[$id_topic] = [
@@ -176,7 +176,7 @@ class Recent implements ModuleInterface
 					'topic_list' => $topic_list,
 				]
 			);
-			while (list ($id_topic, $co) = $smcFunc['db_fetch_row']($request)) {
+			while ([$id_topic, $co] = $smcFunc['db_fetch_row']($request)) {
 				$topics[$id_topic]['co'] = $co;
 			}
 			$smcFunc['db_free_result']($request);

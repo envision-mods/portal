@@ -1,5 +1,6 @@
 <?php
 
+use EnvisionPortal\ProvidesSubActionTrait;
 use PHPUnit\Framework\TestCase;
 
 class ProvidesSubActionTraitTest extends TestCase
@@ -7,7 +8,7 @@ class ProvidesSubActionTraitTest extends TestCase
 	public function testSetDefaultSubAction()
 	{
 		$instance = new class {
-			use EnvisionPortal\ProvidesSubActionTrait;
+			use ProvidesSubActionTrait;
 		};
 
 		$instance->setDefaultSubAction('default_action');
@@ -18,7 +19,7 @@ class ProvidesSubActionTraitTest extends TestCase
 	public function testAddAndHasSubAction()
 	{
 		$instance = new class {
-			use EnvisionPortal\ProvidesSubActionTrait;
+			use ProvidesSubActionTrait;
 		};
 
 		$instance->addSubAction('test_action', fn() => 'Test Passed');
@@ -29,7 +30,7 @@ class ProvidesSubActionTraitTest extends TestCase
 	public function testFindRequestedSubAction()
 	{
 		$instance = new class {
-			use EnvisionPortal\ProvidesSubActionTrait;
+			use ProvidesSubActionTrait;
 		};
 
 		$instance->addSubAction('action1', fn() => 'Action 1');
@@ -49,7 +50,7 @@ class ProvidesSubActionTraitTest extends TestCase
 	public function testCallSubAction()
 	{
 		$instance = new class {
-			use EnvisionPortal\ProvidesSubActionTrait;
+			use ProvidesSubActionTrait;
 		};
 
 		$instance->addSubAction('action1', fn() => 'Action Executed');

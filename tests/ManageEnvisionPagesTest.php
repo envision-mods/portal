@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
+use PHPUnit\Framework\MockObject\MockObject;
+use EnvisionPortal\ManageEnvisionPages;
+use EnvisionPortal\Page;
+use EnvisionPortal\PageModeInterface;
 use PHPUnit\Framework\TestCase;
 
 class ManageEnvisionPagesTest extends TestCase
 {
-    private $manageEnvisionPages;
+    private MockObject $manageEnvisionPages;
 
 	public static function setUpBeforeClass(): void
 	{
@@ -52,7 +56,7 @@ class ManageEnvisionPagesTest extends TestCase
 		$stmt->execute([2, 'second-slug', 'Second Page', 'php', '<?php echo "Hello"; ?>', '1,2', 'inactive', 'Second test page', 5]);
 		$stmt->execute([3, 'third-slug', 'Third Page', 'html', '<div>Third Body</div>', '2', 'active', 'Third test page', 7]);
 
-        $this->manageEnvisionPages = $this->getMockBuilder(EnvisionPortal\ManageEnvisionPages::class)
+        $this->manageEnvisionPages = $this->getMockBuilder(ManageEnvisionPages::class)
                 ->disableOriginalConstructor()
             ->onlyMethods(['getInput'])
             ->getMock();
@@ -60,7 +64,7 @@ class ManageEnvisionPagesTest extends TestCase
 
     public function t4estManageMenu()
     {
-        $manageEnvisionPages = new EnvisionPortal\ManageEnvisionPages('');
+        $manageEnvisionPages = new ManageEnvisionPages('');
         $this->assertArrayHasKey('page_title', $context);
         $this->assertEquals('Admin Menu Title', $context['page_title']);
         $this->assertArrayHasKey('sub_template', $GLOBALS['context']);
@@ -87,9 +91,9 @@ class ManageEnvisionPagesTest extends TestCase
 
         $this->assertArrayNotHasKey('data', $context);
         $this->assertArrayNotHasKey('post_error', $context);
-		$pages = EnvisionPortal\Page::fetchBy(['*'], []);
+		$pages = Page::fetchBy(['*'], []);
 		$this->assertCount(4, $pages);
-		$this->assertInstanceOf(EnvisionPortal\Page::class, $pages[3]);
+		$this->assertInstanceOf(Page::class, $pages[3]);
         $this->assertEquals('Test Page', $pages[3]->name);
         $this->assertEquals('test-page', $pages[3]->slug);
         $this->assertEquals('A test page description', $pages[3]->description);
@@ -103,7 +107,7 @@ class ManageEnvisionPagesTest extends TestCase
     {
         global $context;
 
-        $this->manageEnvisionPages = $this->getMockBuilder(EnvisionPortal\ManageEnvisionPages::class)
+        $this->manageEnvisionPages = $this->getMockBuilder(ManageEnvisionPages::class)
                 ->disableOriginalConstructor()
             ->onlyMethods(['getInput'])
             ->getMock();
@@ -129,7 +133,7 @@ class ManageEnvisionPagesTest extends TestCase
         global $context;
         $_GET['in'] = 1;
 
-        $manageEnvisionPages = new EnvisionPortal\ManageEnvisionPages('editpage');
+        $manageEnvisionPages = new ManageEnvisionPages('editpage');
 
         $this->assertArrayHasKey('data', $context);
         $this->assertArrayHasKey('name', $context['data']);
@@ -155,7 +159,7 @@ class ManageEnvisionPagesTest extends TestCase
         $_GET['in'] = 9999; // Assuming an invalid ID
 
         $this->expectException(Error::class);
-        $manageEnvisionPages = new EnvisionPortal\ManageEnvisionPages('editpage');
+        $manageEnvisionPages = new ManageEnvisionPages('editpage');
 
         $this->assertArrayNotHasKey('data', $context);
     }
@@ -164,7 +168,7 @@ class ManageEnvisionPagesTest extends TestCase
     {
         global $context;
 
-        $manageEnvisionPages = new EnvisionPortal\ManageEnvisionPages('addpage');
+        $manageEnvisionPages = new ManageEnvisionPages('addpage');
 
         $this->assertArrayHasKey('data', $context);
         $this->assertEquals('', $context['data']['name']);
@@ -176,7 +180,7 @@ class ManageEnvisionPagesTest extends TestCase
 		$this->assertIsList($context['data']['types'][0]);
 		$this->assertEquals('bb_code', $context['data']['types'][0][1]);
 		$this->assertEquals('BBCode', $context['data']['types'][0][0]);
-		$this->assertInstanceOf(EnvisionPortal\PageModeInterface::class, $context['data']['types'][0][2]);
+		$this->assertInstanceOf(PageModeInterface::class, $context['data']['types'][0][2]);
 		$this->assertIsList($context['data']['types'][1]);
 		$this->assertEquals('html', $context['data']['types'][1][1]);
 		$this->assertEquals('HTML', $context['data']['types'][1][0]);
@@ -207,7 +211,7 @@ class ManageEnvisionPagesTest extends TestCase
 		$_POST = ['save' => true, 'status' => ['2' => 'on']];
 		$this->manageEnvisionPages->ManageMenu();
 
-		$pages = EnvisionPortal\Page::fetchBy(['id_page', 'status']);
+		$pages = Page::fetchBy(['id_page', 'status']);
 		$this->assertEquals('inactive', $pages[0]['status'],'nnnnnnnnnnnnnn');
 		$this->assertEquals('active', $pages[1]['status']);
 		$this->assertEquals('inactive', $pages[2]['status']);

@@ -7,7 +7,7 @@ class ArrayAccessTraitTest extends TestCase
 {
 	use ArrayAccessTrait;
 
-	private $testObject;
+	private object $testObject;
 
 	protected function setUp(): void
 	{

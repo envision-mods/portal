@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
+use EnvisionPortal\Page;
+use EnvisionPortal\PageModeInterface;
 use PHPUnit\Framework\TestCase;
 
 class PageTest extends TestCase
 {
-	private $page;
+	private Page $page;
 
 	public static function setUpBeforeClass(): void
 	{
@@ -45,7 +47,7 @@ class PageTest extends TestCase
 		$stmt->execute([2, 'second-slug', 'Second Page', 'php', '<?php echo "Hello"; ?>', '1,2', 'inactive', 'Second test page', 5]);
 		$stmt->execute([3, 'third-slug', 'Third Page', 'html', '<div>Third Body</div>', '2', 'active', 'Third test page', 7]);
 
-		$this->page = new EnvisionPortal\Page(1, 'test-slug', 'Test Page', 'html', '<p>Body</p>', ['1'], 'active', 'A test page', 10);
+		$this->page = new Page(1, 'test-slug', 'Test Page', 'html', '<p>Body</p>', ['1'], 'active', 'A test page', 10);
 	}
 
 	public function testPageProperties(): void
@@ -63,19 +65,19 @@ class PageTest extends TestCase
 
 	public function testFetchBy(): void
 	{
-		$pages = EnvisionPortal\Page::fetchBy(['id_page', 'name'], []);
+		$pages = Page::fetchBy(['id_page', 'name'], []);
 		$this->assertIsArray($pages);
 		$this->assertCount(3, $pages);
 
-		$this->assertInstanceOf(EnvisionPortal\Page::class, $pages[0]);
+		$this->assertInstanceOf(Page::class, $pages[0]);
 		$this->assertEquals(1, $pages[0]->id);
 		$this->assertEquals('Test Page', $pages[0]->name);
 
-		$this->assertInstanceOf(EnvisionPortal\Page::class, $pages[1]);
+		$this->assertInstanceOf(Page::class, $pages[1]);
 		$this->assertEquals(2, $pages[1]->id);
 		$this->assertEquals('Second Page', $pages[1]->name);
 
-		$this->assertInstanceOf(EnvisionPortal\Page::class, $pages[2]);
+		$this->assertInstanceOf(Page::class, $pages[2]);
 		$this->assertEquals(3, $pages[2]->id);
 		$this->assertEquals('Third Page', $pages[2]->name);
 	}
@@ -90,7 +92,7 @@ class PageTest extends TestCase
 		$this->assertArrayHasKey('name', TestObj::$last_insert[2]);
 		$this->assertStringContainsString('INSERT INTO {db_prefix}envision_pages', TestObj::$last_query);
 
-		$pages = EnvisionPortal\Page::fetchBy(['id_page', 'name'], ['id_page = 4']);
+		$pages = Page::fetchBy(['id_page', 'name'], ['id_page = 4']);
 		$this->assertEquals('Test Page', $pages[0]->name);
 	}
 
@@ -141,7 +143,7 @@ class PageTest extends TestCase
 		$property = $reflection->getProperty('mode');
 		$property->setAccessible(true);
 
-		$this->assertInstanceOf(EnvisionPortal\PageModeInterface::class, $property->getValue($this->page));
+		$this->assertInstanceOf(PageModeInterface::class, $property->getValue($this->page));
 	}
 
 	public static function getBodyProvider(): array
@@ -160,7 +162,7 @@ class PageTest extends TestCase
 
 	public function testDeleteMany(): void
 	{
-		EnvisionPortal\Page::deleteMany([2, 3]);
+		Page::deleteMany([2, 3]);
 		$this->assertStringContainsString('DELETE FROM {db_prefix}envision_pages WHERE', TestObj::$last_query);
 		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages');
 		$count = $stmt->fetchColumn();
@@ -169,7 +171,7 @@ class PageTest extends TestCase
 
 	public function testDeleteAll(): void
 	{
-		EnvisionPortal\Page::deleteAll();
+		Page::deleteAll();
 		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM envision_pages');
 		$count = $stmt->fetchColumn();
 		$this->assertEquals(0, $count);

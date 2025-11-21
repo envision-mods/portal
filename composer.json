@@ -4,7 +4,8 @@
     },
     "require-dev": {
         "saggre/phpdocumentor-markdown": "^0.1.4",
-        "phpunit/phpunit": "^10.5"
+        "rector/rector": "^2.2",
+        "phpunit/phpunit": "10.5"
     },
     "scripts": {
         "phpunit": "phpunit --testdox",

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace EnvisionPortal\Tests;
 
+use PHPUnit\Framework\TestCase;
 use EnvisionPortal\Menu;
 
-class MenuTest extends \PHPUnit\Framework\TestCase
+class MenuTest extends TestCase
 {
 	private array $menuButtons;
 

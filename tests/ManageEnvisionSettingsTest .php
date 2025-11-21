@@ -1,10 +1,11 @@
 <?php
 
+use EnvisionPortal\ActionInterfcace;
 use PHPUnit\Framework\TestCase;
 
 class ManageEnvisionSettingsTest extends TestCase
 {
-	private EnvisionPortal\ActionInterfcace $instance;
+	private ActionInterfcace $instance;
 
 	public function setUp()
 	{

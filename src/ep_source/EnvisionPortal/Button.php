@@ -58,8 +58,8 @@ class Button implements \ArrayAccess
 		array $where = [],
 		array $order = [],
 		array $group = [],
-		int $limit = null,
-		int $offset = null
+		?int $limit = null,
+		?int $offset = null
 	): array {
 		$entries = DatabaseHelper::fetchBy($selects, '{db_prefix}ep_menu', $params, $joins, $where, $order, $group, $limit, $offset);
 		$buttons = [];

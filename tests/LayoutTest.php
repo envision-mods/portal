@@ -1,5 +1,6 @@
 <?php
 
+use EnvisionPortal\Layout;
 use PHPUnit\Framework\TestCase;
 
 class LayoutTest extends TestCase
@@ -29,7 +30,7 @@ class LayoutTest extends TestCase
 	 */
 	public function testToBits(int $x, int $rowspan, int $y, int $colspan)
 	{
-		$layout = new EnvisionPortal\Layout(0, $x, $rowspan, $y, $colspan, true, true);
+		$layout = new Layout(0, $x, $rowspan, $y, $colspan, true, true);
 		$encoded = $layout->toBits();
 
 		$expected = ($x << 9) | ($rowspan << 6) | ($y << 3) | $colspan;
@@ -42,7 +43,7 @@ class LayoutTest extends TestCase
 	 */
 	public function testFromBits(int $x, int $rowspan, int $y, int $colspan)
 	{
-		$layout = new EnvisionPortal\Layout(1, 0, 0, 0, 0, true, true);
+		$layout = new Layout(1, 0, 0, 0, 0, true, true);
 		$layout->fromBits(($x << 9) | ($rowspan << 6) | ($y << 3) | $colspan);
 
 		$this->assertSame($x, $layout->x, 'Decoded x value is incorrect.');
@@ -58,13 +59,13 @@ class LayoutTest extends TestCase
 	 */
 	public function testBitwiseEncodingWithInvalidValues(int $x, int $rowspan, int $y, int $colspan)
 	{
-		$layout = new EnvisionPortal\Layout(0, $x, $rowspan, $y, $colspan, true, true);
+		$layout = new Layout(0, $x, $rowspan, $y, $colspan, true, true);
 		$encoded = $layout->toBits();
 
 		$expected = ($x << 9) | ($rowspan << 6) | ($y << 3) | $colspan;
 
 		$this->assertNotSame($expected, $encoded, 'toBits() did not return the expected encoded value.');
-		$layout = new EnvisionPortal\Layout(1, 0, 0, 0, 0, true, true);
+		$layout = new Layout(1, 0, 0, 0, 0, true, true);
 
 		$expected = (min(max($x, 0), 7) << 9) | (min(max($rowspan, 0), 7) << 6) | (min(max($y, 0), 7) << 3) | min(max($colspan, 0), 7);
 

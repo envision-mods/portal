@@ -85,7 +85,7 @@ class Integration
 		global $context, $modSettings, $sourcedir, $txt;
 
 		if (!empty($_REQUEST['page']) && !empty($modSettings['ep_pages_mode'])) {
-			call_user_func(['EnvisionPortal\Pages', 'main']);
+			call_user_func([Pages::class, 'main']);
 		} else {
 			if (!self::$isActive) {
 				require_once $sourcedir . '/BoardIndex.php';

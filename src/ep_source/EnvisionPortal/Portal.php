@@ -88,7 +88,7 @@ class Portal
 		$parts = explode(';', $spec);
 		foreach ($parts as $part) {
 			if (strpos($part, '=') !== false) {
-				list($key, $values) = explode('=', $part, 2);
+				[$key, $values] = explode('=', $part, 2);
 				$values = explode(',', $values);
 				if (!isset($params[$key]) || !in_array($params[$key], $values)) {
 					return false;
@@ -357,7 +357,7 @@ class Portal
 				]
 			);
 
-			while (list ($name, $id, $value) = $smcFunc['db_fetch_row']($request)) {
+			while ([$name, $id, $value] = $smcFunc['db_fetch_row']($request)) {
 				$data['modules'][$id][$name] = $value;
 			}
 		}

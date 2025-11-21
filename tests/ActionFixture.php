@@ -1,8 +1,11 @@
 <?php
 
-class ActionFixture implements EnvisionPortal\ActionInterface, Stringable
+use EnvisionPortal\ActionInterface;
+use EnvisionPortal\ActionTrait;
+
+class ActionFixture implements ActionInterface, Stringable
 {
-	use EnvisionPortal\ActionTrait;
+	use ActionTrait;
 
 	public string $var = '';
 

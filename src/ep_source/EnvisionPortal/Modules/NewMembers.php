@@ -10,7 +10,7 @@ class NewMembers implements ModuleInterface, SharedMemberDataInterface
 {
 	use ModuleTrait;
 
-	private $groups = [];
+	private array $groups = [];
 	private int $list_type;
 	private array $members_list;
 

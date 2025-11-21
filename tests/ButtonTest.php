@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
+use EnvisionPortal\Button;
 use PHPUnit\Framework\TestCase;
 
 class ButtonTest extends TestCase
 {
-	private $button;
+	private Button $button;
 
 	public static function setUpBeforeClass(): void
 	{
@@ -71,7 +72,7 @@ class ButtonTest extends TestCase
 			'parent' => 'parent'
 		]);
 
-		$this->button = new \EnvisionPortal\Button(
+		$this->button = new Button(
 			1,
 			'Test Button',
 			'_blank',
@@ -99,19 +100,19 @@ class ButtonTest extends TestCase
 
 	public function testFetchBy(): void
 	{
-		$buttons = EnvisionPortal\Button::fetchBy(['id_button', 'name'], []);
+		$buttons = Button::fetchBy(['id_button', 'name'], []);
 		$this->assertIsArray($buttons);
 		$this->assertCount(3, $buttons);
 
-		$this->assertInstanceOf(EnvisionPortal\Button::class, $buttons[0]);
+		$this->assertInstanceOf(Button::class, $buttons[0]);
 		$this->assertEquals(1, $buttons[0]->id);
 		$this->assertEquals('Test Button', $buttons[0]->name);
 
-		$this->assertInstanceOf(EnvisionPortal\Button::class, $buttons[1]);
+		$this->assertInstanceOf(Button::class, $buttons[1]);
 		$this->assertEquals(2, $buttons[1]->id);
 		$this->assertEquals('Second Button', $buttons[1]->name);
 
-		$this->assertInstanceOf(EnvisionPortal\Button::class, $buttons[2]);
+		$this->assertInstanceOf(Button::class, $buttons[2]);
 		$this->assertEquals(3, $buttons[2]->id);
 		$this->assertEquals('Third Button', $buttons[2]->name);
 	}
@@ -126,7 +127,7 @@ class ButtonTest extends TestCase
 		$this->assertArrayHasKey('name', TestObj::$last_insert[2]);
 		$this->assertStringContainsString('INSERT INTO {db_prefix}ep_menu', TestObj::$last_query);
 
-		$buttons = EnvisionPortal\Button::fetchBy(['id_button', 'name'], ['id_button = 4']);
+		$buttons = Button::fetchBy(['id_button', 'name'], ['id_button = 4']);
 		$this->assertEquals('Test Button', $buttons[0]->name);
 	}
 
@@ -152,7 +153,7 @@ class ButtonTest extends TestCase
 
 	public function testDeleteMany(): void
 	{
-		EnvisionPortal\Button::deleteMany([2, 3]);
+		Button::deleteMany([2, 3]);
 		$this->assertStringContainsString('DELETE FROM {db_prefix}ep_menu WHERE', TestObj::$last_query);
 		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM ep_menu');
 		$count = $stmt->fetchColumn();
@@ -161,7 +162,7 @@ class ButtonTest extends TestCase
 
 	public function testDeleteAll(): void
 	{
-		EnvisionPortal\Button::deleteAll();
+		Button::deleteAll();
 		$stmt = TestObj::$pdo->query('SELECT COUNT(*) FROM ep_menu');
 		$count = $stmt->fetchColumn();
 		$this->assertEquals(0, $count);

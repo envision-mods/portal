@@ -40,9 +40,7 @@ class Util
 	{
 		return preg_replace_callback(
 			'/(?:^|_)([a-z])/',
-			function ($m) {
-				return strtoupper($m[1]);
-			},
+			fn($m) => strtoupper($m[1]),
 			$string
 		);
 	}

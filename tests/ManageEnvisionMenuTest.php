@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use PHPUnit\Framework\MockObject\MockObject;
+use EnvisionPortal\ManageEnvisionMenu;
+use EnvisionPortal\Button;
 use PHPUnit\Framework\TestCase;
 
 class ManageEnvisionMenuTest extends TestCase
 {
-    private $manageEnvisionButtons;
+    private MockObject $manageEnvisionButtons;
 
 	public static function setUpBeforeClass(): void
 	{
@@ -78,7 +81,7 @@ class ManageEnvisionMenuTest extends TestCase
 			'parent' => 'parent'
 		]);
 
-        $this->manageEnvisionButtons = $this->getMockBuilder(EnvisionPortal\ManageEnvisionMenu::class)
+        $this->manageEnvisionButtons = $this->getMockBuilder(ManageEnvisionMenu::class)
                 ->disableOriginalConstructor()
             ->onlyMethods(['getInput'])
             ->getMock();
@@ -86,7 +89,7 @@ class ManageEnvisionMenuTest extends TestCase
 
     public function t4estManageMenu()
     {
-        $manageEnvisionButtons = new EnvisionPortal\ManageEnvisionMenu('');
+        $manageEnvisionButtons = new ManageEnvisionMenu('');
         $this->assertArrayHasKey('button_title', $context);
         $this->assertEquals('Admin Menu Title', $context['button_title']);
         $this->assertArrayHasKey('sub_template', $GLOBALS['context']);
@@ -112,9 +115,9 @@ class ManageEnvisionMenuTest extends TestCase
 
         $this->assertArrayNotHasKey('button_data', $context);
         $this->assertArrayNotHasKey('post_error', $context);
-		$buttons = EnvisionPortal\Button::fetchBy(['*'], []);
+		$buttons = Button::fetchBy(['*'], []);
 		$this->assertCount(4, $buttons);
-		$this->assertInstanceOf(EnvisionPortal\Button::class, $buttons[3]);
+		$this->assertInstanceOf(Button::class, $buttons[3]);
 		$this->assertEquals(['1'], $buttons[3]->permissions);
 		$this->assertEquals('active', $buttons[3]->status);
     }
@@ -140,7 +143,7 @@ class ManageEnvisionMenuTest extends TestCase
         global $context;
         $_GET['in'] = 1;
 
-        $manageEnvisionButtons = new EnvisionPortal\ManageEnvisionMenu('editbutton');
+        $manageEnvisionButtons = new ManageEnvisionMenu('editbutton');
 
         $this->assertArrayHasKey('button_data', $context);
         $this->assertArrayHasKey('name', $context['button_data']);
@@ -157,7 +160,7 @@ class ManageEnvisionMenuTest extends TestCase
         $_GET['in'] = 9999; // Assuming an invalid ID
 
         $this->expectException(Error::class);
-        $manageEnvisionButtons = new EnvisionPortal\ManageEnvisionMenu('editbutton');
+        $manageEnvisionButtons = new ManageEnvisionMenu('editbutton');
 
         $this->assertArrayNotHasKey('button_data', $context);
     }
@@ -166,7 +169,7 @@ class ManageEnvisionMenuTest extends TestCase
     {
         global $context;
 
-        $manageEnvisionButtons = new EnvisionPortal\ManageEnvisionMenu('addbutton');
+        $manageEnvisionButtons = new ManageEnvisionMenu('addbutton');
 
         $this->assertArrayHasKey('button_data', $context);
         $this->assertEquals('', $context['button_data']['name']);
@@ -197,7 +200,7 @@ class ManageEnvisionMenuTest extends TestCase
 		$_POST = ['save' => true, 'status' => ['2' => 'on']];
 		$this->manageEnvisionButtons->ManageMenu();
 
-		$buttons = EnvisionPortal\Button::fetchBy(['id_button', 'status']);
+		$buttons = Button::fetchBy(['id_button', 'status']);
 		$this->assertEquals('inactive', $buttons[0]['status'],'nnnnnnnnnnnnnn');
 		$this->assertEquals('active', $buttons[1]['status']);
 		$this->assertEquals('inactive', $buttons[2]['status']);

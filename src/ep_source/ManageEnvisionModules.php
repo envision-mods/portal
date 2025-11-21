@@ -10,6 +10,13 @@
 
 declare(strict_types=1);
 
+use EnvisionPortal\Portal;
+use EnvisionPortal\Util;
+use EnvisionPortal\ModuleInterface;
+use EnvisionPortal\CacheableFieldInterface;
+use EnvisionPortal\UpdateFieldInterface;
+use EnvisionPortal\Integration;
+
 function Modules()
 {
 	global $context, $txt, $settings;
@@ -79,22 +86,22 @@ function ManageEnvisionModules()
 	}
 
 	$context['selected_layout'] = (int)$_REQUEST['in'];
-	$context['ep_cols'] = EnvisionPortal\Portal::getLoadedLayoutFromId($context['selected_layout'], 2);
+	$context['ep_cols'] = Portal::getLoadedLayoutFromId($context['selected_layout'], 2);
 
 	if ($context['ep_cols'] === null) {
 		fatal_lang_error('cant_find_layout_id', false);
 	}
 
 	$context['modules'] = iterator_to_array(
-		EnvisionPortal\Util::map(
-			fn($cn) => EnvisionPortal\Util::decamelize(substr($cn, strrpos($cn, '\\') + 1)),
-			EnvisionPortal\Util::find_classes(
+		Util::map(
+			fn($cn) => Util::decamelize(substr($cn, strrpos($cn, '\\') + 1)),
+			Util::find_classes(
 				new GlobIterator(
 					__DIR__ . '/EnvisionPortal/Modules/*.php',
 					FilesystemIterator::SKIP_DOTS
 				),
 				'EnvisionPortal\Modules\\',
-				'EnvisionPortal\ModuleInterface'
+				ModuleInterface::class
 			)
 		)
 	);
@@ -202,7 +209,7 @@ function ModifyModule()
 		fatal_lang_error('no_access', false);
 	}
 
-	[$info, $type] = EnvisionPortal\Portal::loadModule((int)$_GET['in']);
+	[$info, $type] = Portal::loadModule((int)$_GET['in']);
 
 	if ($info === null) {
 		fatal_lang_error('no_access', false);
@@ -222,11 +229,11 @@ function ModifyModule()
 		}
 
 		$txt_key = strpos($key, 'module_') !== 0 ? $type : 'default';
-		$cn = 'EnvisionPortal\Fields\\' . EnvisionPortal\Util::camelize($field['type']);
+		$cn = 'EnvisionPortal\Fields\\' . Util::camelize($field['type']);
 		$obj = new $cn($field, $key, $txt_key);
 		$context['module'][] = [$key, $txt_key, $obj];
 
-		if ($obj instanceof EnvisionPortal\CacheableFieldInterface) {
+		if ($obj instanceof CacheableFieldInterface) {
 			if (!isset($cache[$field['type']])) {
 				$cache[$field['type']] = $obj->fetchData();
 			}
@@ -251,7 +258,7 @@ function ModifyModule2()
 		fatal_lang_error('no_access', false);
 	}
 
-	[$info, $type] = EnvisionPortal\Portal::loadModule((int)$_POST['in']);
+	[$info, $type] = Portal::loadModule((int)$_POST['in']);
 
 	if ($info === null) {
 		fatal_lang_error('no_access', false);
@@ -269,10 +276,10 @@ function ModifyModule2()
 			$field = call_user_func($field['preload'], $field);
 		}
 
-		$cn = 'EnvisionPortal\Fields\\' . EnvisionPortal\Util::camelize($field['type']);
+		$cn = 'EnvisionPortal\Fields\\' . Util::camelize($field['type']);
 		$obj = new $cn($field, $key, '');
 
-		if ($obj instanceof EnvisionPortal\UpdateFieldInterface) {
+		if ($obj instanceof UpdateFieldInterface) {
 			$fields_to_save[] = [$_POST['in'], $key, $obj->beforeSave($_POST[$key] ?? null)];
 		} elseif (isset($_POST[$key]) && $field['value'] != $_POST[$key]) {
 			$fields_to_save[] = [$_POST['in'], $key, $_POST[$key]];
@@ -436,7 +443,7 @@ function AddEnvisionLayout()
 		'xmlhttp',
 	];
 
-	$smf_actions = EnvisionPortal\Integration::getActions();
+	$smf_actions = Integration::getActions();
 	for ($i = 0, $n = count($smf_actions); $i < $n; $i++) {
 		if (!in_array($smf_actions[$i], $exceptions) && $smf_actions[$i][-1] !== '2') {
 			$context['available_actions'][$smf_actions[$i]] = false;
@@ -653,7 +660,7 @@ function EditEnvisionLayout()
 
 	$context['layout_name'] = $context['layout_list'][$_GET['in']];
 	$context['selected_layout'] = (int)$_GET['in'];
-	$context['ep_cols'] = EnvisionPortal\Portal::getLoadedLayoutFromId($context['selected_layout'], 2);
+	$context['ep_cols'] = Portal::getLoadedLayoutFromId($context['selected_layout'], 2);
 
 	if ($context['ep_cols'] === null) {
 		fatal_lang_error('cant_find_layout_id', false);
@@ -731,7 +738,7 @@ function EditEnvisionLayout()
 		'xmlhttp',
 	];
 
-	$smf_actions = EnvisionPortal\Integration::getActions();
+	$smf_actions = Integration::getActions();
 	for ($i = 0, $n = count($smf_actions); $i < $n; $i++) {
 		if (!in_array($smf_actions[$i], $exceptions) && $smf_actions[$i][-1] !== '2') {
 			$context['available_actions'][$smf_actions[$i]] = false;
@@ -785,7 +792,7 @@ function EditEnvisionLayout2()
 	}
 
 	$layout = (int)$_POST['in'];
-	$context['ep_cols'] = EnvisionPortal\Portal::getLoadedLayoutFromId($layout);
+	$context['ep_cols'] = Portal::getLoadedLayoutFromId($layout);
 
 	if ($context['ep_cols'] === null) {
 		fatal_lang_error('cant_find_layout_id', false);

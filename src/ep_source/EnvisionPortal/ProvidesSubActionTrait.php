@@ -89,7 +89,7 @@ trait ProvidesSubActionTrait
 		if (isset($this->sub_actions[$sa])) {
 			$this->sub_action = $sa;
 		} else {
-			$this->sub_action = $this->sub_action ?? array_key_first($this->sub_actions);
+			$this->sub_action ??= array_key_first($this->sub_actions);
 		}
 	}
 

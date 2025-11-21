@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use EnvisionPortal\Pages;
+use EnvisionPortal\Page;
 use PHPUnit\Framework\TestCase;
 
 class PagesTest extends TestCase
@@ -47,8 +49,8 @@ class PagesTest extends TestCase
 	 */
 	public function testFetchReturnsPageInstance(string $identifier): void
 	{
-		$page = EnvisionPortal\Pages::fetch($identifier);
-		$this->assertInstanceOf(EnvisionPortal\Page::class, $page);
+		$page = Pages::fetch($identifier);
+		$this->assertInstanceOf(Page::class, $page);
 		$this->assertEquals('Test Page', $page->name);
 	}
 
@@ -70,7 +72,7 @@ class PagesTest extends TestCase
 		$modSettings['ep_portal_mode'] = true;
 		$_GET['page'] = $identifier;
 
-		EnvisionPortal\Pages::main();
+		Pages::main();
 
 		$this->assertArrayHasKey('page_title', $context);
 		$this->assertEquals('Test Page', $context['page_title']);
@@ -97,7 +99,7 @@ class PagesTest extends TestCase
 		$this->expectException(Error::class);
 		$this->expectExceptionMessage('ep_pages_not_exist');
 
-		EnvisionPortal\Pages::main();
+		Pages::main();
 	}
 
 	public function testMainPageNotAllowed(): void
@@ -105,12 +107,12 @@ class PagesTest extends TestCase
 		$this->expectException(Error::class);
 		$this->expectExceptionMessage('ep_pages_not_exist');
 
-		EnvisionPortal\Pages::main();
+		Pages::main();
 	}
 
 	public function testFetchReturnsNullForInvalidPage(): void
 	{
-		$page = EnvisionPortal\Pages::fetch('non-existent-page');
+		$page = Pages::fetch('non-existent-page');
 		$this->assertNull($page);
 	}
 
@@ -119,7 +121,7 @@ class PagesTest extends TestCase
 		global $context;
 
 		$context['meta_tags'] = [];
-		EnvisionPortal\Pages::setMetaTag('description', 'Test Description');
+		Pages::setMetaTag('description', 'Test Description');
 
 		$this->assertCount(1, $context['meta_tags']);
 		$this->assertEquals('description', $context['meta_tags'][0]['name']);
@@ -131,7 +133,7 @@ class PagesTest extends TestCase
 		global $context;
 
 		$context['meta_tags'] = [];
-		EnvisionPortal\Pages::setMetaProperty('title', 'Test Title');
+		Pages::setMetaProperty('title', 'Test Title');
 
 		$this->assertCount(1, $context['meta_tags']);
 		$this->assertEquals('og:title', $context['meta_tags'][0]['property']);

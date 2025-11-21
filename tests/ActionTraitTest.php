@@ -1,5 +1,6 @@
 <?php
 
+use EnvisionPortal\ActionInterface;
 use PHPUnit\Framework\TestCase;
 
 class ActionTraitTest extends TestCase
@@ -14,9 +15,9 @@ class ActionTraitTest extends TestCase
 		$instance1 = ActionFixture::load();
 		$instance2 = ActionFixture::load();
 
-		$this->assertInstanceOf(EnvisionPortal\ActionInterface::class, $instance1);
+		$this->assertInstanceOf(ActionInterface::class, $instance1);
 		$this->assertInstanceOf(ActionFixture::class, $instance1);
-		$this->assertInstanceOf(EnvisionPortal\ActionInterface::class, $instance2);
+		$this->assertInstanceOf(ActionInterface::class, $instance2);
 		$this->assertInstanceOf(ActionFixture::class, $instance2);
 		$this->assertSame($instance1, $instance2);
 	}

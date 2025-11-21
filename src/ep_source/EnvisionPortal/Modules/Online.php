@@ -24,17 +24,13 @@ class Online implements ModuleInterface
 		$membersOnlineStats = getMembersOnlineStats($membersOnlineOptions);
 		$show_buddies = !empty($user_info['buddies']);
 		$this->groups = array_map(
-			function ($group) use ($membersOnlineStats) {
-				return [
+			fn($group) => [
 					$group['name'],
 					array_filter(
 						$membersOnlineStats['users_online'],
-						function ($user) use ($group) {
-							return $user['group'] == $group['id'];
-						}
+						fn($user) => $user['group'] == $group['id']
 					),
-				];
-			},
+				],
 			$membersOnlineStats['online_groups']
 		);
 
@@ -58,10 +54,10 @@ class Online implements ModuleInterface
 		}
 	}
 
-	private $totals = [];
-	private $groups = [];
-	private $online_groups = [];
-	private $show_online = [];
+	private array $totals = [];
+	private array $groups = [];
+	private array $online_groups = [];
+	private array $show_online = [];
 	private $fields;
 
 	public function __invoke(array $fields)

@@ -39,7 +39,7 @@ class News implements ModuleInterface, SharedPermissionsInterface
 		}
 	}
 
-	private $posts = [];
+	private array $posts = [];
 	private $fields;
 
 	public function __invoke(array $fields)
@@ -100,7 +100,7 @@ class News implements ModuleInterface, SharedPermissionsInterface
 		}
 
 		$topic_list = [];
-		while (list ($id_topic, $id_board, $replies, $views) = $smcFunc['db_fetch_row']($request)) {
+		while ([$id_topic, $id_board, $replies, $views] = $smcFunc['db_fetch_row']($request)) {
 			$topic_list[] = $id_topic;
 			$this->posts[$id_topic] = [
 				'replies' => $replies,

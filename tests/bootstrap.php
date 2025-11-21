@@ -10,13 +10,13 @@ function remove_integration_function($hook, $function)
 	global $modSettings;
 
 	// Turn the function list into something usable.
-	$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
+	$functions = empty($modSettings[$hook]) ? [] : explode(',', $modSettings[$hook]);
 
 	// You can only remove it if it's available.
 	if (!in_array($function, $functions))
 		return;
 
-	$functions = array_diff($functions, array($function));
+	$functions = array_diff($functions, [$function]);
 	$modSettings[$hook] = implode(',', $functions);
 }
 
@@ -25,7 +25,7 @@ function add_integration_function($hook, $function, $permanent = true)
 	global $modSettings;
 
 	// Make current function list usable.
-	$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
+	$functions = empty($modSettings[$hook]) ? [] : explode(',', $modSettings[$hook]);
 
 	// Do nothing, if it's already there.
 	if (in_array($function, $functions))
@@ -45,11 +45,11 @@ function isAllowedTo(string $string)
 	return true;
 }
 
-function call_integration_hook($hook, $parameters = array())
+function call_integration_hook($hook, $parameters = [])
 {
 	global $modSettings;
 
-	$results = array();
+	$results = [];
 	if (empty($modSettings[$hook]))
 		return $results;
 
@@ -97,7 +97,7 @@ function parse_bbc($text)
 {
 	$text = strip_tags($text);
 	// BBcode array
-	$find = array(
+	$find = [
 		'~\[b\](.*?)\[/b\]~s',
 		'~\[i\](.*?)\[/i\]~s',
 		'~\[u\](.*?)\[/u\]~s',
@@ -106,9 +106,9 @@ function parse_bbc($text)
 		'~\[color=([^"><]*?)\](.*?)\[/color\]~s',
 		'~\[url\]((?:ftp|https?)://[^"><]*?)\[/url\]~s',
 		'~\[img\](https?://[^"><]*?\.(?:jpg|jpeg|gif|png|bmp))\[/img\]~s'
-	);
+	];
 	// HTML tags to replace BBcode
-	$replace = array(
+	$replace = [
 		'<b>$1</b>',
 		'<i>$1</i>',
 		'<span style="text-decoration:underline;">$1</span>',
@@ -117,7 +117,7 @@ function parse_bbc($text)
 		'<span style="color:$1;">$2</span>',
 		'<a href="$1">$1</a>',
 		'<img src="$1" alt="" />'
-	);
+	];
 	// Replacing the BBcodes with corresponding HTML tags
 	return preg_replace($find, $replace, $text);
 }
@@ -164,10 +164,10 @@ function updateSettings($changeArray, $update = false, $debug = false)
 				UPDATE {db_prefix}settings
 				SET value = {' . ($value === false || $value === true ? 'raw' : 'string') . ':value}
 				WHERE variable = {string:variable}',
-				array(
+				[
 					'value' => $value === true ? 'value + 1' : ($value === false ? 'value - 1' : $value),
 					'variable' => $variable,
-				)
+				]
 			);
 			$modSettings[$variable] = $value === true ? $modSettings[$variable] + 1 : ($value === false ? $modSettings[$variable] - 1 : $value);
 		}
@@ -175,7 +175,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 		return;
 	}
 
-	$replaceArray = array();
+	$replaceArray = [];
 	foreach ($changeArray as $variable => $value)
 	{
 		// Don't bother if it's already like that ;).
@@ -185,7 +185,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 		elseif (!isset($modSettings[$variable]) && empty($value))
 			continue;
 
-		$replaceArray[] = array($variable, $value);
+		$replaceArray[] = [$variable, $value];
 
 		$modSettings[$variable] = $value;
 	}
@@ -195,9 +195,9 @@ function updateSettings($changeArray, $update = false, $debug = false)
 
 	$smcFunc['db_insert']('replace',
 		'{db_prefix}settings',
-		array('variable' => 'string-255', 'value' => 'string-65534'),
+		['variable' => 'string-255', 'value' => 'string-65534'],
 		$replaceArray,
-		array('variable')
+		['variable']
 	);
 }
 
@@ -439,7 +439,7 @@ $smcFunc['db_insert'] = function ($method, $table, $columns, $data, $keys) use (
 	}
 
 	// Here's where the variables are injected to the query.
-	$insertRows = array();
+	$insertRows = [];
 	foreach ($data as $dataRow)
 		$insertRows[] = $smcFunc['db_quote']($insertData, array_combine($indexed_columns, $dataRow));
 
@@ -456,9 +456,9 @@ $smcFunc['db_insert'] = function ($method, $table, $columns, $data, $keys) use (
 		VALUES
 			' . implode(',
 			', $insertRows),
-		array(
+		[
 			'security_override' => true,
-		)
+		]
 	);
 
 	TestObj::$last_insert = [$method, $table, $columns, $data, $keys];

@@ -36,9 +36,9 @@ class Staff implements ModuleInterface, SharedMemberDataInterface
 			}
 
 			$query = $smcFunc['db_query']('', '
-				SELECT mem.id_member, mg.id_group, mg.group_name, mg.online_color
-				FROM {db_prefix}members AS mem, {db_prefix}membergroups AS mg
-				WHERE mem.id_group >= 1 AND mem.id_group IN ({array_int:groups}) AND mem.id_group = mg.id_group',
+				SELECT mg.id_group, mg.group_name, mg.online_color
+				FROM {db_prefix}membergroups AS mg
+				WHERE id_group IN ({array_int:groups})',
 				[
 					'groups' => $this->groups,
 				]
@@ -53,9 +53,23 @@ class Staff implements ModuleInterface, SharedMemberDataInterface
 						'members' => [],
 					];
 				}
+			}
 
-				$this->groups[$row['id_group']]['members'][] = $row['id_member'];
-				$this->members_list[] = $row['id_member'];
+			$query = $smcFunc['db_query']('', '
+				SELECT id_member, id_group
+				FROM {db_prefix}members
+				WHERE id_group IN ({array_int:groups})',
+				[
+					'groups' => array_keys($this->groups),
+				]
+			);
+
+			$this->members_list = [];
+			while ($row = $smcFunc['db_fetch_assoc']($query)) {
+				if (isset($this->groups[$row['id_group']])) {
+					$this->groups[$row['id_group']]['members'][] = $row['id_member'];
+					$this->members_list[] = $row['id_member'];
+				}
 			}
 
 			$this->loadCustomFields();
@@ -105,28 +119,38 @@ class Staff implements ModuleInterface, SharedMemberDataInterface
 						$value = parse_bbc($value);
 					elseif ($row['field_type'] == 'textarea')
 						// Allow for newlines at least
-						$value = strtr($value, array("\n" => '<br>'));
+						$value = strtr($value, ["\n" => '<br>']);
 
 					// Enclosing the user input within some other text?
 					if ($row['enclose'] !== '')
-						$value = strtr($row['enclose'], array(
+						$value = strtr($row['enclose'], [
 							'{SCRIPTURL}' => $scripturl,
 							'{IMAGES_URL}' => $settings['images_url'],
 							'{DEFAULT_IMAGES_URL}' => $settings['default_images_url'],
 							'{INPUT}' => un_htmlspecialchars($value),
 							'{KEY}' => $currentKey
-						));
+						]);
 
-					$this->custom_field_info[$row['col_name']][$member] = array(
+					$this->custom_field_info[$row['col_name']][$member] = [
 						'name' => tokenTxtReplace($row['field_name']),
 						'value' => tokenTxtReplace($value),
-					);
+					];
 				}
+	}
+
+	public function queryMemberIds(): string
+	{
+		return '';
 	}
 
 	public function fetchMemberIds(): array
 	{
 		return $this->members_list;
+	}
+
+	public function setMembers(array $members_list): void
+	{
+		$this->members_list = $members_list;
 	}
 
 	public function __toString()
