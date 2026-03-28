@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use EnvisionPortal\DatabaseHelper;
-
 /**
  * @package   Envision Portal
  * @version   2.0.2
@@ -175,10 +173,10 @@ function editLayout(
 	global $smcFunc;
 
 	// Update the name
-	DatabaseHelper::update('{db_prefix}ep_layouts', ['name' =>  ['string-40',$layout_name]],'id_layout', $id_layout);
+	EnvisionPortal\DatabaseHelper::update('{db_prefix}ep_layouts', ['name' =>  ['string-40',$layout_name]],'id_layout', $id_layout);
 
 	// Delete old actions
-	DatabaseHelper::delete('{db_prefix}ep_layout_actions','id_layout', $id_layout);
+	EnvisionPortal\DatabaseHelper::delete('{db_prefix}ep_layout_actions','id_layout', $id_layout);
 
 	$smcFunc['db_insert'](
 		'insert',
@@ -270,10 +268,10 @@ function editLayout(
 		);
 	}
 
-	DatabaseHelper::delete('{db_prefix}ep_module_positions', 'id_layout_position', $smf_pos);
+	EnvisionPortal\DatabaseHelper::delete('{db_prefix}ep_module_positions', 'id_layout_position', $smf_pos);
 
 	if ($remove_positions != []) {
-		DatabaseHelper::deleteMany('{db_prefix}ep_layout_positions', 'id_layout_position', $remove_positions);
+		EnvisionPortal\DatabaseHelper::deleteMany('{db_prefix}ep_layout_positions', 'id_layout_position', $remove_positions);
 	}
 }
 

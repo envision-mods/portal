@@ -10,13 +10,6 @@
 
 declare(strict_types=1);
 
-use EnvisionPortal\Portal;
-use EnvisionPortal\Util;
-use EnvisionPortal\ModuleInterface;
-use EnvisionPortal\CacheableFieldInterface;
-use EnvisionPortal\UpdateFieldInterface;
-use EnvisionPortal\Integration;
-
 function Modules()
 {
 	global $context, $txt, $settings;
@@ -86,22 +79,22 @@ function ManageEnvisionModules()
 	}
 
 	$context['selected_layout'] = (int)$_REQUEST['in'];
-	$context['ep_cols'] = Portal::getLoadedLayoutFromId($context['selected_layout'], 2);
+	$context['ep_cols'] = EnvisionPortal\Portal::getLoadedLayoutFromId($context['selected_layout'], 2);
 
 	if ($context['ep_cols'] === null) {
 		fatal_lang_error('cant_find_layout_id', false);
 	}
 
 	$context['modules'] = iterator_to_array(
-		Util::map(
-			fn($cn) => Util::decamelize(substr($cn, strrpos($cn, '\\') + 1)),
-			Util::find_classes(
+		EnvisionPortal\Util::map(
+			fn($cn) => EnvisionPortal\Util::decamelize(substr($cn, strrpos($cn, '\\') + 1)),
+			EnvisionPortal\Util::find_classes(
 				new GlobIterator(
 					__DIR__ . '/EnvisionPortal/Modules/*.php',
 					FilesystemIterator::SKIP_DOTS
 				),
 				'EnvisionPortal\Modules\\',
-				ModuleInterface::class
+				\EnvisionPortal\ModuleInterface::class
 			)
 		)
 	);

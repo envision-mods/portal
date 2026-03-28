@@ -95,7 +95,7 @@ return RectorConfig::configure()
 		__DIR__ . '/tests',
 	])
 	->withSkip([
-		__DIR__ . '/src/vendor',
+		__DIR__ . '/src/ep_source/vendor',
 	])
 	//~ ->withImportNames(importShortClasses: false, removeUnusedImports: true)
 	->withComposerBased(phpunit: true)

@@ -222,7 +222,7 @@ class Portal
 			]
 		);
 
-		while (list ($name, $id, $value) = $smcFunc['db_fetch_row']($request)) {
+		while ([$name, $id, $value] = $smcFunc['db_fetch_row']($request)) {
 			$module_fields[$id][$name] = $value;
 		}
 
