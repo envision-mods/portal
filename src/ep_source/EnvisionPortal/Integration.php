@@ -61,19 +61,11 @@ class Integration
 		}
 
 		if (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed']))) {
-			if (defined('SID') && SID != '') {
-				$setLocation = preg_replace_callback(
-					'|^\E' . $scripturl . '\Q\?(?:' . SID . '(?:;|&|&amp;))(page=[^#]+?)(#[^"]*?)?$|',
-					fn($m) => $scripturl . '/' . strtr($m[1], '&;=', '//,') . '.html?' . SID . ($m[2] ?? ''),
-					$setLocation
-				);
-			} else {
-				$setLocation = preg_replace_callback(
-					'|^\E' . $scripturl . '\Q\?(page=[^#"]+?)(#[^"]*?)?$|',
-					fn($m) => $scripturl . '/' . strtr($m[1], '&;=', '//,') . '.html' . ($m[2] ?? ''),
-					$setLocation
-				);
-			}
+			$setLocation = preg_replace_callback(
+				'|^\E' . $scripturl . '\Q\?(page=[^#"]+?)(#[^"]*?)?$|',
+				fn($m) => $scripturl . '/' . strtr($m[1], '&;=', '//,') . '.html' . ($m[2] ?? ''),
+				$setLocation
+			);
 		}
 	}
 
@@ -538,20 +530,11 @@ class Integration
 
 		// This should work even in 4.2.x, just not CGI without cgi.fix_pathinfo.
 		if (!empty($modSettings['queryless_urls']) && (!$context['server']['is_cgi'] || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && ($context['server']['is_apache'] || $context['server']['is_lighttpd'] || $context['server']['is_litespeed'])) {
-			// Let's do something special for session ids!
-			if (defined('SID') && SID != '') {
-				$buffer = preg_replace_callback(
-					'|"\E' . $scripturl . '\Q\?(?:' . SID . '(?:;|&|&amp;))(page=[^#"]+?)(#[^"]*?)?"|',
-					fn($m) => '"' . $scripturl . '/' . strtr($m[1], '&;=', '//,') . '.html?' . SID . ($m[2] ?? '') . '"',
-					$buffer
-				);
-			} else {
-				$buffer = preg_replace_callback(
-					'|"\E' . $scripturl . '\Q\?(page=[^#"]+?)(#[^"]*?)?"|',
-					fn($m) => '"' . $scripturl . '/' . strtr($m[1], '&;=', '//,') . '.html' . ($m[2] ?? '') . '"',
-					$buffer
-				);
-			}
+			$buffer = preg_replace_callback(
+				'|"\E' . $scripturl . '\Q\?(page=[^#"]+?)(#[^"]*?)?"|',
+				fn($m) => '"' . $scripturl . '/' . strtr($m[1], '&;=', '//,') . '.html' . ($m[2] ?? '') . '"',
+				$buffer
+			);
 		}
 
 		return isset($_REQUEST['xml']) ? $buffer : preg_replace($search_array, $replace_array, $buffer);
