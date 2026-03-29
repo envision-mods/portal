@@ -130,14 +130,26 @@ class News implements ModuleInterface, SharedPermissionsInterface
 		while ($row = $smcFunc['db_fetch_assoc']($request)) {
 			$this->findMessageIcons($row['icon']);
 
-			// Only parse BBCode if detected (simple check for [b], [i], etc.)
-			// parse_bbc can be quite slow, especially on larger messages, probably
-			// because of its approach of splitting strings and then joining them
-			// back together.  This trick will only work as expected for common bbcodes.
-			if (preg_match('/\[(b|i|u|quote|size|color|url|img)[^]]*\]/i', $row['body'])) {
-				$parsed_body = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-			} else {
-				$parsed_body = $row['body'];
+			// Create a unique cache key for the parsed body
+			$cache_key = 'ep_news_parsed_' . $row['id_msg'];
+
+			// Try to get cached parsed body
+			$parsed_body = cache_get_data($cache_key);
+
+			// If not in cache, parse it
+			if ($parsed_body === null) {
+				// Only parse BBCode if detected (simple check for [b], [i], etc.)
+				// parse_bbc can be quite slow, especially on larger messages, probably
+				// because of its approach of splitting strings and then joining them
+				// back together.  This trick will only work as expected for common bbcodes.
+				if (preg_match('/\[(b|i|u|quote|size|color|url|img)[^]]*\]/i', $row['body'])) {
+					$parsed_body = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+				} else {
+					$parsed_body = $row['body'];
+				}
+
+				// Cache the parsed body for 24 hours (86400 seconds)
+				cache_put_data($cache_key, $parsed_body, 86400);
 			}
 
 			$row['body'] = nl2br(
