@@ -407,11 +407,8 @@ class Portal
 		foreach ($data['layout'] as $id_layout_position => $row) {
 			foreach ($row['modules'] as $module_position => $module) {
 				$time = hrtime(true);
-				$data['layout'][$id_layout_position]->modules[$module_position] = $this->process_module(
-					$data['modules'],
-					$module
-				);
-				$data['layout'][$id_layout_position]->modules[$module_position]['time'] = (hrtime(true) - $time) / 1e6;
+				$this->processModule($data['modules'], $module);
+				$module->time = (hrtime(true) - $time) / 1e6;
 			}
 		}
 
@@ -437,13 +434,11 @@ class Portal
 		foreach ($data['layout'] as $id_layout_position => $row) {
 			foreach ($row['modules'] as $module_position => $module) {
 				$time = hrtime(true);
-				if ($module['class'] instanceof SharedPermissionsInterface) {
-					$module['class']->setSharedPermissions($boards_can);
+				if ($module->class instanceof SharedPermissionsInterface) {
+					$module->class->setSharedPermissions($boards_can);
 				}
 
-				$module_name = substr(strrchr(get_class($module['class']), '\\'), 1);
-
-				$data['layout'][$id_layout_position]->modules[$module_position]['time'] += (hrtime(true) - $time) / 1e6;
+				$module->time += (hrtime(true) - $time) / 1e6;
 			}
 		}
 
@@ -456,69 +451,47 @@ class Portal
 	];
 	public static array $timers = [];
 
-	private function process_module(array $module_fields, array|Module $data)
+	private function processModule(array $module_fields, Module $data)
 	{
 		global $options, $txt, $user_info, $scripturl;
 
-		$data['module_title'] = $data['module_title'] ?? isset($txt['ep_modules'][$data['type']], $txt['ep_modules'][$data['type']]['title']) ? $txt['ep_modules'][$data['type']]['title'] : $data['type'];
-		$module = 'EnvisionPortal\Modules\\' . Util::camelize($data['type']);
+		$data->module_title ??= isset($txt['ep_modules'][$data->type], $txt['ep_modules'][$data->type]['title']) ? $txt['ep_modules'][$data->type]['title'] : $data->type;
 
-		$data['class'] = class_exists($module) ? new $module : new Modules\Error_;
-		$fields = [];
+		$module = 'EnvisionPortal\Modules\\' . Util::camelize($data->type);
+		$data->class = class_exists($module) ? new $module : new Modules\Error_;
+		$fields = $data->class->getDefaultProperties();
 
-		foreach ($data['class']->getDefaultProperties() as $key => $field) {
-			$fields[$key] = $module_fields[$data['id']][$key] ?? $field['value'];
+		foreach ($fields as $key => $field) {
+			$fields[$key] = $module_fields[$data->id][$key] ?? $field['value'];
 		}
 
-		if ($data['class'] instanceof SharedPermissionsInterface) {
+		if ($data->class instanceof SharedPermissionsInterface) {
 			$this->sharedModuleData['permissions'] = array_merge(
 				$this->sharedModuleData['permissions'],
-				$data['class']->fetchPermissionNames()
+				$data->class->fetchPermissionNames()
 			);
 		}
 
-		$data['class']($fields);
+		($data->class)($fields);
 
-		if ($data['class'] instanceof SharedMemberDataInterface) {
+		if ($data->class instanceof SharedMemberDataInterface) {
 			$this->sharedModuleData['member_ids'] = array_merge(
 				$this->sharedModuleData['member_ids'],
-				$data['class']->fetchMemberIds()
+				$data->class->fetchMemberIds()
 			);
 		}
 
-		if (!isset($fields['module_target'])) {
-			$data['module_target'] = '_self';
-		}
+		$data->module_target = $fields['module_target'] ?? '_self';
+		$data->module_link = isset($fields['module_link']) && strpos($fields['module_link'], '://') === false
+			?  $fields['module_link'] = $scripturl . '?' . $fields['module_link']
+			:'';
+		$data->module_icon = $fields['module_icon'] ?? '';
 
-		if (!empty($fields['module_icon'])) {
-			$data['module_icon'] = sprintf(
-				'<span class="fugue fugue-%s" aria-hidden="true"></span>&nbsp;',
-				$fields['module_icon']
-			);
-		}
+		$collapsed_key = 'ep_hide_module_' . $data->id;
+		$data->is_collapsed = $user_info['is_guest']
+			? !empty($_COOKIE[$collapsed_key])
+			: !empty($options[$collapsed_key]);
 
-		if (isset($fields['module_link'])) {
-			if (empty(parse_url($fields['module_link'], PHP_URL_SCHEME))) {
-				$fields['module_link'] = $scripturl . '?' . $fields['module_link'];
-			}
-
-			$data['module_title'] = sprintf(
-				'<a href="%s" target="%s">%s</a>',
-				$fields['module_link'],
-				$data['module_target'],
-				$data['module_title']
-			);
-		}
-
-		$collapsed_key = 'ep_hide_module_' . $data['id'];
-		$data['is_collapsed'] = $user_info['is_guest'] ? !empty($_COOKIE[$collapsed_key]) : !empty($options[$collapsed_key]);
-
-		if (!isset($data['header_display'])) {
-			$data['header_display'] = 0;
-		}
-
-		call_integration_hook('integrate_ep_process_module', [&$data]);
-
-		return $data;
+		$data->header_display = $data->header_display ?? 0;
 	}
 }

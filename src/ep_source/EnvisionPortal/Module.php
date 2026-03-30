@@ -22,6 +22,7 @@ class Module implements \ArrayAccess
 	public ModuleInterface $class;
 	public string $module_target;
 	public string $module_icon;
+	public string $module_link;
 	public bool $is_collapsed;
 	public string $header_display = '';
 	public float $time;

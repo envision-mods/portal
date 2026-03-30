@@ -81,16 +81,27 @@ function template_portal_below()
 
 function template_module_column($column)
 {
-	global $modSettings, $settings, $txt;
+	global $modSettings, $txt;
 
 	foreach ($column as $module) {
-		if ($module['header_display'] != 1) {
+		if ($module->header_display != 1) {
 			echo '
-			<div class="cat_bar" data-id="', $module['id'], '" data-collapsed="', $module['is_collapsed'] ? '1' : '0', '">
-				<h3 class="', !empty($modSettings['ep_collapse_modules']) && $module['header_display'] != 2 ? 'ep_upshrink' : '', ' catbg">
-					', $module['module_icon'] ?? '', $module['module_title'], '
-				</h3>
-			</div>';
+				<div class="cat_bar" data-id="' . $module->id . '" data-collapsed="' . ($module->is_collapsed ? '1' : '0') . '">
+					<h3 class="' . (!empty($modSettings['ep_collapse_modules']) && $module->header_display != 2 ? 'ep_upshrink' : '') . ' catbg">';
+
+				if (!empty($module->module_icon)) {
+					echo '<span class="fugue fugue-' . $module->module_icon . '" aria-hidden="true"></span>&nbsp;';
+				}
+
+				if (!empty($module->module_link)) {
+					echo '<a href="' . $module->module_link . '" target="' . $module->module_target . '">' . $module->module_title . '</a>';
+				} else {
+					echo $module->module_title;
+				}
+
+				echo '
+					</h3>
+				</div>';
 		}
 
 		printf(
@@ -98,8 +109,8 @@ function template_module_column($column)
 			<span class="upperframe"><span></span></span>
 			<div class="ep_module_%s roundframe noup">%s</div>
 			<span class="lowerframe"><span></span></span>',
-			$module['type'],
-			$module['class']
+			$module->type,
+			$module->class
 		);
 	}
 }
