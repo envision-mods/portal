@@ -6,27 +6,26 @@ use EnvisionPortal\ModuleInterface;
 
 class Sitemenu implements ModuleInterface
 {
-	private array $menu;
+	private string $menu;
 
 	public function __invoke(array $fields)
 	{
-		global $context;
-
-		switch ($fields['menu'] ?? '') {
-			default:
-				if (empty($context['menu_buttons'])) {
-					setupMenuContext();
-				}
-				$this->menu = $context['menu_buttons'];
-		}
+		$this->menu = $fields['menu'] ?? '';
 	}
 
 	function __toString()
 	{
+		global $context;
+
+		switch ($this->menu) {
+			default:
+				$menu = $context['menu_buttons'];
+		}
+
 		$ret = '
 			<ul>';
 
-		foreach ($this->menu as $button) {
+		foreach ($menu as $button) {
 			$ret .= sprintf(
 				!empty($button['sub_buttons'])
 					? '
