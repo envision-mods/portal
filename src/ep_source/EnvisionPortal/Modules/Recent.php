@@ -93,12 +93,10 @@ class Recent implements ModuleInterface
 		$id_last_msgs = [];
 		$id_first_msgs = [];
 		$topic_list = [];
-		$board_list = [];
 		$topics = [];
 
 		while ([$id_topic, $id_board, $replies, $views] = $smcFunc['db_fetch_row']($request)) {
 			$topic_list[] = $id_topic;
-			$board_list[$id_board] = $id_board;
 			$topics[$id_topic] = [
 				'board_link' => '<a href="' . $scripturl . '?board=' . $id_board . '.0">' . $boards[$id_board] . '</a>',
 				'replies' => $replies,

@@ -133,11 +133,11 @@ class News implements ModuleInterface, SharedPermissionsInterface
 			// Create a unique cache key for the parsed body
 			$cache_key = 'ep_news_parsed_' . $row['id_msg'];
 
-			// Try to get cached parsed body
-			$parsed_body = cache_get_data($cache_key);
+			// Try to get cached data (both parsed_body and formatted time)
+			$cached_data = cache_get_data($cache_key);
 
-			// If not in cache, parse it
-			if ($parsed_body === null) {
+			// If not in cache, parse and format it
+			if ($cached_data === null) {
 				// Only parse BBCode if detected (simple check for [b], [i], etc.)
 				// parse_bbc can be quite slow, especially on larger messages, probably
 				// because of its approach of splitting strings and then joining them
@@ -148,9 +148,24 @@ class News implements ModuleInterface, SharedPermissionsInterface
 					$parsed_body = $row['body'];
 				}
 
-				// Cache the parsed body for 24 hours (86400 seconds)
-				cache_put_data($cache_key, $parsed_body, 86400);
+				// Format the time and store both in one cache entry
+				$formatted_time = timeformat($row['poster_time']);
+
+				// Combine both into one cached array
+				$cached_data = [
+					'parsed_body' => $parsed_body,
+					'formatted_time' => $formatted_time,
+				];
+
+				// Cache both values together for 24 hours (86400 seconds)
+				cache_put_data($cache_key, $cached_data, 86400);
 			}
+
+			// Extract from cache
+			$parsed_body = $cached_data['parsed_body'];
+			$formatted_time = $cached_data['formatted_time'];
+
+			\EnvisionPortal\Portal::$timers['News' . $row['id_msg']] = -hrtime(true);
 
 			$row['body'] = nl2br(
 				$this->truncate(
@@ -166,7 +181,7 @@ class News implements ModuleInterface, SharedPermissionsInterface
 			$this->posts[$row['id_topic']] += [
 				'subject' => $row['subject'],
 				'preview' => $row['body'],
-				'time' => timeformat($row['poster_time']),
+				'time' => $formatted_time,
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 				'poster' => !empty($row['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>' : $row['poster_name'],
 				'icon' => sprintf(
