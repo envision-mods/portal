@@ -153,6 +153,41 @@ class Recent implements ModuleInterface
 		}
 		$smcFunc['db_free_result']($request);
 
+		return [
+			'min_msg' => min($id_first_msgs),
+			'max_msg' => max($id_last_msgs),
+			'topic_list' => $topic_list,
+			'topics' => $topics,
+		];
+	}
+
+	private $topics = [];
+
+	public function __invoke(array $fields)
+	{
+		global $context, $modSettings, $scripturl, $smcFunc, $user_info;
+
+		$boards = $fields['boards'] !== '' ? explode(',', $fields['boards']) : [];
+		$ex = $fields['prop'] === '0' ? $boards : [];
+		$inc = $fields['prop'] === '1' ? $boards : [];
+
+		// Create cache key with all three parameters that can vary
+		$cache_key = 'ep_recent_topics_' . md5(
+			$fields['prop'] . '_' .
+			$fields['num_recent'] . '_' .
+			$fields['boards'] . '_' .
+			$user_info['query_see_board']
+		);
+
+		// Use cache_quick_get with callback function
+		$topics = cache_quick_get(
+			$cache_key,
+			'ep_source/EnvisionPortal/Modules/Recent.php',
+			[$this, 'getCache'],
+			[$fields['num_recent'], true, $ex, $inc],
+		);
+		$this->topics = $topics['topics'];
+
 		// Count number of new posts per topic.
 		if (!$user_info['is_guest']) {
 			$request = $smcFunc['db_query']('', '
@@ -169,30 +204,17 @@ class Recent implements ModuleInterface
 				GROUP BY m.id_topic',
 				[
 					'current_member' => $user_info['id'],
-					'min_msg' => min($id_first_msgs),
-					'max_msg' => max($id_last_msgs),
-					'topic_list' => $topic_list,
+					'min_msg' => $topics['min_msg'],
+					'max_msg' => $topics['max_msg'],
+					'topic_list' => $topics['topic_list'],
 				]
 			);
 			while ([$id_topic, $co] = $smcFunc['db_fetch_row']($request)) {
-				$topics[$id_topic]['co'] = $co;
+				$this->topics[$id_topic]['co'] = $co;
 			}
 			$smcFunc['db_free_result']($request);
 		}
 
-		return $topics;
-	}
-
-	private $topics = [];
-
-	public function __invoke(array $fields)
-	{
-		global $context, $scripturl;
-
-		$boards = $fields['boards'] !== '' ? explode(',', $fields['boards']) : [];
-		$ex = $fields['prop'] === '0' ? $boards : [];
-		$inc = $fields['prop'] === '1' ? $boards : [];
-		$this->topics = $this->getTopics($fields['num_recent'], true, $ex, $inc);
 		$context['mark_read_button'] = [
 			'markread' => [
 				'text' => 'mark_as_read',
@@ -260,6 +282,35 @@ class Recent implements ModuleInterface
 				'type' => 'boardlist',
 				'value' => '',
 			],
+		];
+	}
+
+	/**
+	 * Cache callback function for Recent module getTopics
+	 * Validates all three parameters to ensure cache match
+	 */
+	function getCache($num_recent, $ignore, $exclude_boards, $include_boards)
+	{
+		global $context, $modSettings, $scripturl, $smcFunc, $user_info;
+
+		// Validate parameters to ensure we're using the right cache
+		if (!is_int($num_recent) || $num_recent < 1) {
+			$num_recent = 8;
+		}
+		if (!is_bool($ignore)) {
+			$ignore = true;
+		}
+		if (!is_array($exclude_boards)) {
+			$exclude_boards = [];
+		}
+		if (!is_array($include_boards)) {
+			$include_boards = [];
+		}
+
+		return [
+			'data' => $this->getTopics($num_recent, true, $exclude_boards, $include_boards),
+			'refresh_eval' => 'return $GLOBALS[\'modSettings\'][\'maxMsgID\'] > ' . $modSettings['maxMsgID'] . ';',
+			'expires' => time() + 600, // Cache for 10 minutes
 		];
 	}
 }
