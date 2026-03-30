@@ -412,6 +412,11 @@ class Portal
 			}
 		}
 
+		$loaded_data = [];
+		if ($this->sharedModuleData['custom_data'] != []) {
+			$loaded_data = SharedDataLoader::loadData($this->sharedModuleData['custom_data']);
+		}
+
 		if ($this->sharedModuleData['permissions'] != []) {
 			if (!defined('SMF_VERSION')) {
 				$boards_can = [];
@@ -437,6 +442,9 @@ class Portal
 				if ($module->class instanceof SharedPermissionsInterface) {
 					$module->class->setSharedPermissions($boards_can);
 				}
+				if ($module->class instanceof SharedDataInterface) {
+					$module->class->setSharedData($loaded_data);
+				}
 
 				$module->time += (hrtime(true) - $time) / 1e6;
 			}
@@ -448,6 +456,7 @@ class Portal
 	private array $sharedModuleData = [
 		'member_ids' => [],
 		'permissions' => [],
+		'custom_data' => [],
 	];
 	public static array $timers = [];
 
@@ -479,6 +488,21 @@ class Portal
 				$this->sharedModuleData['member_ids'],
 				$data->class->fetchMemberIds()
 			);
+		}
+
+		if ($data->class instanceof SharedDataInterface) {
+			$data_keys = $data->class->fetchSharedDataKeys();
+
+			foreach ($data_keys as $data_type => $ids) {
+				if (!isset($this->sharedModuleData['custom_data'][$data_type])) {
+					$this->sharedModuleData['custom_data'][$data_type] = [];
+				}
+
+				$this->sharedModuleData['custom_data'][$data_type] = array_merge(
+					$this->sharedModuleData['custom_data'][$data_type],
+					(array)$ids
+				);
+			}
 		}
 
 		$data->module_target = $fields['module_target'] ?? '_self';
