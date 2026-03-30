@@ -178,13 +178,20 @@ class Portal
 	public static function getLoadedLayoutFromName(?string $layout_name = null): ?array
 	{
 		$obj = new self;
+		self::$timers['getMatchedLayout'] = -hrtime(true);
 		$id_layout = $obj->getMatchedLayout($layout_name ?? $_GET);
+		self::$timers['getMatchedLayout'] += hrtime(true);
 
 		if ($id_layout !== null) {
+			self::$timers['loadLayoutData'] = -hrtime(true);
 			$data = $obj->loadLayoutData($id_layout);
+			self::$timers['loadLayoutData'] += hrtime(true);
 
 			if ($data !== null) {
-				return $obj->loadLayoutContext($data);
+				self::$timers['loadLayoutContext'] = -hrtime(true);
+				$ret = $obj->loadLayoutContext($data);
+				self::$timers['loadLayoutContext'] += hrtime(true);
+				return $ret;
 			}
 		}
 
@@ -447,6 +454,7 @@ class Portal
 		'member_ids' => [],
 		'permissions' => [],
 	];
+	public static array $timers = [];
 
 	private function process_module(array $module_fields, array|Module $data)
 	{

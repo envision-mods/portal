@@ -478,7 +478,13 @@ class Integration
 		];
 
 		if (isset($db_show_debug) && $db_show_debug === true && isset($context['ep_cols'])) {
-			$ret = '
+			$ret = '';
+
+			foreach (Portal::$timers as $label => $time) {
+				$ret .= $label . ' => ' . $time / 1e6. '<br>';
+			}
+
+			$ret .= '
 	<div id="ep_debug">';
 
 			foreach ($context['ep_cols'] as $col) {
@@ -495,7 +501,7 @@ class Integration
 					foreach ($col['modules'] as $module) {
 						$ret .= '
 			<div class="' . (defined('SMF_VERSION') ? 'descbox' : 'plainbox') . ' centertext">
-				<b>' . $module['module_title'] . '</b><br>' . $module['time'] . ' ms
+				<b>' . $module->module_title . '</b><br>' . $module->time . ' ms
 			</div>';
 					}
 				}
