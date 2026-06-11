@@ -18,7 +18,13 @@ namespace EnvisionPortal;
 class Util
 {
 	/**
-	 * Convert a camelCase string to snake_case.
+	 * Converts a camelCase or PascalCase string to snake_case.
+	 *
+	 * Examples:
+	 *
+	 * userName          => user_name
+	 * memberID          => member_id
+	 * parseHTTPResponse => parse_http_response
 	 *
 	 * @param string $string The input string in camelCase format.
 	 *
